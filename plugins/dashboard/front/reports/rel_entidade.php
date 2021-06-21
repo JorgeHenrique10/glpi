@@ -244,7 +244,7 @@ else {
 		$status = "";
 		$status_open = "('2','1','3','4')";
 		$status_close = "('5','6')";
-		$status_all = "('2','1','3','4','5','6')";
+		$status_all = "('2','1','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23')";
 
 		if(isset($_GET['stat'])) {
 
@@ -331,7 +331,7 @@ else {
 
 		// nome da entidade
 		$sql_nm = "
-		SELECT id , name AS name
+		SELECT id , name AS name, entities_id
 		FROM `glpi_entities`
 		WHERE id = ".$id_ent."";
 
@@ -355,6 +355,7 @@ else {
 				}
 			}
 		}
+		
 
 		//count by status
 		$query_stat = "
@@ -442,25 +443,34 @@ else {
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pending').": </span>".$pend." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Solved','dashboard').": </span>".$solve." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação de TR').": </span>".$validacao_tr." </td>
 				
 			</tr>
-			<tr>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação').": </span>".$publicacao." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Parecer de Habilitação'). ": </span>". ($parecer_habilitacao) ."</td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Técnica').": </span>".$validacao_tecnica." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Resultados').": </span>".$resultados." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Jurídico').": </span>".$juridico." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
-				
-			</tr>
-			<tr>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
-				
-			</tr>
+			";
+
+			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0)
+			{
+				echo "
+					<tr>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação de TR').": </span>".$validacao_tr." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação').": </span>".$publicacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Parecer de Habilitação'). ": </span>". ($parecer_habilitacao) ."</td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Técnica').": </span>".$validacao_tecnica." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Resultados').": </span>".$resultados." </td>
+						
+					</tr>
+					<tr>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Jurídico').": </span>".$juridico." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
+						
+					</tr>
+				";
+			}
+
+		echo "
 			<tr><td>&nbsp;</td></tr>
 			<tr><td>&nbsp;</td></tr>
 		</table>
@@ -487,16 +497,31 @@ else {
 
 		$DB->data_seek($result_cham,0);
 
+		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17)
+			print_r("fjwefw");
+
 		while($row = $DB->fetch_assoc($result_cham)){
+
 
 		    $status1 = $row['status'];
 
-		    if($status1 == "1" ) { $status1 = "new";}
-		    if($status1 == "2" ) { $status1 = "assign";}
-		    if($status1 == "3" ) { $status1 = "plan";}
-		    if($status1 == "4" ) { $status1 = "waiting";}
-		    if($status1 == "5" ) { $status1 = "solved";}
-		    if($status1 == "6" ) { $status1 = "closed";}
+		    if($status1 == "1" )  { $status1 = "new";}
+		    if($status1 == "2" )  { $status1 = "assign";}
+		    if($status1 == "3" )  { $status1 = "plan";}
+		    if($status1 == "4" )  { $status1 = "waiting";}
+		    if($status1 == "5" )  { $status1 = "solved";}
+		    if($status1 == "6" )  { $status1 = "closed";}
+		    if($status1 == "13" ) { $status1 = "validacao_tr";}
+		    if($status1 == "14" ) { $status1 = "publicacao";}
+		    if($status1 == "15" ) { $status1 = "parecer_habilitacao";}
+		    if($status1 == "16" ) { $status1 = "validacao_tecnica";}
+		    if($status1 == "17" ) { $status1 = "resultados";}
+		    if($status1 == "18" ) { $status1 = "homologacao";}
+		    if($status1 == "19" ) { $status1 = "juridico";}
+		    if($status1 == "20" ) { $status1 = "validacao_interna";}
+		    if($status1 == "21" ) { $status1 = "envio_contrato";}
+		    if($status1 == "22" ) { $status1 = "formalizacao";}
+		    if($status1 == "23" ) { $status1 = "atribuido";}
 
 		//requerente
 		      $sql_user = "SELECT glpi_tickets.id AS id, glpi_users.firstname AS name, glpi_users.realname AS sname
