@@ -377,6 +377,8 @@ function margins() {
 			$arr_tip[0] = "-----" ;
 			$arr_tip[1] = __('Incident') ;
 			$arr_tip[2] = __('Request');			
+			$arr_tip[111] = __('Melhoria');
+			$arr_tip[222] = __('Dúvida');
 			$name = 'sel_tip';
 			$options = $arr_tip;
 			$selected = $id_tip;
@@ -584,7 +586,18 @@ if($consulta > 0) {
 	SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 	SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS ValidaçaoTR,
+	SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS Publicacao,
+	SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS ParecerDeHabilitacao,
+	SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS ValidacaoTecnica,
+	SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS Resultados,
+	SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS Homologacao,
+	SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS Juridico,
+	SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS ValidacaoInterna,
+	SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS EnvioDeContrato,
+	SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS Formalizacao,
+	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS Atribuido
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = 0
 	".$entidade."
@@ -596,14 +609,25 @@ if($consulta > 0) {
 	AND glpi_tickets.itilcategories_id LIKE '%".$id_cat."'
 	AND glpi_tickets.type LIKE '%".$id_tip."' ";
 	
-	 $result_stat = $DB->query($query_stat);
+	$result_stat = $DB->query($query_stat);
 	
 	$new = $DB->result($result_stat,0,'new') + 0;
 	$assig = $DB->result($result_stat,0,'assig') + 0;
 	$plan = $DB->result($result_stat,0,'plan') + 0;
 	$pend = $DB->result($result_stat,0,'pend') + 0;
 	$solve = $DB->result($result_stat,0,'solve') + 0;
-	$close = $DB->result($result_stat,0,'close') + 0;	
+	$close = $DB->result($result_stat,0,'close') + 0;
+	$validacaoTR = $DB->result($result_stat,0,'ValidaçaoTR') + 0;	
+	$publicacao = $DB->result($result_stat,0,'Publicacao') + 0;	
+	$parecerDeHabilitacao = $DB->result($result_stat,0,'ParecerDeHabilitacao') + 0;	
+	$validacaoTec = $DB->result($result_stat,0,'ValidacaoTecnica') + 0;	
+	$resultados = $DB->result($result_stat,0,'Resultados') + 0;	
+	$homologacao = $DB->result($result_stat,0,'Homologacao') + 0;	
+	$juridico = $DB->result($result_stat,0,'Juridico') + 0;	
+	$validacaoInt = $DB->result($result_stat,0,'ValidacaoInterna') + 0;	
+	$envioDeCont = $DB->result($result_stat,0,'EnvioDeContrato') + 0;	
+	$formalizacao = $DB->result($result_stat,0,'Formalizacao') + 0;	
+	$atribuido = $DB->result($result_stat,0,'Atribuido') + 0;	
 	
 	//listar chamados
 	echo "
@@ -619,13 +643,32 @@ if($consulta > 0) {
 		
 	</table>
 	
-	<table style='font-size: 16px; font-weight:bold; width: 50%;' border=0>
+	<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0 >
 		<tr>
 			  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
 	        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
 	        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 	        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
 	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
+			<td><span style='color: #000;'>". __('Validação de TR').": </span><b>".$validacaoTR." </b></td>
+	        
+		</tr>
+		<tr>
+		<td><span style='color: #000;'>". __('Publicacao').": </span><b>".$publicacao." </b></td>
+	        <td><span style='color: #000;'>". __('Parecer de Habilitacao').": </span><b>".$parecerDeHabilitacao." </b></td>
+	        <td><span style='color: #000;'>". __('Validação Técnica').": </span><b>".$validacaoTec." </b></td>
+			<td><span style='color: #000;'>". __('Resultados').": </span><b>".$resultados." </b></td>
+	        <td><span style='color: #000;'>". __('Juridico').": </span><b>".$juridico." </b></td>
+	        <td><span style='color: #000;'>". __('Validação Interna').": </span><b>".$validacaoInt." </b></td>
+	        
+		</tr>
+		<tr>
+
+		</tr><tr>
+			<td><span style='color: #000;'>". __('Envio de Contrato').": </span><b>".$envioDeCont." </b></td>
+	        <td><span style='color: #000;'>". __('Homologação').": </span><b>".$homologacao." </b></td>
+	        <td><span style='color: #000;'>". __('Validação').": </span><b>".$formalizacao." </b></td>
+	        <td><span style='color: #000;'>". __('Atribuido').": </span><b>".$atribuido." </b></td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>	
 	</table>
@@ -661,10 +704,23 @@ if($consulta > 0) {
 		if($status1 == "4" ) { $status1 = "waiting";} 
 		if($status1 == "5" ) { $status1 = "solved";}  	            
 		if($status1 == "6" ) { $status1 = "closed";}	
+		if($status1 == "6" ) { $status1 = "Validação_TR";}	
+		if($status1 == "6" ) { $status1 = "Publicação";}	
+		if($status1 == "6" ) { $status1 = "Parecer de Habilitação";}	
+		if($status1 == "6" ) { $status1 = "Validação Técnica";}	
+		if($status1 == "6" ) { $status1 = "Resultados";}	
+		if($status1 == "6" ) { $status1 = "Homoçlogação";}	
+		if($status1 == "6" ) { $status1 = "Juridico";}	
+		if($status1 == "6" ) { $status1 = "Validação Interna";}	
+		if($status1 == "6" ) { $status1 = "Envio de Contrato";}	
+		if($status1 == "6" ) { $status1 = "Formalização";}	
+		if($status1 == "6" ) { $status1 = "Atribuido";}	
 		
 		//type
 		if($row['type'] == 1) { $type = __('Incident'); }
-		else { $type = __('Request'); }
+		else if ($row['type'] == 2) { $type = __('Request'); }
+		else if ($row['type'] == 111) {$type = __('Melhoria');}
+		else if ($row['type'] == 222) {$type = __('Dúvida'); } 
 		
 		//priority
 		$prio = $row['priority'];
