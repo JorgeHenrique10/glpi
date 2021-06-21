@@ -447,7 +447,7 @@ else {
 			</tr>
 			";
 
-			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0)
+			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 )
 			{
 				echo "
 					<tr>
