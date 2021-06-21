@@ -364,7 +364,18 @@ else {
 		SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 		SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 		SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-		SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+		SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+		SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+		SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+		SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+		SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+		SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+		SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+		SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+		SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+		SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+		SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+		SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
 		FROM glpi_tickets
 		WHERE glpi_tickets.is_deleted = 0
 		".$entidade."
@@ -378,6 +389,17 @@ else {
 	    $pend = $DB->result($result_stat,0,'pend') + 0;
 	    $solve = $DB->result($result_stat,0,'solve') + 0;
 	    $close = $DB->result($result_stat,0,'close') + 0;
+	    $validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
+	    $publicacao = $DB->result($result_stat,0,'publicacao') + 0;
+	    $parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
+	    $validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
+	    $resultados = $DB->result($result_stat,0,'resultados') + 0;
+	    $homologacao = $DB->result($result_stat,0,'homologacao') + 0;
+	    $juridico = $DB->result($result_stat,0,'juridico') + 0;
+	    $validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
+	    $envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
+	    $formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
+	    $atribuido = $DB->result($result_stat,0,'atribuido') + 0;
 
 
 		//listar chamados
@@ -413,13 +435,31 @@ else {
 			</tr>
 		</table>
 
-		<table style='font-size: 16px; width: 50%;' border=0>
+		<table style='font-size: 16px; width: 100%;' border=0>
 			<tr>
 				<td style='font-weight:bold;'><span style='color: #000;'>". _x('status','New').": </span>".$new." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Assigned'). ": </span>". ($assig + $plan) ."</td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pending').": </span>".$pend." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Solved','dashboard').": </span>".$solve." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação de TR').": </span>".$validacao_tr." </td>
+				
+			</tr>
+			<tr>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação').": </span>".$publicacao." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Parecer de Habilitação'). ": </span>". ($parecer_habilitacao) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Técnica').": </span>".$validacao_tecnica." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Resultados').": </span>".$resultados." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Jurídico').": </span>".$juridico." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
+				
+			</tr>
+			<tr>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
+				
 			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr><td>&nbsp;</td></tr>
