@@ -256,9 +256,10 @@ else {
 
 			//status
 			$status = "";
-			$status_open = "('2','1','3','4')";
-			$status_close = "('5','6')";
-			$status_all = "('2','1','3','4','5','6')";
+			$status = "";
+			$status_open = "('1','2','3','4')";
+			$status_close = "('5','6')";	
+			$status_all = "('1','2','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23')";
 
 			if(isset($_GET['stat'])) {
 
@@ -403,7 +404,18 @@ else {
 			SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 			SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 			SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+			SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+			SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+			SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+			SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+			SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+			SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+			SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$datas2."
@@ -418,6 +430,18 @@ else {
 			$pend = $DB->result($result_stat,0,'pend') + 0;
 			$solve = $DB->result($result_stat,0,'solve') + 0;
 			$close = $DB->result($result_stat,0,'close') + 0;
+			$validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
+		    $publicacao = $DB->result($result_stat,0,'publicacao') + 0;
+		    $parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
+		    $validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
+		    $resultados = $DB->result($result_stat,0,'resultados') + 0;
+		    $homologacao = $DB->result($result_stat,0,'homologacao') + 0;
+		    $juridico = $DB->result($result_stat,0,'juridico') + 0;
+		    $validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
+		    $envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
+		    $formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
+		    $atribuido = $DB->result($result_stat,0,'atribuido') + 0;
+
 
 			echo "
 			<table align='right' style='margin-bottom:10px; border=1'>
@@ -430,17 +454,43 @@ else {
 				</tr>
 			</table>
 
-			<table style='font-size: 16px; font-weight:bold; width: 50%;' border=0>
+			<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0>
 				<tr>
 					  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
 			        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
 			        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 			        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
-			        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
-				</tr>
-				<tr><td>&nbsp;</td></tr>
-				<tr><td>&nbsp;</td></tr>
-			</table>
+			        <td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>
+				
+			</tr>
+			";
+
+			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )
+			{
+				echo "
+					<tr>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação de TR').": </span>".$validacao_tr." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação').": </span>".$publicacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Parecer de Habilitação'). ": </span>". ($parecer_habilitacao) ."</td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Técnica').": </span>".$validacao_tecnica." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Resultados').": </span>".$resultados." </td>
+						
+					</tr>
+					<tr>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Jurídico').": </span>".$juridico." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
+						
+					</tr>
+					<tr><td>&nbsp;</td></tr>
+					<tr><td>&nbsp;</td></tr>
+				";
+			}
+
+		echo "
 
 			<table id='cat' class='display'  style='font-size: 12px; font-weight:normal;' cellpadding = 2px>
 				<thead>

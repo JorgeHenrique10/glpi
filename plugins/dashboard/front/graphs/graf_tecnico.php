@@ -138,6 +138,7 @@ $result_tec = $DB->query($sql_tec);
 
 $tec = $DB->fetch_assoc($result_tec);
 
+
 // lista de tecnicos
 function dropdown( $name, array $options, $selected=null )
 {
@@ -319,7 +320,18 @@ SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
 SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
 FROM glpi_tickets_users, glpi_tickets
 WHERE glpi_tickets.is_deleted = '0'
 AND glpi_tickets.date ".$datas."
@@ -336,6 +348,185 @@ $plan = $DB->result($result_stat,0,'plan') + 0;
 $pend = $DB->result($result_stat,0,'pend') + 0;
 $solve = $DB->result($result_stat,0,'solve') + 0;
 $close = $DB->result($result_stat,0,'close') + 0;
+$validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
+$publicacao = $DB->result($result_stat,0,'publicacao') + 0;
+$parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
+$validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
+$resultados = $DB->result($result_stat,0,'resultados') + 0;
+$homologacao = $DB->result($result_stat,0,'homologacao') + 0;
+$juridico = $DB->result($result_stat,0,'juridico') + 0;
+$validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
+$envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
+$formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
+$atribuido = $DB->result($result_stat,0,'atribuido') + 0;
+
+
+
+$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" .$sel_ent . ")";
+
+$result_contratos = $DB->query($query_contratos);
+$sel_ent_contratos = $result_contratos->fetch_all();
+
+$status_contratos = '';
+
+$entidades_sel = explode(',', $sel_ent);
+
+$exibir = false;
+foreach($sel_ent_contratos as $item)
+{
+	if($item[0] == 17 || $item[1] == 17){
+		$exibir = true;
+	}
+}
+
+if( $exibir )
+{
+	$status_contratos = "<div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#F9E79F'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer5' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Validação de TR</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A2D9CE'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer6' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Publicação</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#1A5276'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer7' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Parecer de Habilitação</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#85929E'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer8' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Validação Técnica</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#1F618D'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer9' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Resultados</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer10' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Jurídico</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer11' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Validação Interna</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#AED6F1'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer12' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Envio de Contrato</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#F7DC6F'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer13' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Homologação</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#F5CBA7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer14' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Formalização</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Atribuido</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>";
+}
+
+
 
 echo '<div id="entidade2" class="col-md-12 fluid" style="margin-bottom: 15px;">';
 echo '<div id="name"  style="margin-top: 15px;">
@@ -402,7 +593,11 @@ echo '<div id="name"  style="margin-top: 15px;">
 					   </div>
 					</div>
 				 </div>
-			  </div>																	                          				                           							
+			  </div>			  
+			'
+			. $status_contratos .
+
+			'														                          				                           							
 	</div>   		
 </div>
 </div>';
@@ -418,6 +613,18 @@ echo '<div id="name"  style="margin-top: 15px;">
 			    odometer2.innerHTML = <?php echo $pend; ?>;
 			    odometer3.innerHTML = <?php echo $solve; ?>;
 			    odometer4.innerHTML = <?php echo $close; ?>;
+			    odometer5.innerHTML = <?php echo $validacao_tr; ?>;
+			    odometer6.innerHTML = <?php echo $publicacao; ?>;
+			    odometer7.innerHTML = <?php echo $parecer_habilitacao; ?>;
+			    odometer8.innerHTML = <?php echo $validacao_tecnica; ?>;
+			    odometer9.innerHTML = <?php echo $resultados; ?>;
+			    odometer10.innerHTML = <?php echo $homologacao; ?>;
+			    odometer11.innerHTML = <?php echo $juridico; ?>;
+			    odometer12.innerHTML = <?php echo $validacao_interna; ?>;
+			    odometer13.innerHTML = <?php echo $envio_contrato; ?>;
+			    odometer14.innerHTML = <?php echo $formalizacao; ?>;
+			    odometer15.innerHTML = <?php echo $atribuido; ?>;
+
 			}, 1000);
 		</script> 
 		
