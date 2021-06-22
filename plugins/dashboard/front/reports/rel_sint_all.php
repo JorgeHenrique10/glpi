@@ -27,8 +27,6 @@ if(!isset($_POST["sel_date"])) {
 else {
 	$id_date = $_POST["sel_date"];
 }
-print_r($_SESSION['glpiactiveentities']);
-print_r($_SESSION['glpiID']);
 
 # entity
 $sql_e = "SELECT value FROM glpi_plugin_dashboard_config WHERE name = 'entity' AND users_id = ".$_SESSION['glpiID']."";
@@ -398,13 +396,13 @@ else {
 			
 			$result_grp = $DB->query($sql_grp);	
 			
-			//logo						
-			if (file_exists('../../../../pics/logo_big.png')) {
-				$logo = "../../../../pics/logo_big.png";
-				$imgsize = "width:100px; height:100px;";
+		//logo						
+			if (file_exists('../../../../pics/logoverde.svg')) {
+				$logo = "../../../../pics/logoverde.svg";
+				$imgsize = "width:200px; height:100px;";
 			}
 			//else {
-			if (!file_exists('../../../../pics/logo_big.png')) {						
+			if (!file_exists('../../../../pics/logoverde.svg')) {						
 				if ($CFG_GLPI['version'] >= 0.90){					
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "background-color:#000;";

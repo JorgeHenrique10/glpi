@@ -447,7 +447,7 @@ else {
 			</tr>
 			";
 
-			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 )
+			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )
 			{
 				echo "
 					<tr>
@@ -496,9 +496,6 @@ else {
 		";
 
 		$DB->data_seek($result_cham,0);
-
-		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17)
-			print_r("fjwefw");
 
 		while($row = $DB->fetch_assoc($result_cham)){
 

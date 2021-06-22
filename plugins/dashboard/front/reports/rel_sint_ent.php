@@ -14,7 +14,6 @@ if(!empty($_POST['submit']))
     $data_ini =  $_POST['date1'];
     $data_fin = $_POST['date2'];
 }
-
 else {
     $data_ini = date("Y-m-01");
     $data_fin = date("Y-m-d");
@@ -344,7 +343,18 @@ $result_ent = $DB->query($sql_ent);
 			SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 			SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 			SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+			SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+			SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+			SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+			SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+			SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+			SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+			SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$sel_date."			
@@ -358,7 +368,17 @@ $result_ent = $DB->query($sql_ent);
                         $pend = $DB->result($result_stat,0,'pend') + 0;
                         $solve = $DB->result($result_stat,0,'solve') + 0;
                         $close = $DB->result($result_stat,0,'close') + 0;
-			
+						$validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
+					    $publicacao = $DB->result($result_stat,0,'publicacao') + 0;
+					    $parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
+					    $validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
+					    $resultados = $DB->result($result_stat,0,'resultados') + 0;
+					    $homologacao = $DB->result($result_stat,0,'homologacao') + 0;
+					    $juridico = $DB->result($result_stat,0,'juridico') + 0;
+					    $validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
+					    $envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
+					    $formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
+					    $atribuido = $DB->result($result_stat,0,'atribuido') + 0;
 			
 			//count by type
 			$query_type = "
@@ -390,12 +410,13 @@ $result_ent = $DB->query($sql_ent);
 			
 			$result_grp = $DB->query($sql_grp);	
 			
-			//logo						
-			if (file_exists('../../../../pics/logo_big.png')) {
-				$logo = "../../../../pics/logo_big.png";
-				$imgsize = "width:100px; height:100px;";
+		//logo						
+			if (file_exists('../../../../pics/logoverde.svg')) {
+				$logo = "../../../../pics/logoverde.svg";
+				$imgsize = "width:200px; height:100px;";
 			}
-			else {					
+			//else {
+			if (!file_exists('../../../../pics/logoverde.svg')) {						
 				if ($CFG_GLPI['version'] >= 0.90){					
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "background-color:#000;";
@@ -404,6 +425,48 @@ $result_ent = $DB->query($sql_ent);
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "";
 				}
+			}
+
+			$status_contratos = '';
+
+			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )
+			{
+				$status_contratos =
+				"
+				 <td>". 'Atribuido'."</td>
+				 <td align='right'>".$atribuido."</td>			
+				 </tr>
+				 <td>". 'Validacão TR'."</td>
+				 <td align='right'>".$validacao_tr."</td>			
+				 </tr>
+				 <td>". 'Publicação'."</td>
+				 <td align='right'>".$publicacao."</td>			
+				 </tr>
+				 <td>". 'Parecer Habilitação'."</td>
+				 <td align='right'>".$parecer_habilitacao."</td>			
+				 </tr>
+				 <td>". 'Validação Técnica'."</td>
+				 <td align='right'>".$validacao_tecnica."</td>			
+				 </tr>
+				 <td>". 'Resultados'."</td>
+				 <td align='right'>".$resultados."</td>			
+				 </tr>
+				 <td>". 'Homologação'."</td>
+				 <td align='right'>".$homologacao."</td>			
+				 </tr>
+				 <td>". 'Juridico'."</td>
+				 <td align='right'>".$juridico."</td>			
+				 </tr>
+				 <td>". 'Validação Interna'."</td>
+				 <td align='right'>".$validacao_interna."</td>			
+				 </tr>
+				 <td>". 'Envio de Contrato'."</td>
+				 <td align='right'>".$envio_contrato."</td>			
+				 </tr>
+				 <td>". 'Formalização'."</td>
+				 <td align='right'>".$formalizacao."</td>			
+				 </tr>			 															
+				";
 			}
 
 
@@ -500,8 +563,8 @@ $content .= "
 			 <tr>
 			 <td>". __('Closed')."</td>
 			 <td align='right'>".$close."</td>			
-			 </tr>								
-													
+			 </tr>" . $status_contratos .
+			"										
 		    </tbody> </table>
 		   		    		   
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
