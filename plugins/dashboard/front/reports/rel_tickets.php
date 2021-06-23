@@ -569,7 +569,7 @@ if($consulta > 0) {
 	
 	if($count_ent == 1) {
 		$sql_nm = "
-		SELECT name, completename AS cname
+		SELECT id, name, completename AS cname, entities_id
 		FROM `glpi_entities`
 		WHERE id IN (".$id_ent.")";
 		
@@ -587,7 +587,7 @@ if($consulta > 0) {
 	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 	SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
 	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
-	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS ValidaçaoTR,
+	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS ValidacaoTR,
 	SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS Publicacao,
 	SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS ParecerDeHabilitacao,
 	SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS ValidacaoTecnica,
@@ -617,7 +617,7 @@ if($consulta > 0) {
 	$pend = $DB->result($result_stat,0,'pend') + 0;
 	$solve = $DB->result($result_stat,0,'solve') + 0;
 	$close = $DB->result($result_stat,0,'close') + 0;
-	$validacaoTR = $DB->result($result_stat,0,'ValidaçaoTR') + 0;	
+	$validacaoTR = $DB->result($result_stat,0,'ValidacaoTR') + 0;	
 	$publicacao = $DB->result($result_stat,0,'Publicacao') + 0;	
 	$parecerDeHabilitacao = $DB->result($result_stat,0,'ParecerDeHabilitacao') + 0;	
 	$validacaoTec = $DB->result($result_stat,0,'ValidacaoTecnica') + 0;	
@@ -649,49 +649,56 @@ if($consulta > 0) {
 	        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
 	        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 	        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
-	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
-			<td><span style='color: #000;'>". __('Validação de TR').": </span><b>".$validacaoTR." </b></td>
-	        
+	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>	        
 		</tr>
-		<tr>
-		<td><span style='color: #000;'>". __('Publicacao').": </span><b>".$publicacao." </b></td>
-	        <td><span style='color: #000;'>". __('Parecer de Habilitacao').": </span><b>".$parecerDeHabilitacao." </b></td>
-	        <td><span style='color: #000;'>". __('Validação Técnica').": </span><b>".$validacaoTec." </b></td>
-			<td><span style='color: #000;'>". __('Resultados').": </span><b>".$resultados." </b></td>
-	        <td><span style='color: #000;'>". __('Juridico').": </span><b>".$juridico." </b></td>
-	        <td><span style='color: #000;'>". __('Validação Interna').": </span><b>".$validacaoInt." </b></td>
-	        
-		</tr>
-		<tr>
+		";
+		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 )
+		{
+			echo "		
+				<tr>
+					<td><span style='color: #000;'>". __('Validação de TR').": </span><b>".$validacaoTR." </b></td>
+					<td><span style='color: #000;'>". __('Publicacao').": </span><b>".$publicacao." </b></td>
+					<td><span style='color: #000;'>". __('Parecer de Habilitacao').": </span><b>".$parecerDeHabilitacao." </b></td>
+					<td><span style='color: #000;'>". __('Validação Técnica').": </span><b>".$validacaoTec." </b></td>
+					<td><span style='color: #000;'>". __('Resultados').": </span><b>".$resultados." </b></td>					      
+				</tr>
+				<tr>
 
-		</tr><tr>
-			<td><span style='color: #000;'>". __('Envio de Contrato').": </span><b>".$envioDeCont." </b></td>
-	        <td><span style='color: #000;'>". __('Homologação').": </span><b>".$homologacao." </b></td>
-	        <td><span style='color: #000;'>". __('Validação').": </span><b>".$formalizacao." </b></td>
-	        <td><span style='color: #000;'>". __('Atribuido').": </span><b>".$atribuido." </b></td>
-		</tr>
-		<tr><td>&nbsp;</td></tr>	
-	</table>
-	
-	<table id='ticket' class='display'  style='width: 99%; font-size: 11px; font-weight:bold;' cellpadding = 2px>
-		<thead>
-			<tr>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('ID')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Status')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Source')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Priority')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Category')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Title')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Content')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Requester')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Technician')." </th>			
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Opened','dashboard')."</th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Closed')." </th>
-				<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Due Date','dashboard')." </th>
-			</tr>
-		</thead>
-	<tbody>";
+				</tr>
+				<tr>
+					<td><span style='color: #000;'>". __('Juridico').": </span><b>".$juridico." </b></td>  
+					<td><span style='color: #000;'>". __('Validação Interna').": </span><b>".$validacaoInt." </b></td>
+					<td><span style='color: #000;'>". __('Envio de Contrato').": </span><b>".$envioDeCont." </b></td>
+					<td><span style='color: #000;'>". __('Homologação').": </span><b>".$homologacao." </b></td>
+					<td><span style='color: #000;'>". __('Validação').": </span><b>".$formalizacao." </b></td>
+					<td><span style='color: #000;'>". __('Atribuido').": </span><b>".$atribuido." </b></td>
+				</tr>
+			";
+		}
+		echo "
+			<tr><td>&nbsp;</td></tr>	
+			</table>
+			
+			<table id='ticket' class='display'  style='width: 99%; font-size: 11px; font-weight:bold;' cellpadding = 2px>
+				<thead>
+					<tr>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('ID')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Status')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Source')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Priority')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Category')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Title')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Content')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Requester')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Technician')." </th>			
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Opened','dashboard')."</th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Closed')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Due Date','dashboard')." </th>
+					</tr>
+				</thead>
+			<tbody>
+		";
 	
 	
 	while($row = $DB->fetch_assoc($result_cham)){
@@ -704,17 +711,17 @@ if($consulta > 0) {
 		if($status1 == "4" ) { $status1 = "waiting";} 
 		if($status1 == "5" ) { $status1 = "solved";}  	            
 		if($status1 == "6" ) { $status1 = "closed";}	
-		if($status1 == "6" ) { $status1 = "Validação_TR";}	
-		if($status1 == "6" ) { $status1 = "Publicação";}	
-		if($status1 == "6" ) { $status1 = "Parecer de Habilitação";}	
-		if($status1 == "6" ) { $status1 = "Validação Técnica";}	
-		if($status1 == "6" ) { $status1 = "Resultados";}	
-		if($status1 == "6" ) { $status1 = "Homoçlogação";}	
-		if($status1 == "6" ) { $status1 = "Juridico";}	
-		if($status1 == "6" ) { $status1 = "Validação Interna";}	
-		if($status1 == "6" ) { $status1 = "Envio de Contrato";}	
-		if($status1 == "6" ) { $status1 = "Formalização";}	
-		if($status1 == "6" ) { $status1 = "Atribuido";}	
+		if($status1 == "13" ) { $status1 = "ValidacaoTR";}	
+		if($status1 == "14" ) { $status1 = "Publicacao";}	
+		if($status1 == "15" ) { $status1 = "ParecerDeHabilitacao";}	
+		if($status1 == "16" ) { $status1 = "ValidacaoTecnica";}	
+		if($status1 == "17" ) { $status1 = "Resultados";}	
+		if($status1 == "18" ) { $status1 = "Homoçlogação";}	
+		if($status1 == "19" ) { $status1 = "Juridico";}	
+		if($status1 == "20" ) { $status1 = "Validação Interna";}	
+		if($status1 == "21" ) { $status1 = "Envio de Contrato";}	
+		if($status1 == "22" ) { $status1 = "Formalização";}	
+		if($status1 == "23" ) { $status1 = "Atribuido";}	
 		
 		//type
 		if($row['type'] == 1) { $type = __('Incident'); }
