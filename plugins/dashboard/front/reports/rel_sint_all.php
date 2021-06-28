@@ -397,21 +397,101 @@ else {
 			$result_grp = $DB->query($sql_grp);	
 			
 		//logo						
-			if (file_exists('../../../../pics/logoverde.svg')) {
-				$logo = "../../../../pics/logoverde.svg";
-				$imgsize = "width:200px; height:100px;";
+		if (file_exists('../../../../pics/logoverde.svg')) {
+			$logo = "../../../../pics/logoverde.svg";
+			$imgsize = "width:200px; height:100px;";
+		}
+		//else {
+		if (!file_exists('../../../../pics/logoverde.svg')) {						
+			if ($CFG_GLPI['version'] >= 0.90){					
+				$logo = "../../../../pics/logo-glpi-login.png";
+				$imgsize = "background-color:#000;";
+			}	
+			else {
+				$logo = "../../../../pics/logo-glpi-login.png";
+				$imgsize = "";
 			}
-			//else {
-			if (!file_exists('../../../../pics/logoverde.svg')) {						
-				if ($CFG_GLPI['version'] >= 0.90){					
-					$logo = "../../../../pics/logo-glpi-login.png";
-					$imgsize = "background-color:#000;";
-				}	
-				else {
-					$logo = "../../../../pics/logo-glpi-login.png";
-					$imgsize = "";
-				}
-			}
+		}
+
+
+		//Calculo para cotação
+		$query_chamados = "
+			SELECT * 
+			FROM glpi_tickets_status 
+			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			WHERE glpi_tickets.date $sel_date
+			AND glpi_tickets.is_deleted = 0
+			AND glpi_tickets.itilcategories_id = 189
+			$entidade
+		";
+		
+		$query_cont = "
+			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
+			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			WHERE glpi_tickets.date $sel_date
+			AND glpi_tickets.is_deleted = 0
+			AND glpi_tickets.itilcategories_id = 189
+			$entidade
+		";
+		$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
+
+
+		//print_r($query_cont);
+		print_r($result_cham_cont['total']);
+
+
+		$result_cham_contratos = $DB->query($query_chamados);	
+
+		$qtd_dias_dispensa_1 = 0;
+		$qtd_dias_dispensa_2 = 0;
+		$cont_dispensa = 0;
+
+		foreach ($result_cham_contratos as $chamado) {
+			//print_r($chamado['itilcategories_id']);
+
+			$cont_dispensa ++;
+			$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = {$chamado['ticket_id']}) IS NULL
+							THEN NOW() 
+							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = {$chamado['ticket_id']}) 
+						END),
+						(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = {$chamado['ticket_id']}) IS NULL
+							THEN NOW() 
+							ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = {$chamado['ticket_id']}) 
+						END)
+					) dias;";			
+
+			$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = {$chamado['ticket_id']}) IS NULL
+							THEN NOW() 
+							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = {$chamado['ticket_id']}) 
+						END),
+						(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = {$chamado['ticket_id']}) IS NULL
+							THEN NOW() 
+							ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = {$chamado['ticket_id']}) 
+						END)
+					) dias;";
+
+			$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
+			$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
+
+			$qtd_dias_dispensa_1 = intval($qtd_dias_dispensa_1) + intval($result_etapa1['dias']);
+			$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
+
+			// print_r( $result_etapa1['dias']);
+			// print_r( $result_etapa2['dias']);
+	
+			//print_r($result_etapa1['dias']);
+		}
+
+
+		// print_r($qtd_dias_dispensa_1);
+		// print_r('<br>');
+		// print_r($qtd_dias_dispensa_2);
+		// print_r('<br>');
+		// print_r($cont_dispensa);
+
+		$indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_cont['total'];
 
 
 		$content = "
@@ -469,7 +549,11 @@ else {
 			 <tr>
 			 <td>". __('Average time to closure')."</td>
 			 <td align='right'>". time_hrs($avgtime )."</td>
-			 </tr>					
+			 </tr>
+			 <tr>
+			 <td>". ('Média de dias de contratos com novos prestadores - Cotação')."</td>
+			 <td align='right'>". $indicadorDispensa."</td>
+			 </tr>						
 		    </tbody> </table>		   		    
 
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
