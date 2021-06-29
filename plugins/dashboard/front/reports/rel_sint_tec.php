@@ -614,12 +614,68 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		}
 
 
-		// $indicadorCotacao =  ($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) / $result_cham_cont['total'];
-		// $indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_dispensa_cont['total'];
+//Calculo para aditivo contrato
+$query_chamados_aditivo = "
+SELECT * 
+FROM glpi_tickets		
+INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 189
+AND glpi_tickets.solvedate is not null
+AND glpi_tickets_users.type = 2
+AND glpi_tickets_users.users_id = " . $id_tec . "
+		$entidade
+";
+				$query_cont_aditivo = "
+SELECT count(DISTINCT glpi_tickets.id) as total 
+FROM glpi_tickets		
+INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 189
+AND glpi_tickets.solvedate is not null
+AND glpi_tickets_users.type = 2
+AND glpi_tickets_users.users_id = " . $id_tec . "
+$entidade
+";
 
-		$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
-		$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
+				// print_r($query_cont_aditivo);
+				// exit;
+				$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
+				$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);
+				$qtd_dias_aditivo = 0;
+				$entrouif = 0;
+				$entrouelse = 0;
+				//$qtd_dias_aditivo_2 = 0;
+				//print_r($result_cham_aditivo_contratos);exit();
+				foreach ($result_cham_aditivo_contratos as $chamado) {
 
+					//print_r($chamado['content']);
+					$content = explode(' Insira Data de Inicio :', $chamado['content']);
+					$data_inicio_aditivo = date('Y-m-d H:i:s', strtotime(substr($content[1], 16, 10)));
+					$data_fim_aditivo = $chamado['solvedate'];
+
+					$datetime1 = new DateTime($data_inicio_aditivo);
+					$datetime2 = new DateTime($data_fim_aditivo);
+
+					$diferenca = date_diff($datetime1, $datetime2);
+
+					if ($data_inicio_aditivo >= $data_fim_aditivo) {
+						$entrouif++;
+						$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+					} else {
+						$entrouelse++;
+						$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+					}
+				}
+
+				//________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+				$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+				$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
+				$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
+				$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
 
 			$status_contratos = '';
 
@@ -735,8 +791,12 @@ $content .= "
 			 <td align='right'>". time_hrs($avgtime )."</td>
 			 </tr>			
 			 <tr>
-			 <td>". ('Média de dias de aditivos renovados')."</td>
-			 <td align='right'>". $aditivos_renovados."</td>
+			 <td>" . ('% Contratos formalizados') . "</td>
+			 <td align='right'>" . $aditivos_renovados . "</td>
+			 </tr>		
+			 <tr>
+			 <td>" . ('Média de dias de aditivos renovados') . "</td>
+			 <td align='right'>" . $aditivos_dias . "</td>
 			 </tr>			
 		    </tbody> </table>		   		    
 
