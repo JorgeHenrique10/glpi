@@ -493,18 +493,24 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SELECT * 
 			FROM glpi_tickets_status 
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 			WHERE glpi_tickets.date $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 189
+			AND glpi_tickets_users.type = 2
+			AND glpi_tickets_users.users_id = ". $id_tec ."
 			$entidade
 		";
 		
 		$query_cont = "
 			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 			WHERE glpi_tickets.date $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 189
+			AND glpi_tickets_users.type = 2
+			AND glpi_tickets_users.users_id = ". $id_tec ."
 			$entidade
 		";
 		$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
@@ -550,18 +556,24 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SELECT * 
 			FROM glpi_tickets_status 
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 			WHERE glpi_tickets.date $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 191
+			AND glpi_tickets_users.type = 2
+			AND glpi_tickets_users.users_id = ". $id_tec ."
 			$entidade
 		";
 
 		$query_cont_dispensa = "
 			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 			WHERE glpi_tickets.date $sel_date
 			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.itilcategories_id = 189
+			AND glpi_tickets.itilcategories_id = 191
+			AND glpi_tickets_users.type = 2
+			AND glpi_tickets_users.users_id = ". $id_tec ."
 			$entidade
 		";
 		$result_cham_dispensa_cont = $DB->query($query_cont_dispensa)->fetch_assoc();

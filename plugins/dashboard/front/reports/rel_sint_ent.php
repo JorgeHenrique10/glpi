@@ -546,6 +546,7 @@ $qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dia
 
 $aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
 $aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
+
 			$status_contratos = '';
 
 			if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )

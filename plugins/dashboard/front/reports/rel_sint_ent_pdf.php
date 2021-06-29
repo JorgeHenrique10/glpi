@@ -278,6 +278,125 @@ else {
 				}
 			}
 
+//Calculo para cotação
+$query_chamados = "
+SELECT * 
+FROM glpi_tickets_status 
+INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 189
+$entidade
+";
+
+$query_cont = "
+SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
+INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 189
+$entidade
+";
+$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
+$result_cham_contratos = $DB->query($query_chamados);	
+
+$qtd_dias_cotacao_1 = 0;
+$qtd_dias_cotacao_2 = 0;
+
+
+foreach ($result_cham_contratos as $chamado) {
+
+$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] ." ) IS NULL
+				THEN NOW() 
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END),
+			(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END)
+		) dias";			
+
+$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END),
+			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END)
+		) dias";
+
+$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
+$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
+
+$qtd_dias_cotacao_1 = intval($qtd_dias_cotacao_1) + intval($result_etapa1['dias']);
+$qtd_dias_cotacao_2 = intval($qtd_dias_cotacao_2) + intval($result_etapa2['dias']);
+}
+
+//Calculo para dispensa
+$query_chamados_dispensa = "
+SELECT * 
+FROM glpi_tickets_status 
+INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 191
+$entidade
+";
+
+$query_cont_dispensa = "
+SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
+INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+WHERE glpi_tickets.date $sel_date
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.itilcategories_id = 189
+$entidade
+";
+$result_cham_dispensa_cont = $DB->query($query_cont_dispensa)->fetch_assoc();
+$result_cham_dispensa_contratos = $DB->query($query_chamados_dispensa);	
+
+$qtd_dias_dispensa_1 = 0;
+$qtd_dias_dispensa_2 = 0;
+
+foreach ($result_cham_dispensa_contratos as $chamado) {
+
+$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] ." ) IS NULL
+				THEN NOW() 
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END),
+			(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END)
+		) dias";			
+
+$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END),
+			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+				THEN NOW() 
+				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") 
+			END)
+		) dias";
+
+$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
+$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
+
+$qtd_dias_dispensa_1 = intval($qtd_dias_dispensa_1) + intval($result_etapa1['dias']);
+$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
+}
+
+
+// $indicadorCotacao =  ($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) / $result_cham_cont['total'];
+// $indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_dispensa_cont['total'];
+
+$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 
 
 $content = "
