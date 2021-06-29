@@ -413,86 +413,6 @@ else {
 			}
 		}
 
-
-		//Calculo para cotação
-		$query_chamados = "
-			SELECT * 
-			FROM glpi_tickets_status 
-			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
-			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.itilcategories_id = 189
-			$entidade
-		";
-		
-		$query_cont = "
-			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
-			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
-			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.itilcategories_id = 189
-			$entidade
-		";
-		$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
-
-
-		//print_r($query_cont);
-		print_r($result_cham_cont['total']);
-
-
-		$result_cham_contratos = $DB->query($query_chamados);	
-
-		$qtd_dias_dispensa_1 = 0;
-		$qtd_dias_dispensa_2 = 0;
-		$cont_dispensa = 0;
-
-		foreach ($result_cham_contratos as $chamado) {
-			//print_r($chamado['itilcategories_id']);
-
-			$cont_dispensa ++;
-			$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
-						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = {$chamado['ticket_id']}) IS NULL
-							THEN NOW() 
-							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = {$chamado['ticket_id']}) 
-						END),
-						(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = {$chamado['ticket_id']}) IS NULL
-							THEN NOW() 
-							ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = {$chamado['ticket_id']}) 
-						END)
-					) dias;";			
-
-			$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = {$chamado['ticket_id']}) IS NULL
-							THEN NOW() 
-							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = {$chamado['ticket_id']}) 
-						END),
-						(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = {$chamado['ticket_id']}) IS NULL
-							THEN NOW() 
-							ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = {$chamado['ticket_id']}) 
-						END)
-					) dias;";
-
-			$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
-			$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
-
-			$qtd_dias_dispensa_1 = intval($qtd_dias_dispensa_1) + intval($result_etapa1['dias']);
-			$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
-
-			// print_r( $result_etapa1['dias']);
-			// print_r( $result_etapa2['dias']);
-	
-			//print_r($result_etapa1['dias']);
-		}
-
-
-		// print_r($qtd_dias_dispensa_1);
-		// print_r('<br>');
-		// print_r($qtd_dias_dispensa_2);
-		// print_r('<br>');
-		// print_r($cont_dispensa);
-
-		$indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_cont['total'];
-
 		//Calculo para cotação
 		$query_chamados = "
 		SELECT * 
@@ -512,6 +432,7 @@ else {
 		AND glpi_tickets.itilcategories_id = 189
 		$entidade
 	";
+
 	$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
 	$result_cham_contratos = $DB->query($query_chamados);	
 
@@ -606,13 +527,67 @@ else {
 		$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
 	}
 
+	//Calculo para aditivo contrato
+	$query_chamados_aditivo = "
+		SELECT * 
+		FROM glpi_tickets 
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.solvedate is not null
+		$entidade
+	";
+	
+	$query_cont_aditivo = "
+		SELECT count(DISTINCT glpi_tickets.id) as total 
+		from glpi_tickets
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.solvedate is not null
+		$entidade
+	";
 
-	// $indicadorCotacao =  ($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) / $result_cham_cont['total'];
-	// $indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_dispensa_cont['total'];
+	$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
+	$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);	
+	$qtd_dias_aditivo = 0;
+	$entrouif = 0;
+	$entrouelse = 0;
+	//$qtd_dias_aditivo_2 = 0;
+	//print_r($result_cham_aditivo_contratos);exit();
+	foreach ($result_cham_aditivo_contratos as $chamado) {
+
+		//print_r($chamado['content']);
+		$content = explode(' Insira Data de Inicio :', $chamado['content']);
+		$data_inicio_aditivo = date('Y-m-d H:i:s', strtotime(substr($content[1], 16, 10)));
+		$data_fim_aditivo = $chamado['solvedate'];
+
+		$datetime1 = new DateTime($data_inicio_aditivo);
+   		$datetime2 = new DateTime($data_fim_aditivo);
+
+		$diferenca = date_diff($datetime1 , $datetime2);
+
+		if( $data_inicio_aditivo >= $data_fim_aditivo )
+		{
+			$entrouif ++;
+			$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+		}
+		else
+		{
+			$entrouelse ++;
+			$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+		}
+
+
+	}
+	
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 	$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
 	$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
-
+	$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
+	$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________	
 		$content = "
 		<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>	
  			<div class='btn-right'> <button class='btn btn-primary btn-sm' type='button' onclick=window.open(\"./rel_sint_all_pdf.php?con=1&date1=".$data_ini2."&date2=".$data_fin2."\",\"_blank\")>Export PDF</button>  </div>	
@@ -670,8 +645,12 @@ else {
 			 <td align='right'>". time_hrs($avgtime )."</td>
 			 </tr>			
 			 <tr>
-			 <td>". ('Média de dias de aditivos renovados')."</td>
+			 <td>". ('% Contratos formalizados')."</td>
 			 <td align='right'>". $aditivos_renovados."</td>
+			 </tr>		
+			 <tr>
+			 <td>". ('Média de dias de aditivos renovados')."</td>
+			 <td align='right'>". $aditivos_dias."</td>
 			 </tr>			
 		    </tbody> </table>		   		    
 
