@@ -597,7 +597,12 @@ if($consulta > 0) {
 	SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS ValidacaoInterna,
 	SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS EnvioDeContrato,
 	SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS Formalizacao,
-	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS Atribuido
+	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS Atribuido,
+	SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+	SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+	SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+	SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+	SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = 0
 	".$entidade."
@@ -627,7 +632,12 @@ if($consulta > 0) {
 	$validacaoInt = $DB->result($result_stat,0,'ValidacaoInterna') + 0;	
 	$envioDeCont = $DB->result($result_stat,0,'EnvioDeContrato') + 0;	
 	$formalizacao = $DB->result($result_stat,0,'Formalizacao') + 0;	
-	$atribuido = $DB->result($result_stat,0,'Atribuido') + 0;	
+	$atribuido = $DB->result($result_stat,0,'Atribuido') + 0;
+	$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+	$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+	$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+	$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+	$recurso = $DB->result($result_stat,0,'recurso') + 0;	
 	
 	//listar chamados
 	echo "
@@ -652,7 +662,8 @@ if($consulta > 0) {
 	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>	        
 		</tr>
 		";
-		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 )
+
+		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )
 		{
 			echo "		
 				<tr>
@@ -671,8 +682,16 @@ if($consulta > 0) {
 					<td><span style='color: #000;'>". __('Envio de Contrato').": </span><b>".$envioDeCont." </b></td>
 					<td><span style='color: #000;'>". __('Homologação').": </span><b>".$homologacao." </b></td>
 					<td><span style='color: #000;'>". __('Validação').": </span><b>".$formalizacao." </b></td>
-					<td><span style='color: #000;'>". __('Atribuido').": </span><b>".$atribuido." </b></td>
 				</tr>
+
+				<tr>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pendente Unidade').": </span>".$pendente_unidade." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação de Errata').": </span>".$publicacao_errata." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Prorrogação').": </span>".$prorrogacao." </td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>						
+			</tr>
 			";
 		}
 		echo "
