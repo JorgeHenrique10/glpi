@@ -264,9 +264,10 @@ else {
 			//logo						
 			if (file_exists('../../../../pics/logo_big.png')) {
 				$logo = "../../../../pics/logo_big.png";
-				$imgsize = "width:100px; height:100px;";
+				$imgsize = "width:100px; height:55px;";
 			}
-			else {					
+			//else {
+			if (!file_exists('../../../../pics/logo_big.png')) {						
 				if ($CFG_GLPI['version'] >= 0.90){					
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "background-color:#000;";
@@ -276,6 +277,7 @@ else {
 					$imgsize = "";
 				}
 			}
+
 
 
 $content = "
@@ -347,6 +349,10 @@ $content .= "
 			 <tr>
 			 <td>". __('Average time to closure')."</td>
 			 <td align='right'>". time_hrs($avgtime )."</td>
+			 </tr>	
+			 <tr>
+			 <td>". ('Média de dias de aditivos renovados')."</td>
+			 <td align='right'>". $aditivos_renovados."</td>
 			 </tr>	
 			 <tr><td>&nbsp;</td></tr>				
 		    </tbody> 
