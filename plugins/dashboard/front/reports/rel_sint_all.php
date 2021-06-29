@@ -528,11 +528,11 @@ else {
 		}
 
 
-		$indicadorCotacao =  ($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) / $result_cham_cont['total'];
-		$indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_dispensa_cont['total'];
+		// $indicadorCotacao =  ($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) / $result_cham_cont['total'];
+		// $indicadorDispensa =  ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2) / $result_cham_dispensa_cont['total'];
 
-		$teste_cdcd = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
-
+		$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+		$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 		
 
 		$content = "
@@ -543,7 +543,7 @@ else {
 				 <div class='col-md-2' ><img src='".$logo."' alt='GLPI' style='".$imgsize."'> </div>
 				 <div class='col-md-8' style='height:120px; text-align:center; margin:auto;'><h3 style='vertical-align:middle;' >". __('Summary Report','dashboard')." </h3></div>
 			 </div>
-									
+			 									
 			 <table id='data' class='table table-condensed table-striped' style='font-size: 16px; width:55%; margin:auto; margin-top:5px; margin-bottom:25px;'>			
 			 <tbody>				
 			 <tr>
@@ -591,16 +591,9 @@ else {
 			 <td>". __('Average time to closure')."</td>
 			 <td align='right'>". time_hrs($avgtime )."</td>
 			 </tr>
-			 <tr>
-			 <td>". ('Média de dias de contratos com novos prestadores - Cotação')."</td>
-			 <td align='right'>". $indicadorCotacao."</td>
-			 </tr>
-			 <td>". ('Média de dias de contratos com novos prestadores - Dispensa de cotação')."</td>
-			 <td align='right'>". $indicadorDispensa."</td>
-			 </tr>
-			 </tr>
-			 <td>". ('Média de dias de contratos com novos prestadores - Teste')."</td>
-			 <td align='right'>". $teste_cdcd."</td>
+			<tr>
+			 <td>". ('Média de dias de aditivos renovados')."</td>
+			 <td align='right'>". $aditivos_renovados."</td>
 			 </tr>							
 		    </tbody> </table>		   		    
 
