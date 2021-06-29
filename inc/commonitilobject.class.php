@@ -87,6 +87,12 @@ abstract class CommonITILObject extends CommonDBTM {
    const SEND_CONTRACT        = 21; // envio de contrato 
    const FORMALIZATION        = 22; // formalização 
    const ATTACH               = 23; //atribuido
+   const PENDING_UNIT         = 24; //pendente unidade
+   const WRONG_PUBLICATION    = 25; //publicação de Errata
+   const EXTENSION            = 26; //prorrogação
+   const DILIGENCE            = 27; //diligencia
+   const RESOURCE             = 28; //recurso
+
 
    const TIMELINE_NOTSET   = 0;
    const TIMELINE_LEFT     = 1;
@@ -3562,6 +3568,27 @@ abstract class CommonITILObject extends CommonDBTM {
             $class = 'circle';
             $solid = false;
             break;
+         case self::PENDING_UNIT :
+            $class = 'circle';
+            $solid = false;
+            break;
+         case self::WRONG_PUBLICATION :
+            $class = 'circle';
+            $solid = false;
+            break;
+         case self::EXTENSION :
+            $class = 'circle';
+            $solid = false;
+            break;
+         case self::DILIGENCE :
+            $class = 'circle';
+            $solid = false;
+            break;
+         case self::RESOURCE :
+            $class = 'circle';
+            $solid = false;
+            break;
+
       }
 
       return $class == null
@@ -3617,38 +3644,54 @@ abstract class CommonITILObject extends CommonDBTM {
             $key = 'qualif';
             break;
          case self::ATTACH :
-            $key = 'qualif';
+            $key = 'attach';
             break;
          case self::VALIDATION_TR :
-            $key = 'qualif';
+            $key = 'validTr';
             break;
          case self::PUBLICATION :
-            $key = 'qualif';
+            $key = 'public';
             break;
          case self::SEEM_ENABLING :
-            $key = 'qualif';
+            $key = 'seemEnab';
             break;
          case self::VALIDATION_TECHNIQUE :
-            $key = 'qualif';
+            $key = 'validTec';
             break;
          case self::RESULT :
-            $key = 'qualif';
+            $key = 'result';
             break;
          case self::HOMOLOGATION :
-            $key = 'qualif';
+            $key = 'homolo';
             break;
          case self::JURIDICAL :
-            $key = 'qualif';
+            $key = 'jurid';
             break;
          case self::VALIDATION_INTERNAL :
-            $key = 'qualif';
+            $key = 'validInter';
             break;
          case self::SEND_CONTRACT :
-            $key = 'qualif';
+            $key = 'sendCont';
             break;
          case self::FORMALIZATION :
-            $key = 'qualif';
+            $key = 'form';
             break;
+         case self::PENDING_UNIT :
+            $key = 'pendUnit';
+            break;
+         case self::WRONG_PUBLICATION :
+            $key = 'wrongPub';
+            break;
+         case self::EXTENSION :
+            $key = 'extension';
+            break;
+         case self::DILIGENCE :
+            $key = 'diligence';
+            break;
+         case self::RESOURCE :
+            $key = 'resource';
+            break;
+
       }
       return $key;
    }
