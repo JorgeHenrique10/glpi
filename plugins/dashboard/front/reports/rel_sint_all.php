@@ -327,8 +327,7 @@ else {
 			SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 			SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
 			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
-			SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,
-			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,			
 			SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
 			SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
 			SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
@@ -338,8 +337,13 @@ else {
 			SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
 			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
-			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao
-
+			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$sel_date."			
@@ -364,7 +368,11 @@ else {
 			$validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
 			$envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
 			$formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
-			
+			$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+			$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+			$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+			$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+			$recurso = $DB->result($result_stat,0,'recurso') + 0;
 			
 			//count by type
 			$query_type = "
@@ -668,6 +676,21 @@ else {
 			 </tr>
 			 <td>". 'Formalização'."</td>
 			 <td align='right'>".$formalizacao."</td>			
+			 </tr>			 
+			 <td>". 'Pendente Unidade'."</td>
+			 <td align='right'>".$pendente_unidade."</td>			
+			 </tr>			 							
+			 <td>". 'Publicação de Errata'."</td>
+			 <td align='right'>".$publicacao_errata."</td>			
+			 </tr>
+			 <td>". 'Prorrogação'."</td>
+			 <td align='right'>".$prorrogacao."</td>			
+			 </tr>			 							
+			 <td>". 'Diligência'."</td>
+			 <td align='right'>".$diligencia."</td>			
+			 </tr>
+			 <td>". 'Recurso'."</td>
+			 <td align='right'>".$recurso."</td>			
 			 </tr>			 							
 													
 		    </tbody> </table>

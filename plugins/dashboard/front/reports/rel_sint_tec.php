@@ -391,7 +391,12 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
 			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
-			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM `glpi_tickets_users`, glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$sel_date."			
@@ -419,6 +424,11 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 					    $envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
 					    $formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
 					    $atribuido = $DB->result($result_stat,0,'atribuido') + 0;
+						$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+						$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+						$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+						$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+						$recurso = $DB->result($result_stat,0,'recurso') + 0;
 			
 			
 			//count by type
@@ -537,7 +547,22 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 				 </tr>
 				 <td>". 'Formalização'."</td>
 				 <td align='right'>".$formalizacao."</td>			
-				 </tr>			 															
+				 </tr>			 					
+				 <td>". 'Pendente Unidade'."</td>
+				 <td align='right'>".$pendente_unidade."</td>			
+				 </tr>			 							
+				 <td>". 'Publicação de Errata'."</td>
+				 <td align='right'>".$publicacao_errata."</td>			
+				 </tr>
+				 <td>". 'Prorrogação'."</td>
+				 <td align='right'>".$prorrogacao."</td>			
+				 </tr>			 							
+				 <td>". 'Diligência'."</td>
+				 <td align='right'>".$diligencia."</td>			
+				 </tr>
+				 <td>". 'Recurso'."</td>
+				 <td align='right'>".$recurso."</td>			
+				 </tr>										
 				";
 			}
 			
