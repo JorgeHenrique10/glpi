@@ -499,8 +499,7 @@ else {
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação de Errata').": </span>".$publicacao_errata." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Prorrogação').": </span>".$prorrogacao." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>
-						<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>
-						
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>						
 					</tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
