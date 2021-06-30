@@ -327,8 +327,7 @@ else {
 			SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 			SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
 			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
-			SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,
-			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,			
 			SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
 			SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
 			SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
@@ -338,8 +337,13 @@ else {
 			SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
 			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
-			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao
-
+			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$sel_date."			
@@ -364,7 +368,11 @@ else {
 			$validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
 			$envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
 			$formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
-			
+			$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+			$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+			$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+			$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+			$recurso = $DB->result($result_stat,0,'recurso') + 0;
 			
 			//count by type
 			$query_type = "
@@ -611,6 +619,11 @@ else {
 		SUM(case when glpi_tickets_status.status_cod = 20 then glpi_tickets_status.data_cons else 0 end) AS validacao_interna,
 		SUM(case when glpi_tickets_status.status_cod = 21 then glpi_tickets_status.data_cons else 0 end) AS envio_contrato,
 		SUM(case when glpi_tickets_status.status_cod = 22 then glpi_tickets_status.data_cons else 0 end) AS formalizacao,
+		SUM(case when glpi_tickets_status.status_cod = 24 then glpi_tickets_status.data_cons else 0 end) AS pendente_unidade,
+		SUM(case when glpi_tickets_status.status_cod = 25 then glpi_tickets_status.data_cons else 0 end) AS publicacao_errata,
+		SUM(case when glpi_tickets_status.status_cod = 26 then glpi_tickets_status.data_cons else 0 end) AS prorrogacao,
+		SUM(case when glpi_tickets_status.status_cod = 27 then glpi_tickets_status.data_cons else 0 end) AS diligencia,
+		SUM(case when glpi_tickets_status.status_cod = 28 then glpi_tickets_status.data_cons else 0 end) AS recurso,
 
 		count( IF(glpi_tickets_status.status_cod=1, glpi_tickets_status.id, NULL)  ) AS new_count,
 		count( IF(glpi_tickets_status.status_cod=2, glpi_tickets_status.id, NULL)  ) AS assig_count,
@@ -629,7 +642,12 @@ else {
 		count( IF(glpi_tickets_status.status_cod=19, glpi_tickets_status.id, NULL) ) AS juridico_count,
 		count( IF(glpi_tickets_status.status_cod=20, glpi_tickets_status.id, NULL) ) AS validacao_interna_count,
 		count( IF(glpi_tickets_status.status_cod=21, glpi_tickets_status.id, NULL) ) AS envio_contrato_count,
-		count( IF(glpi_tickets_status.status_cod=22, glpi_tickets_status.id, NULL) ) AS formalizacao_count
+		count( IF(glpi_tickets_status.status_cod=22, glpi_tickets_status.id, NULL) ) AS formalizacao_count,
+		count( IF(glpi_tickets_status.status_cod=24, glpi_tickets_status.id, NULL) ) AS pendente_unidade_count,
+		count( IF(glpi_tickets_status.status_cod=25, glpi_tickets_status.id, NULL) ) AS publicacao_errata_count,
+		count( IF(glpi_tickets_status.status_cod=26, glpi_tickets_status.id, NULL) ) AS prorrogacao_count,
+		count( IF(glpi_tickets_status.status_cod=27, glpi_tickets_status.id, NULL) ) AS diligencia_count,
+		count( IF(glpi_tickets_status.status_cod=28, glpi_tickets_status.id, NULL) ) AS recurso_count
 
 		FROM glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
@@ -657,8 +675,13 @@ else {
 		$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_interna') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_interna_count') + 0)), 2, ',', ' ') ;
 		$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time,0,'envio_contrato') + 0) / ($DB->result($result_stat_lead_time,0,'envio_contrato_count') + 0)), 2, ',', ' ') ;
 		$formalizacao_lead = number_format((($DB->result($result_stat_lead_time,0,'formalizacao') + 0) / ($DB->result($result_stat_lead_time,0,'formalizacao_count') + 0)), 2, ',', ' ') ;
+		$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time,0,'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time,0,'pendente_unidade_count') + 0)), 2, ',', ' ') ;
+		$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time,0,'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time,0,'publicacao_errata_count') + 0)), 2, ',', ' ') ;
+		$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time,0,'prorrogacao') + 0) / ($DB->result($result_stat_lead_time,0,'prorrogacao_count') + 0)), 2, ',', ' ') ;
+		$diligencia_lead = number_format((($DB->result($result_stat_lead_time,0,'diligencia') + 0) / ($DB->result($result_stat_lead_time,0,'diligencia_count') + 0)), 2, ',', ' ') ;
+		$recurso_lead = number_format((($DB->result($result_stat_lead_time,0,'recurso') + 0) / ($DB->result($result_stat_lead_time,0,'recurso_count') + 0)), 2, ',', ' ') ;
 
-		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead) / 17;
+		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
 
 		$content = "
 		<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>	
@@ -816,6 +839,26 @@ else {
 			 <td>". 'Formalização'."</td>
 			 <td align='center'>".$formalizacao."</td>			
 			 <td align='center'>".$formalizacao_lead."</td>			
+			 </tr>			 
+			 <td>". 'Pendente Unidade'."</td>
+			 <td align='center'>".$pendente_unidade."</td>			
+			 <td align='center'>".$pendente_unidade_lead."</td>			
+			 </tr>			 							
+			 <td>". 'Publicação de Errata'."</td>
+			 <td align='center'>".$publicacao_errata."</td>			
+			 <td align='center'>".$publicacao_errata_lead."</td>			
+			 </tr>
+			 <td>". 'Prorrogação'."</td>
+			 <td align='center'>".$prorrogacao."</td>			
+			 <td align='center'>".$prorrogacao_lead."</td>			
+			 </tr>			 							
+			 <td>". 'Diligência'."</td>
+			 <td align='center'>".$diligencia."</td>			
+			 <td align='center'>".$diligencia_lead."</td>			
+			 </tr>
+			 <td>". 'Recurso'."</td>
+			 <td align='center'>".$recurso."</td>			
+			 <td align='center'>".$recurso_lead."</td>			
 			 </tr>			 							
 													
 		    </tbody> </table>

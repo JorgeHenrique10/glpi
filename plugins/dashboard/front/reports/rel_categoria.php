@@ -256,10 +256,9 @@ else {
 
 			//status
 			$status = "";
-			$status = "";
 			$status_open = "('1','2','3','4')";
 			$status_close = "('5','6')";	
-			$status_all = "('1','2','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23')";
+			$status_all = "('1','2','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29')";
 
 			if(isset($_GET['stat'])) {
 
@@ -415,7 +414,12 @@ else {
 			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
 			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
-			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$datas2."
@@ -441,6 +445,11 @@ else {
 		    $envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
 		    $formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
 		    $atribuido = $DB->result($result_stat,0,'atribuido') + 0;
+		    $pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+		    $publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+		    $prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+		    $diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+		    $recurso = $DB->result($result_stat,0,'recurso') + 0;
 
 
 			echo "
@@ -481,9 +490,16 @@ else {
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
-						<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>						
+					</tr>	
+
+					<tr>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
-						
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Pendente Unidade').": </span>".$pendente_unidade." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação de Errata').": </span>".$publicacao_errata." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Prorrogação').": </span>".$prorrogacao." </td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>						
 					</tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>

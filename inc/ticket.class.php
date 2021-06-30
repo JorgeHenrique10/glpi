@@ -3666,7 +3666,12 @@ class Ticket extends CommonITILObject {
                    self::JURIDICAL  => _x('status', '8-Juridico'),
                    self::VALIDATION_INTERNAL  => _x('status', '9-Validação Interna'),
                    self::SEND_CONTRACT  => _x('status', '10-Envio de Contrato'),
-                   self::FORMALIZATION  => _x('status', '11-Formalização'),                   
+                   self::FORMALIZATION  => _x('status', '11-Formalização'),
+                   self::PENDING_UNIT   => _x('status', 'Pendente Unidade'),
+                   self::WRONG_PUBLICATION  => _x('status', 'Publicação de Errata'),
+                   self::EXTENSION  => _x('status', 'Prorrogação'),
+                   self::DILIGENCE  => _x('status', 'Diligência'),                   
+                   self::RESOURCE  => _x('status', 'Recurso'),
                    self::WAITING  => __('Pending'),
                    self::SOLVED   => _x('status', 'Solved'),
                    self::CLOSED   => _x('status', 'Closed')];        
