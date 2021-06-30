@@ -587,7 +587,78 @@ else {
 	$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 	$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 	$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
-//________________________________________________________________________________________________________________________________________________________________________________________________________________________	
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+
+		$query_stat_lead_time = "
+		SELECT
+		SUM(case when glpi_tickets_status.status_cod = 1 then glpi_tickets_status.data_cons else 0 end) AS new,
+		SUM(case when glpi_tickets_status.status_cod = 2 then glpi_tickets_status.data_cons else 0 end) AS assig,
+		SUM(case when glpi_tickets_status.status_cod = 3 then glpi_tickets_status.data_cons else 0 end) AS plan,
+		SUM(case when glpi_tickets_status.status_cod = 4 then glpi_tickets_status.data_cons else 0 end) AS pend,
+		SUM(case when glpi_tickets_status.status_cod = 5 then glpi_tickets_status.data_cons else 0 end) AS solve,
+		SUM(case when glpi_tickets_status.status_cod = 6 then glpi_tickets_status.data_cons else 0 end) AS close,
+		SUM(case when glpi_tickets_status.status_cod = 12 then glpi_tickets_status.data_cons else 0 end) AS qualificacao,
+		SUM(case when glpi_tickets_status.status_cod = 23 then glpi_tickets_status.data_cons else 0 end) AS atribuido,
+		SUM(case when glpi_tickets_status.status_cod = 13 then glpi_tickets_status.data_cons else 0 end) AS validacao_tr,
+		SUM(case when glpi_tickets_status.status_cod = 14 then glpi_tickets_status.data_cons else 0 end) AS publicacao,
+		SUM(case when glpi_tickets_status.status_cod = 15 then glpi_tickets_status.data_cons else 0 end) AS parecer_habilitacao,
+		SUM(case when glpi_tickets_status.status_cod = 16 then glpi_tickets_status.data_cons else 0 end) AS validacao_tecnica,
+		SUM(case when glpi_tickets_status.status_cod = 17 then glpi_tickets_status.data_cons else 0 end) AS resultados,
+		SUM(case when glpi_tickets_status.status_cod = 18 then glpi_tickets_status.data_cons else 0 end) AS homologacao,
+		SUM(case when glpi_tickets_status.status_cod = 19 then glpi_tickets_status.data_cons else 0 end) AS juridico,
+		SUM(case when glpi_tickets_status.status_cod = 20 then glpi_tickets_status.data_cons else 0 end) AS validacao_interna,
+		SUM(case when glpi_tickets_status.status_cod = 21 then glpi_tickets_status.data_cons else 0 end) AS envio_contrato,
+		SUM(case when glpi_tickets_status.status_cod = 22 then glpi_tickets_status.data_cons else 0 end) AS formalizacao,
+
+		count( IF(glpi_tickets_status.status_cod=1, glpi_tickets_status.id, NULL)  ) AS new_count,
+		count( IF(glpi_tickets_status.status_cod=2, glpi_tickets_status.id, NULL)  ) AS assig_count,
+		count( IF(glpi_tickets_status.status_cod=3, glpi_tickets_status.id, NULL)  ) AS plan_count,
+		count( IF(glpi_tickets_status.status_cod=4, glpi_tickets_status.id, NULL)  ) AS pend_count,
+		count( IF(glpi_tickets_status.status_cod=5, glpi_tickets_status.id, NULL)  ) AS solve_count,
+		count( IF(glpi_tickets_status.status_cod=6, glpi_tickets_status.id, NULL)  ) AS close_count,
+		count( IF(glpi_tickets_status.status_cod=12, glpi_tickets_status.id, NULL) ) AS qualificacao_count,
+		count( IF(glpi_tickets_status.status_cod=23, glpi_tickets_status.id, NULL) ) AS atribuido_count,
+		count( IF(glpi_tickets_status.status_cod=13, glpi_tickets_status.id, NULL) ) AS validacao_tr_count,
+		count( IF(glpi_tickets_status.status_cod=14, glpi_tickets_status.id, NULL) ) AS publicacao_count,
+		count( IF(glpi_tickets_status.status_cod=15, glpi_tickets_status.id, NULL) ) AS parecer_habilitacao_count,
+		count( IF(glpi_tickets_status.status_cod=16, glpi_tickets_status.id, NULL) ) AS validacao_tecnica_count,
+		count( IF(glpi_tickets_status.status_cod=17, glpi_tickets_status.id, NULL) ) AS resultados_count,
+		count( IF(glpi_tickets_status.status_cod=18, glpi_tickets_status.id, NULL) ) AS homologacao_count,
+		count( IF(glpi_tickets_status.status_cod=19, glpi_tickets_status.id, NULL) ) AS juridico_count,
+		count( IF(glpi_tickets_status.status_cod=20, glpi_tickets_status.id, NULL) ) AS validacao_interna_count,
+		count( IF(glpi_tickets_status.status_cod=21, glpi_tickets_status.id, NULL) ) AS envio_contrato_count,
+		count( IF(glpi_tickets_status.status_cod=22, glpi_tickets_status.id, NULL) ) AS formalizacao_count
+
+		FROM glpi_tickets_status
+		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+		WHERE glpi_tickets.is_deleted = '0'
+		AND glpi_tickets_status.data_fim is not null
+		AND glpi_tickets.date ".$sel_date."			
+		".$entidade."";
+		
+		$result_stat_lead_time = $DB->query($query_stat_lead_time);
+
+		$new_lead = number_format((($DB->result($result_stat_lead_time,0,'new') + 0) / ($DB->result($result_stat_lead_time,0,'new_count') + 0)), 2, ',', ' ') ;
+		$assig_lead = number_format((($DB->result($result_stat_lead_time,0,'assig') + 0) / ($DB->result($result_stat_lead_time,0,'assig_count') + 0)), 2, ',', ' ') ;
+		$plan_lead = number_format((($DB->result($result_stat_lead_time,0,'plan') + 0) / ($DB->result($result_stat_lead_time,0,'plan_count') + 0)), 2, ',', ' ') ;
+		$pend_lead = number_format((($DB->result($result_stat_lead_time,0,'pend') + 0) / ($DB->result($result_stat_lead_time,0,'pend_count') + 0)), 2, ',', ' ') ;
+		$solve_lead = number_format((($DB->result($result_stat_lead_time,0,'solve') + 0) / ($DB->result($result_stat_lead_time,0,'solve_count') + 0)), 2, ',', ' ') ;
+		$close_lead = number_format((($DB->result($result_stat_lead_time,0,'close') + 0) / ($DB->result($result_stat_lead_time,0,'close_count') + 0)), 2, ',', ' ') ;
+		$atribuido_lead = number_format((($DB->result($result_stat_lead_time,0,'atribuido') + 0) / ($DB->result($result_stat_lead_time,0,'atribuido_count') + 0)), 2, ',', ' ') ;
+		$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tr') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tr_count') + 0)), 2, ',', ' ') ;
+		$publicacao_lead = number_format((($DB->result($result_stat_lead_time,0,'publicacao') + 0) / ($DB->result($result_stat_lead_time,0,'publicacao_count') + 0)), 2, ',', ' ') ;
+		$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time,0,'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time,0,'parecer_habilitacao_count') + 0)), 2, ',', ' ') ;
+		$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tecnica_count') + 0)), 2, ',', ' ') ;
+		$resultados_lead = number_format((($DB->result($result_stat_lead_time,0,'resultados') + 0) / ($DB->result($result_stat_lead_time,0,'resultados_count') + 0)), 2, ',', ' ') ;
+		$homologacao_lead = number_format((($DB->result($result_stat_lead_time,0,'homologacao') + 0) / ($DB->result($result_stat_lead_time,0,'homologacao_count') + 0)), 2, ',', ' ') ;
+		$juridico_lead = number_format((($DB->result($result_stat_lead_time,0,'juridico') + 0) / ($DB->result($result_stat_lead_time,0,'juridico_count') + 0)), 2, ',', ' ') ;
+		$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_interna') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_interna_count') + 0)), 2, ',', ' ') ;
+		$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time,0,'envio_contrato') + 0) / ($DB->result($result_stat_lead_time,0,'envio_contrato_count') + 0)), 2, ',', ' ') ;
+		$formalizacao_lead = number_format((($DB->result($result_stat_lead_time,0,'formalizacao') + 0) / ($DB->result($result_stat_lead_time,0,'formalizacao_count') + 0)), 2, ',', ' ') ;
+
+		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead) / 17;
+
 		$content = "
 		<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>	
  			<div class='btn-right'> <button class='btn btn-primary btn-sm' type='button' onclick=window.open(\"./rel_sint_all_pdf.php?con=1&date1=".$data_ini2."&date2=".$data_fin2."\",\"_blank\")>Export PDF</button>  </div>	
@@ -651,73 +722,99 @@ else {
 			 <tr>
 			 <td>". ('Média de dias de aditivos renovados')."</td>
 			 <td align='right'>". $aditivos_dias."</td>
+			 </tr>		
+			 <tr>
+			 <td>". ('Média de dias leadtime')."</td>
+			 <td align='right'>". number_format($media_lead, 2, ',', ' ')."</td>
 			 </tr>			
 		    </tbody> </table>		   		    
 
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>". __('Tickets by Status','dashboard')."</th>						
+			 <th colspan='3' style='text-align:center; background:#286090; color:#fff;'>". __('Tickets by Status','dashboard')."</th>						
 			 </tr>
 			 </thead>	
 
-			 <tbody>							
+			 <tbody>
+			 <tr>
+			 <td align='left'> <b>Status</b> </td>
+			 <td align='center'> <b>Total Chamados</b> </td>
+			 <td align='center'> <b>Tempo Média Chamados</b> </td>
+			 </tr>							
 			 <tr>
 			 <td>". _x('status','New')."</td>
-			 <td align='right'>".$new."</td>			
+			 <td align='center'>".$new."</td>			
+			 <td align='center'>".$new_lead."</td>			
 			 </tr>				
 			 <tr>
 			 <td>". __('Assigned')."</td>
-			 <td align='right'>".$assig."</td>			
+			 <td align='center'>".$assig."</td>			
+			 <td align='center'>".$assig_lead."</td>			
 			 </tr>				
 			 <tr>
 			 <td>". __('Planned')."</td>
-			 <td align='right'>".$plan."</td>			
+			 <td align='center'>".$plan."</td>			
+			 <td align='center'>".$plan_lead."</td>			
 			 </tr>				
 			 <tr>
 			 <td>". __('Pending')."</td>
-			 <td align='right'>".$pend."</td>			
+			 <td align='center'>".$pend."</td>			
+			 <td align='center'>".$pend_lead."</td>			
 			 </tr>			
 			 <tr>
 			 <td>". __('Solved','dashboard')."</td>
-			 <td align='right'>".$solve."</td>			
+			 <td align='center'>".$solve."</td>			
+			 <td align='center'>".$solve_lead."</td>			
 			 </tr>				
 			 <tr>
 			 <td>". __('Closed')."</td>
-			 <td align='right'>".$close."</td>			
+			 <td align='center'>".$close."</td>			
+			 <td align='center'>".$close_lead."</td>			
 			 </tr>
 			 <td>". 'Atribuido'."</td>
-			 <td align='right'>".$atribuido."</td>			
+			 <td align='center'>".$atribuido."</td>			
+			 <td align='center'>".$atribuido_lead."</td>			
 			 </tr>
 			 <td>". 'Validacão TR'."</td>
-			 <td align='right'>".$validacao_tr."</td>			
+			 <td align='center'>".$validacao_tr."</td>			
+			 <td align='center'>".$validacao_tr_lead."</td>			
 			 </tr>
 			 <td>". 'Publicação'."</td>
-			 <td align='right'>".$publicacao."</td>			
+			 <td align='center'>".$publicacao."</td>			
+			 <td align='center'>".$publicacao_lead."</td>			
 			 </tr>
 			 <td>". 'Parecer Habilitação'."</td>
-			 <td align='right'>".$parecer_habilitacao."</td>			
+			 <td align='center'>".$parecer_habilitacao."</td>			
+			 <td align='center'>".$parecer_habilitacao_lead."</td>			
 			 </tr>
 			 <td>". 'Validação Técnica'."</td>
-			 <td align='right'>".$validacao_tecnica."</td>			
+			 <td align='center'>".$validacao_tecnica."</td>			
+			 <td align='center'>".$validacao_tecnica_lead."</td>			
 			 </tr>
 			 <td>". 'Resultados'."</td>
-			 <td align='right'>".$resultados."</td>			
+			 <td align='center'>".$resultados."</td>			
+			 <td align='center'>".$resultados_lead."</td>			
 			 </tr>
 			 <td>". 'Homologação'."</td>
-			 <td align='right'>".$homologacao."</td>			
+			 <td align='center'>".$homologacao."</td>			
+			 <td align='center'>".$homologacao_lead."</td>			
 			 </tr>
 			 <td>". 'Juridico'."</td>
-			 <td align='right'>".$juridico."</td>			
+			 <td align='center'>".$juridico."</td>			
+			 <td align='center'>".$juridico_lead."</td>			
 			 </tr>
 			 <td>". 'Validação Interna'."</td>
-			 <td align='right'>".$validacao_interna."</td>			
+			 <td align='center'>".$validacao_interna."</td>			
+			 <td align='center'>".$validacao_interna_lead."</td>			
 			 </tr>
 			 <td>". 'Envio de Contrato'."</td>
-			 <td align='right'>".$envio_contrato."</td>			
+			 <td align='center'>".$envio_contrato."</td>			
+			 <td align='center'>".$envio_contrato_lead."</td>			
 			 </tr>
 			 <td>". 'Formalização'."</td>
-			 <td align='right'>".$formalizacao."</td>			
+			 <td align='center'>".$formalizacao."</td>			
+			 <td align='center'>".$formalizacao_lead."</td>			
 			 </tr>			 							
 													
 		    </tbody> </table>
