@@ -681,6 +681,34 @@ else {
 		$diligencia_lead = number_format((($DB->result($result_stat_lead_time,0,'diligencia') + 0) / ($DB->result($result_stat_lead_time,0,'diligencia_count') + 0)), 2, ',', ' ') ;
 		$recurso_lead = number_format((($DB->result($result_stat_lead_time,0,'recurso') + 0) / ($DB->result($result_stat_lead_time,0,'recurso_count') + 0)), 2, ',', ' ') ;
 
+		//RETIRAR "NAN"
+		$new_lead != 'nan' ? $new_lead : $new_lead = 0;
+		$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
+		$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
+		$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
+		$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
+		$close_lead != 'nan' ? $close_lead : $close_lead = 0;
+		$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
+		$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
+		$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
+		$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
+		$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
+		$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
+		$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
+		$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
+		$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
+		$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
+		$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
+		$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
+		$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
+		$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
+		$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
+		$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
+		$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
+		$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
+
+
+
 		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
 
 		$content = "
@@ -765,97 +793,135 @@ else {
 			 <td align='left'> <b>Status</b> </td>
 			 <td align='center'> <b>Total Chamados</b> </td>
 			 <td align='center'> <b>Tempo Média Chamados</b> </td>
-			 </tr>							
+			 </tr>
+
 			 <tr>
 			 <td>". _x('status','New')."</td>
 			 <td align='center'>".$new."</td>			
 			 <td align='center'>".$new_lead."</td>			
-			 </tr>				
+			 </tr>
+
 			 <tr>
 			 <td>". __('Assigned')."</td>
 			 <td align='center'>".$assig."</td>			
 			 <td align='center'>".$assig_lead."</td>			
-			 </tr>				
+			 </tr>
+
 			 <tr>
 			 <td>". __('Planned')."</td>
 			 <td align='center'>".$plan."</td>			
 			 <td align='center'>".$plan_lead."</td>			
-			 </tr>				
+			 </tr>
+
 			 <tr>
 			 <td>". __('Pending')."</td>
 			 <td align='center'>".$pend."</td>			
 			 <td align='center'>".$pend_lead."</td>			
-			 </tr>			
+			 </tr>
+
 			 <tr>
 			 <td>". __('Solved','dashboard')."</td>
 			 <td align='center'>".$solve."</td>			
 			 <td align='center'>".$solve_lead."</td>			
-			 </tr>				
+			 </tr>	
+
 			 <tr>
 			 <td>". __('Closed')."</td>
 			 <td align='center'>".$close."</td>			
 			 <td align='center'>".$close_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Atribuido'."</td>
 			 <td align='center'>".$atribuido."</td>			
 			 <td align='center'>".$atribuido_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Validacão TR'."</td>
 			 <td align='center'>".$validacao_tr."</td>			
 			 <td align='center'>".$validacao_tr_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Publicação'."</td>
 			 <td align='center'>".$publicacao."</td>			
 			 <td align='center'>".$publicacao_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Parecer Habilitação'."</td>
 			 <td align='center'>".$parecer_habilitacao."</td>			
 			 <td align='center'>".$parecer_habilitacao_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Validação Técnica'."</td>
 			 <td align='center'>".$validacao_tecnica."</td>			
 			 <td align='center'>".$validacao_tecnica_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Resultados'."</td>
 			 <td align='center'>".$resultados."</td>			
 			 <td align='center'>".$resultados_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Homologação'."</td>
 			 <td align='center'>".$homologacao."</td>			
 			 <td align='center'>".$homologacao_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Juridico'."</td>
 			 <td align='center'>".$juridico."</td>			
 			 <td align='center'>".$juridico_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Validação Interna'."</td>
 			 <td align='center'>".$validacao_interna."</td>			
 			 <td align='center'>".$validacao_interna_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Envio de Contrato'."</td>
 			 <td align='center'>".$envio_contrato."</td>			
 			 <td align='center'>".$envio_contrato_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Formalização'."</td>
 			 <td align='center'>".$formalizacao."</td>			
 			 <td align='center'>".$formalizacao_lead."</td>			
-			 </tr>			 
+			 </tr>
+			 
+			 <tr>
 			 <td>". 'Pendente Unidade'."</td>
 			 <td align='center'>".$pendente_unidade."</td>			
 			 <td align='center'>".$pendente_unidade_lead."</td>			
-			 </tr>			 							
+			 </tr>
+			 
+			 <tr>
 			 <td>". 'Publicação de Errata'."</td>
 			 <td align='center'>".$publicacao_errata."</td>			
 			 <td align='center'>".$publicacao_errata_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Prorrogação'."</td>
 			 <td align='center'>".$prorrogacao."</td>			
 			 <td align='center'>".$prorrogacao_lead."</td>			
-			 </tr>			 							
+			 </tr>
+			 
+			 <tr>
 			 <td>". 'Diligência'."</td>
 			 <td align='center'>".$diligencia."</td>			
 			 <td align='center'>".$diligencia_lead."</td>			
 			 </tr>
+
+			 <tr>
 			 <td>". 'Recurso'."</td>
 			 <td align='center'>".$recurso."</td>			
 			 <td align='center'>".$recurso_lead."</td>			
