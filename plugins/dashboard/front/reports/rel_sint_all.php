@@ -590,6 +590,7 @@ else {
 //________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 
+		//Calculo Leadtime
 		$query_stat_lead_time = "
 		SELECT
 		SUM(case when glpi_tickets_status.status_cod = 1 then glpi_tickets_status.data_cons else 0 end) AS new,
