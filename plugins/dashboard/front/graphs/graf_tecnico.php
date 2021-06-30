@@ -349,7 +349,12 @@ SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
 SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
 SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
-SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
+SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 FROM glpi_tickets_users, glpi_tickets
 WHERE glpi_tickets.is_deleted = '0'
 AND glpi_tickets.date " . $datas . "
@@ -377,7 +382,11 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 						$envio_contrato = $DB->result($result_stat, 0, 'envio_contrato') + 0;
 						$formalizacao = $DB->result($result_stat, 0, 'formalizacao') + 0;
 						$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
-
+						$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+						$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+						$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+						$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+						$recurso = $DB->result($result_stat,0,'recurso') + 0;
 
 
 						$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
@@ -539,7 +548,74 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 					   </div>
 					</div>
 				 </div>
-			  </div>";
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer16' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Pendente Unidade</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer17' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Publicação de Errata</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer18' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Prorrogação</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer19' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Diligência</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  <div class='col-sm-3 col-md-3'>
+				 <div class='dashbox shad panel panel-default db-yellow'>
+					<div class='panel-body_2'>
+					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+					   </div>
+			   		<div class='panel-right'>
+							<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+         				<span class='date'><b>Recurso</b></span>
+					   </div>
+					</div>
+				 </div>
+			  </div>
+			  ";
+
 						}
 
 
@@ -642,6 +718,11 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 									odometer13.innerHTML = <?php echo $envio_contrato; ?>;
 									odometer14.innerHTML = <?php echo $formalizacao; ?>;
 									odometer15.innerHTML = <?php echo $atribuido; ?>;
+									odometer16.innerHTML = <?php echo $pendente_unidade; ?>;
+									odometer17.innerHTML = <?php echo $publicacao_errata; ?>;
+									odometer18.innerHTML = <?php echo $prorrogacao; ?>;
+									odometer19.innerHTML = <?php echo $diligencia; ?>;
+									odometer20.innerHTML = <?php echo $recurso; ?>;
 
 								}
 
