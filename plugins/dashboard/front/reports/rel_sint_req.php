@@ -311,7 +311,8 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 					//quant de chamados
 					$sql_cham2 =
-						"SELECT count(glpi_tickets.id) AS total, count(glpi_tickets.date) AS numdias, AVG(glpi_tickets.close_delay_stat) AS avgtime
+						"SELECT count(glpi_tickets.id) AS total, count(glpi_tickets.date) AS numdias, 
+						AVG(glpi_tickets.close_delay_stat) AS avgtime
 		FROM glpi_tickets, glpi_tickets_users
 		WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 		AND glpi_tickets_users.type = 1
@@ -394,7 +395,12 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
 			SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
 			SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
-			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido
+			SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+			SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM `glpi_tickets_users`, glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date " . $sel_date . "			
@@ -411,6 +417,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						$pend = $DB->result($result_stat, 0, 'pend') + 0;
 						$solve = $DB->result($result_stat, 0, 'solve') + 0;
 						$close = $DB->result($result_stat, 0, 'close') + 0;
+						$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
 						$validacao_tr = $DB->result($result_stat, 0, 'validacao_tr') + 0;
 						$publicacao = $DB->result($result_stat, 0, 'publicacao') + 0;
 						$parecer_habilitacao = $DB->result($result_stat, 0, 'parecer_habilitacao') + 0;
@@ -421,7 +428,11 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						$validacao_interna = $DB->result($result_stat, 0, 'validacao_interna') + 0;
 						$envio_contrato = $DB->result($result_stat, 0, 'envio_contrato') + 0;
 						$formalizacao = $DB->result($result_stat, 0, 'formalizacao') + 0;
-						$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
+						$pendente_unidade = $DB->result($result_stat, 0, 'pendente_unidade') + 0;
+						$publicacao_errata = $DB->result($result_stat, 0, 'publicacao_errata') + 0;
+						$prorrogacao = $DB->result($result_stat, 0, 'prorrogacao') + 0;
+						$diligencia = $DB->result($result_stat, 0, 'diligencia') + 0;
+						$recurso = $DB->result($result_stat, 0, 'recurso') + 0;
 
 						//count by type
 						$query_type = "
@@ -525,8 +536,6 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 
 						foreach ($result_cham_contratos as $chamado) {
-
-
 							$cont_dispensa++;
 							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
@@ -705,7 +714,12 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						SUM(case when glpi_tickets_status.status_cod = 20 then glpi_tickets_status.data_cons else 0 end) AS validacao_interna,
 						SUM(case when glpi_tickets_status.status_cod = 21 then glpi_tickets_status.data_cons else 0 end) AS envio_contrato,
 						SUM(case when glpi_tickets_status.status_cod = 22 then glpi_tickets_status.data_cons else 0 end) AS formalizacao,
-
+						SUM(case when glpi_tickets_status.status_cod = 24 then glpi_tickets_status.data_cons else 0 end) AS pendente_unidade,
+						SUM(case when glpi_tickets_status.status_cod = 25 then glpi_tickets_status.data_cons else 0 end) AS publicacao_errata,
+						SUM(case when glpi_tickets_status.status_cod = 26 then glpi_tickets_status.data_cons else 0 end) AS prorrogacao,
+						SUM(case when glpi_tickets_status.status_cod = 27 then glpi_tickets_status.data_cons else 0 end) AS diligencia,
+						SUM(case when glpi_tickets_status.status_cod = 28 then glpi_tickets_status.data_cons else 0 end) AS recurso,
+				
 						count( IF(glpi_tickets_status.status_cod=1, glpi_tickets_status.id, NULL)  ) AS new_count,
 						count( IF(glpi_tickets_status.status_cod=2, glpi_tickets_status.id, NULL)  ) AS assig_count,
 						count( IF(glpi_tickets_status.status_cod=3, glpi_tickets_status.id, NULL)  ) AS plan_count,
@@ -723,39 +737,74 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						count( IF(glpi_tickets_status.status_cod=19, glpi_tickets_status.id, NULL) ) AS juridico_count,
 						count( IF(glpi_tickets_status.status_cod=20, glpi_tickets_status.id, NULL) ) AS validacao_interna_count,
 						count( IF(glpi_tickets_status.status_cod=21, glpi_tickets_status.id, NULL) ) AS envio_contrato_count,
-						count( IF(glpi_tickets_status.status_cod=22, glpi_tickets_status.id, NULL) ) AS formalizacao_count
+						count( IF(glpi_tickets_status.status_cod=22, glpi_tickets_status.id, NULL) ) AS formalizacao_count,
+						count( IF(glpi_tickets_status.status_cod=24, glpi_tickets_status.id, NULL) ) AS pendente_unidade_count,
+						count( IF(glpi_tickets_status.status_cod=25, glpi_tickets_status.id, NULL) ) AS publicacao_errata_count,
+						count( IF(glpi_tickets_status.status_cod=26, glpi_tickets_status.id, NULL) ) AS prorrogacao_count,
+						count( IF(glpi_tickets_status.status_cod=27, glpi_tickets_status.id, NULL) ) AS diligencia_count,
+						count( IF(glpi_tickets_status.status_cod=28, glpi_tickets_status.id, NULL) ) AS recurso_count
 
 						FROM glpi_tickets_status
 						INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 						INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 						WHERE glpi_tickets.is_deleted = '0'
 						AND glpi_tickets_status.data_fim is not null
-						AND glpi_tickets.date ".$sel_date."
+						AND glpi_tickets.date " . $sel_date . "
 						AND glpi_tickets_users.users_id = " . $id_req . "			
-						".$entidade."";
-						
+						" . $entidade . "";
+
 						$result_stat_lead_time = $DB->query($query_stat_lead_time);
 
-						$new_lead = number_format((($DB->result($result_stat_lead_time,0,'new') + 0) / ($DB->result($result_stat_lead_time,0,'new_count') + 0)), 2, ',', ' ') ;
-						$assig_lead = number_format((($DB->result($result_stat_lead_time,0,'assig') + 0) / ($DB->result($result_stat_lead_time,0,'assig_count') + 0)), 2, ',', ' ') ;
-						$plan_lead = number_format((($DB->result($result_stat_lead_time,0,'plan') + 0) / ($DB->result($result_stat_lead_time,0,'plan_count') + 0)), 2, ',', ' ') ;
-						$pend_lead = number_format((($DB->result($result_stat_lead_time,0,'pend') + 0) / ($DB->result($result_stat_lead_time,0,'pend_count') + 0)), 2, ',', ' ') ;
-						$solve_lead = number_format((($DB->result($result_stat_lead_time,0,'solve') + 0) / ($DB->result($result_stat_lead_time,0,'solve_count') + 0)), 2, ',', ' ') ;
-						$close_lead = number_format((($DB->result($result_stat_lead_time,0,'close') + 0) / ($DB->result($result_stat_lead_time,0,'close_count') + 0)), 2, ',', ' ') ;
-						$atribuido_lead = number_format((($DB->result($result_stat_lead_time,0,'atribuido') + 0) / ($DB->result($result_stat_lead_time,0,'atribuido_count') + 0)), 2, ',', ' ') ;
-						$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tr') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tr_count') + 0)), 2, ',', ' ') ;
-						$publicacao_lead = number_format((($DB->result($result_stat_lead_time,0,'publicacao') + 0) / ($DB->result($result_stat_lead_time,0,'publicacao_count') + 0)), 2, ',', ' ') ;
-						$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time,0,'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time,0,'parecer_habilitacao_count') + 0)), 2, ',', ' ') ;
-						$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tecnica_count') + 0)), 2, ',', ' ') ;
-						$resultados_lead = number_format((($DB->result($result_stat_lead_time,0,'resultados') + 0) / ($DB->result($result_stat_lead_time,0,'resultados_count') + 0)), 2, ',', ' ') ;
-						$homologacao_lead = number_format((($DB->result($result_stat_lead_time,0,'homologacao') + 0) / ($DB->result($result_stat_lead_time,0,'homologacao_count') + 0)), 2, ',', ' ') ;
-						$juridico_lead = number_format((($DB->result($result_stat_lead_time,0,'juridico') + 0) / ($DB->result($result_stat_lead_time,0,'juridico_count') + 0)), 2, ',', ' ') ;
-						$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_interna') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_interna_count') + 0)), 2, ',', ' ') ;
-						$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time,0,'envio_contrato') + 0) / ($DB->result($result_stat_lead_time,0,'envio_contrato_count') + 0)), 2, ',', ' ') ;
-						$formalizacao_lead = number_format((($DB->result($result_stat_lead_time,0,'formalizacao') + 0) / ($DB->result($result_stat_lead_time,0,'formalizacao_count') + 0)), 2, ',', ' ') ;
+						$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
+						$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
+						$plan_lead = number_format((($DB->result($result_stat_lead_time, 0, 'plan') + 0) / ($DB->result($result_stat_lead_time, 0, 'plan_count') + 0)), 2, ',', ' ');
+						$pend_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pend') + 0) / ($DB->result($result_stat_lead_time, 0, 'pend_count') + 0)), 2, ',', ' ');
+						$solve_lead = number_format((($DB->result($result_stat_lead_time, 0, 'solve') + 0) / ($DB->result($result_stat_lead_time, 0, 'solve_count') + 0)), 2, ',', ' ');
+						$close_lead = number_format((($DB->result($result_stat_lead_time, 0, 'close') + 0) / ($DB->result($result_stat_lead_time, 0, 'close_count') + 0)), 2, ',', ' ');
+						$atribuido_lead = number_format((($DB->result($result_stat_lead_time, 0, 'atribuido') + 0) / ($DB->result($result_stat_lead_time, 0, 'atribuido_count') + 0)), 2, ',', ' ');
+						$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tr') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tr_count') + 0)), 2, ',', ' ');
+						$publicacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_count') + 0)), 2, ',', ' ');
+						$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao_count') + 0)), 2, ',', ' ');
+						$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tecnica_count') + 0)), 2, ',', ' ');
+						$resultados_lead = number_format((($DB->result($result_stat_lead_time, 0, 'resultados') + 0) / ($DB->result($result_stat_lead_time, 0, 'resultados_count') + 0)), 2, ',', ' ');
+						$homologacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'homologacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'homologacao_count') + 0)), 2, ',', ' ');
+						$juridico_lead = number_format((($DB->result($result_stat_lead_time, 0, 'juridico') + 0) / ($DB->result($result_stat_lead_time, 0, 'juridico_count') + 0)), 2, ',', ' ');
+						$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_interna') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_interna_count') + 0)), 2, ',', ' ');
+						$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time, 0, 'envio_contrato') + 0) / ($DB->result($result_stat_lead_time, 0, 'envio_contrato_count') + 0)), 2, ',', ' ');
+						$formalizacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'formalizacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'formalizacao_count') + 0)), 2, ',', ' ');
+						$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time, 0, 'pendente_unidade_count') + 0)), 2, ',', ' ');
+						$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_errata_count') + 0)), 2, ',', ' ');
+						$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'prorrogacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'prorrogacao_count') + 0)), 2, ',', ' ');
+						$diligencia_lead = number_format((($DB->result($result_stat_lead_time, 0, 'diligencia') + 0) / ($DB->result($result_stat_lead_time, 0, 'diligencia_count') + 0)), 2, ',', ' ');
+						$recurso_lead = number_format((($DB->result($result_stat_lead_time, 0, 'recurso') + 0) / ($DB->result($result_stat_lead_time, 0, 'recurso_count') + 0)), 2, ',', ' ');
 
-						$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead) / 17;
+						//RETIRAR "NAN"
+						$new_lead != 'nan' ? $new_lead : $new_lead = 0;
+						$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
+						$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
+						$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
+						$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
+						$close_lead != 'nan' ? $close_lead : $close_lead = 0;
+						$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
+						$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
+						$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
+						$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
+						$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
+						$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
+						$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
+						$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
+						$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
+						$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
+						$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
+						$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
+						$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
+						$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
+						$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
+						$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
+						$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
+						$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
 
+						$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
 
 						$status_contratos = '';
 
@@ -771,50 +820,103 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						if ($exibir) {
 							$status_contratos =
 								"
-								 <td>". 'Atribuido'."</td>
-								 <td align='center'>".$atribuido."</td>			
-								 <td align='center'>".$atribuido_lead."</td>			
-								 </tr>
-								 <td>". 'Validacão TR'."</td>
-								 <td align='center'>".$validacao_tr."</td>			
-								 <td align='center'>".$validacao_tr_lead."</td>			
-								 </tr>
-								 <td>". 'Publicação'."</td>
-								 <td align='center'>".$publicacao."</td>			
-								 <td align='center'>".$publicacao_lead."</td>			
-								 </tr>
-								 <td>". 'Parecer Habilitação'."</td>
-								 <td align='center'>".$parecer_habilitacao."</td>			
-								 <td align='center'>".$parecer_habilitacao_lead."</td>			
-								 </tr>
-								 <td>". 'Validação Técnica'."</td>
-								 <td align='center'>".$validacao_tecnica."</td>			
-								 <td align='center'>".$validacao_tecnica_lead."</td>			
-								 </tr>
-								 <td>". 'Resultados'."</td>
-								 <td align='center'>".$resultados."</td>			
-								 <td align='center'>".$resultados_lead."</td>			
-								 </tr>
-								 <td>". 'Homologação'."</td>
-								 <td align='center'>".$homologacao."</td>			
-								 <td align='center'>".$homologacao_lead."</td>			
-								 </tr>
-								 <td>". 'Juridico'."</td>
-								 <td align='center'>".$juridico."</td>			
-								 <td align='center'>".$juridico_lead."</td>			
-								 </tr>
-								 <td>". 'Validação Interna'."</td>
-								 <td align='center'>".$validacao_interna."</td>			
-								 <td align='center'>".$validacao_interna_lead."</td>			
-								 </tr>
-								 <td>". 'Envio de Contrato'."</td>
-								 <td align='center'>".$envio_contrato."</td>			
-								 <td align='center'>".$envio_contrato_lead."</td>			
-								 </tr>
-								 <td>". 'Formalização'."</td>
-								 <td align='center'>".$formalizacao."</td>			
-								 <td align='center'>".$formalizacao_lead."</td>			
-								 </tr>											
+						
+			 <tr>
+			 <td>" . 'Atribuido' . "</td>
+			 <td align='center'>" . $atribuido . "</td>			
+			 <td align='center'>" . $atribuido_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Validacão TR' . "</td>
+			 <td align='center'>" . $validacao_tr . "</td>			
+			 <td align='center'>" . $validacao_tr_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Publicação' . "</td>
+			 <td align='center'>" . $publicacao . "</td>			
+			 <td align='center'>" . $publicacao_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Parecer Habilitação' . "</td>
+			 <td align='center'>" . $parecer_habilitacao . "</td>			
+			 <td align='center'>" . $parecer_habilitacao_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Validação Técnica' . "</td>
+			 <td align='center'>" . $validacao_tecnica . "</td>			
+			 <td align='center'>" . $validacao_tecnica_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Resultados' . "</td>
+			 <td align='center'>" . $resultados . "</td>			
+			 <td align='center'>" . $resultados_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Homologação' . "</td>
+			 <td align='center'>" . $homologacao . "</td>			
+			 <td align='center'>" . $homologacao_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Juridico' . "</td>
+			 <td align='center'>" . $juridico . "</td>			
+			 <td align='center'>" . $juridico_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Validação Interna' . "</td>
+			 <td align='center'>" . $validacao_interna . "</td>			
+			 <td align='center'>" . $validacao_interna_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Envio de Contrato' . "</td>
+			 <td align='center'>" . $envio_contrato . "</td>			
+			 <td align='center'>" . $envio_contrato_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Formalização' . "</td>
+			 <td align='center'>" . $formalizacao . "</td>			
+			 <td align='center'>" . $formalizacao_lead . "</td>			
+			 </tr>
+			 
+			 <tr>
+			 <td>" . 'Pendente Unidade' . "</td>
+			 <td align='center'>" . $pendente_unidade . "</td>			
+			 <td align='center'>" . $pendente_unidade_lead . "</td>			
+			 </tr>
+			 
+			 <tr>
+			 <td>" . 'Publicação de Errata' . "</td>
+			 <td align='center'>" . $publicacao_errata . "</td>			
+			 <td align='center'>" . $publicacao_errata_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Prorrogação' . "</td>
+			 <td align='center'>" . $prorrogacao . "</td>			
+			 <td align='center'>" . $prorrogacao_lead . "</td>			
+			 </tr>
+			 
+			 <tr>
+			 <td>" . 'Diligência' . "</td>
+			 <td align='center'>" . $diligencia . "</td>			
+			 <td align='center'>" . $diligencia_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Recurso' . "</td>
+			 <td align='center'>" . $recurso . "</td>			
+			 <td align='center'>" . $recurso_lead . "</td>			
+			 </tr>			 							
+																					
 								";
 						}
 
@@ -887,9 +989,12 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			 <td align='right'>" . $aditivos_dias . "</td>
 			 </tr>		
 			 <tr>
-			 <td>". ('Média de dias leadtime')."</td>
-			 <td align='right'>". number_format($media_lead, 2, ',', ' ')."</td>
+			 <td>" . ('Média de dias leadtime') . "</td>
+			 <td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
 			 </tr>			
+
+			
+
 		    </tbody> </table>		   		    
 
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
@@ -899,45 +1004,50 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			 </tr>
 			 </thead>	
 
-			 <tbody>							
+			 <tbody>
 			 <tr>
 			 <td align='left'> <b>Status</b> </td>
 			 <td align='center'> <b>Total Chamados</b> </td>
 			 <td align='center'> <b>Tempo Média Chamados</b> </td>
-			 </tr>							
-			 <tr>
-			 <td>". _x('status','New')."</td>
-			 <td align='center'>".$new."</td>			
-			 <td align='center'>".$new_lead."</td>			
-			 </tr>				
-			 <tr>
-			 <td>". __('Assigned')."</td>
-			 <td align='center'>".$assig."</td>			
-			 <td align='center'>".$assig_lead."</td>			
-			 </tr>				
-			 <tr>
-			 <td>". __('Planned')."</td>
-			 <td align='center'>".$plan."</td>			
-			 <td align='center'>".$plan_lead."</td>			
-			 </tr>				
-			 <tr>
-			 <td>". __('Pending')."</td>
-			 <td align='center'>".$pend."</td>			
-			 <td align='center'>".$pend_lead."</td>			
-			 </tr>			
-			 <tr>
-			 <td>". __('Solved','dashboard')."</td>
-			 <td align='center'>".$solve."</td>			
-			 <td align='center'>".$solve_lead."</td>			
-			 </tr>				
-			 <tr>
-			 <td>". __('Closed')."</td>
-			 <td align='center'>".$close."</td>			
-			 <td align='center'>".$close_lead."</td>						
 			 </tr>
-			 " . $status_contratos . "								
-													
-		    </tbody> </table>
+
+			 <tr>
+			 <td>" . _x('status', 'New') . "</td>
+			 <td align='center'>" . $new . "</td>			
+			 <td align='center'>" . $new_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . __('Assigned') . "</td>
+			 <td align='center'>" . $assig . "</td>			
+			 <td align='center'>" . $assig_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . __('Planned') . "</td>
+			 <td align='center'>" . $plan . "</td>			
+			 <td align='center'>" . $plan_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . __('Pending') . "</td>
+			 <td align='center'>" . $pend . "</td>			
+			 <td align='center'>" . $pend_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . __('Solved', 'dashboard') . "</td>
+			 <td align='center'>" . $solve . "</td>			
+			 <td align='center'>" . $solve_lead . "</td>			
+			 </tr>	
+
+			 <tr>
+			 <td>" . __('Closed') . "</td>
+			 <td align='center'>" . $close . "</td>			
+			 <td align='center'>" . $close_lead . "</td>			
+			 </tr>
+$status_contratos
+		    </tbody></table>
 		   
 		    		   
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>

@@ -1,7 +1,7 @@
 <?php
 
-include ("../../../../inc/includes.php");
-include ("../../../../inc/config.php");
+include("../../../../inc/includes.php");
+include("../../../../inc/config.php");
 include "../inc/functions.php";
 
 global $DB;
@@ -9,211 +9,208 @@ global $DB;
 Session::checkLoginUser();
 Session::checkRight("profile", READ);
 
-if(!empty($_POST['submit']))
-{
-    $data_ini =  $_POST['date1'];
-    $data_fin = $_POST['date2'];
+if (!empty($_POST['submit'])) {
+	$data_ini =  $_POST['date1'];
+	$data_fin = $_POST['date2'];
+} else {
+	$data_ini = date("Y-m-01");
+	$data_fin = date("Y-m-d");
 }
 
-else {
-    $data_ini = date("Y-m-01");
-    $data_fin = date("Y-m-d");
-    }
-
-if(!isset($_POST["sel_date"])) {
+if (!isset($_POST["sel_date"])) {
 	$id_date = $_GET["date"];
-}
-
-else {
+} else {
 	$id_date = $_POST["sel_date"];
 }
 
 
 # entity
-$sql_e = "SELECT value FROM glpi_plugin_dashboard_config WHERE name = 'entity' AND users_id = ".$_SESSION['glpiID']."";
+$sql_e = "SELECT value FROM glpi_plugin_dashboard_config WHERE name = 'entity' AND users_id = " . $_SESSION['glpiID'] . "";
 $result_e = $DB->query($sql_e);
-$sel_ent = $DB->result($result_e,0,'value');
+$sel_ent = $DB->result($result_e, 0, 'value');
 
-if($sel_ent == '' || $sel_ent == -1) {
-	
-//	$sel_ent = 0;
-	$entities = $_SESSION['glpiactiveentities'];	
-	$ent = implode(",",$entities);
-	
-	$entidade = "AND glpi_tickets.entities_id IN (".$ent.") ";
-	$entidade_d = "AND entities_id IN (".$ent.") ";
-	$entidade_dw = "WHERE entities_id IN (".$ent.") ";
-}
+if ($sel_ent == '' || $sel_ent == -1) {
 
-else {
-	$entidade = "AND glpi_tickets.entities_id IN (".$sel_ent.") ";
-	$entidade_d = "AND entities_id IN (".$sel_ent.") ";
-	$entidade_dw = "WHERE entities_id IN (".$sel_ent.") ";
+	//	$sel_ent = 0;
+	$entities = $_SESSION['glpiactiveentities'];
+	$ent = implode(",", $entities);
+
+	$entidade = "AND glpi_tickets.entities_id IN (" . $ent . ") ";
+	$entidade_d = "AND entities_id IN (" . $ent . ") ";
+	$entidade_dw = "WHERE entities_id IN (" . $ent . ") ";
+} else {
+	$entidade = "AND glpi_tickets.entities_id IN (" . $sel_ent . ") ";
+	$entidade_d = "AND entities_id IN (" . $sel_ent . ") ";
+	$entidade_dw = "WHERE entities_id IN (" . $sel_ent . ") ";
 }
 
 ?>
 <html>
+
 <head>
-<title> GLPI - <?php echo __('Summary Report','dashboard') ?> </title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-<meta http-equiv="content-language" content="en-us" />
-<meta charset="utf-8">
+	<title> GLPI - <?php echo __('Summary Report', 'dashboard') ?> </title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<meta http-equiv="content-language" content="en-us" />
+	<meta charset="utf-8">
 
-<link rel="icon" href="../img/dash.ico" type="image/x-icon" />
-<link rel="shortcut icon" href="../img/dash.ico" type="image/x-icon" />
-<link href="../css/styles.css" rel="stylesheet" type="text/css" />
-<link href="../css/bootstrap.css" rel="stylesheet" type="text/css" />
-<script src="../js/bootstrap.min.js"></script>
+	<link rel="icon" href="../img/dash.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="../img/dash.ico" type="image/x-icon" />
+	<link href="../css/styles.css" rel="stylesheet" type="text/css" />
+	<link href="../css/bootstrap.css" rel="stylesheet" type="text/css" />
+	<script src="../js/bootstrap.min.js"></script>
 
-<style type="text/css">	
-	select { width: 60px; }
-	table.dataTable { empty-cells: show; }
-   a:link, a:visited, a:active { text-decoration: none;}
-</style>
+	<style type="text/css">
+		select {
+			width: 60px;
+		}
 
-<?php echo '<link rel="stylesheet" type="text/css" href="../css/style-'.$_SESSION['style'].'">';  ?> 
+		table.dataTable {
+			empty-cells: show;
+		}
+
+		a:link,
+		a:visited,
+		a:active {
+			text-decoration: none;
+		}
+	</style>
+
+	<?php echo '<link rel="stylesheet" type="text/css" href="../css/style-' . $_SESSION['style'] . '">';  ?>
 </head>
 
 <body style="background-color: #fff !important;">
-<?php
-		
-		$con = $_REQUEST['con'];
-		if($con == "1") {
-		
-		if(!isset($_REQUEST['date1']))
-		{
-		    $data_ini2 = $_REQUEST['date1'];
-		    $data_fin2 = $_REQUEST['date2'];
+	<?php
+
+	$con = $_REQUEST['con'];
+	if ($con == "1") {
+
+		if (!isset($_REQUEST['date1'])) {
+			$data_ini2 = $_REQUEST['date1'];
+			$data_fin2 = $_REQUEST['date2'];
+		} else {
+			$data_ini2 = $_REQUEST['date1'];
+			$data_fin2 = $_REQUEST['date2'];
 		}
-		
-		else {
-		    $data_ini2 = $_REQUEST['date1'];
-		    $data_fin2 = $_REQUEST['date2'];
+
+		if ($data_ini2 == $data_fin2) {
+			$datas2 = "LIKE '" . $data_ini2 . "%'";
+		} else {
+			$datas2 = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
 		}
-		
-		if($data_ini2 == $data_fin2) {
-			$datas2 = "LIKE '".$data_ini2."%'";
-		}
-		
-		else {
-			$datas2 = "BETWEEN '".$data_ini2." 00:00:00' AND '".$data_fin2." 23:59:59'";
-		}
-		
+
 		// do select
 		$post_date = $_REQUEST["sel_date"];
-		
-		if(!isset($post_date) or $post_date == "0") {
-		    $sel_date = $datas2;
+
+		if (!isset($post_date) or $post_date == "0") {
+			$sel_date = $datas2;
+		} else {
+			$sel_date = $_REQUEST["sel_date"];
 		}
-		
-		else {
-		    $sel_date = $_REQUEST["sel_date"];
+
+		switch ($post_date) {
+
+			case ("1"):
+				$data_ini2 = date('Y-m-01');
+				$data_fin2 = date('Y-m-d');
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("2"):
+				$data_ini2 = date('Y-m-d', strtotime('-1 week'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("3"):
+				$data_ini2 = date('Y-m-d', strtotime('-15 day'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("4"):
+				$data_ini2 = date('Y-m-d', strtotime('-1 month'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("5"):
+				$data_ini2 = date('Y-m-d', strtotime('-3 month'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
 		}
-		
-		switch($post_date) {
-		
-          case ("1") :
-             $data_ini2 = date('Y-m-01');
-             $data_fin2 = date('Y-m-d');
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '". $data_fin2 ." 23:59:59'";
-          break;
-          case ("2") :
-             $data_ini2 = date('Y-m-d', strtotime('-1 week'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("3") :
-             $data_ini2 = date('Y-m-d', strtotime('-15 day'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("4") :
-              $data_ini2 = date('Y-m-d', strtotime('-1 month'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("5") :
-              $data_ini2 = date('Y-m-d', strtotime('-3 month'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;		
-		}
-		
-		
+
+
 		// Chamados
 		$sql_cham = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_tickets.date AS date,
 		 glpi_tickets.solvedate AS solvedate, glpi_tickets.status AS status
 		FROM glpi_tickets
-		WHERE glpi_tickets.date ".$sel_date."
+		WHERE glpi_tickets.date " . $sel_date . "
 		AND glpi_tickets.is_deleted = 0		
-		".$entidade."
+		" . $entidade . "
 		ORDER BY id DESC ";
-		
+
 		$result_cham = $DB->query($sql_cham);
-		$chamados = $DB->fetch_assoc($result_cham) ;
-		
-				
+		$chamados = $DB->fetch_assoc($result_cham);
+
+
 		//quant de chamados
 		$sql_cham2 =
-		"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
+			"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
 		FROM glpi_tickets
 		WHERE glpi_tickets.is_deleted = 0 		
-		AND date ".$sel_date."		
-		".$entidade." ";
-		
-		$result_cham2 = $DB->query($sql_cham2);		
+		AND date " . $sel_date . "		
+		" . $entidade . " ";
+
+		$result_cham2 = $DB->query($sql_cham2);
 		$conta_cham = $DB->fetch_assoc($result_cham2);
-		
+
 		$total_cham = $conta_cham['total'];
 		//$numdias = $conta_cham['numdias'];
-		
-		
-		if($total_cham > 0) {
-			
+
+
+		if ($total_cham > 0) {
+
 			//date diff
-			$numdias = round(abs(strtotime($data_fin2) - strtotime($data_ini2)) / 86400,0);
-			
+			$numdias = round(abs(strtotime($data_fin2) - strtotime($data_ini2)) / 86400, 0);
+
 			//tecnico
 			$sql_tec = "SELECT count(glpi_tickets.id) AS conta, glpi_users.firstname AS name, glpi_users.realname AS sname
 			FROM `glpi_tickets_users` , glpi_tickets, glpi_users
 			WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.date " . $sel_date . "
 			AND glpi_tickets_users.`users_id` = glpi_users.id
 			AND glpi_tickets_users.type = 2
-			".$entidade." 
+			" . $entidade . " 
 			GROUP BY name
 			ORDER BY conta DESC
 			LIMIT 5";
-			
-			$result_tec = $DB->query($sql_tec);	
-			
+
+			$result_tec = $DB->query($sql_tec);
+
 			//requester
-			$sql_req =			
-			"SELECT count( glpi_tickets.id ) AS conta, glpi_tickets_users.`users_id` AS id,  glpi_users.firstname AS name, glpi_users.realname AS sname
+			$sql_req =
+				"SELECT count( glpi_tickets.id ) AS conta, glpi_tickets_users.`users_id` AS id,  glpi_users.firstname AS name, glpi_users.realname AS sname
 			FROM `glpi_tickets_users`, glpi_tickets, glpi_users
 			WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.date " . $sel_date . "
 			AND glpi_tickets_users.`users_id` = glpi_users.id
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets.is_deleted = 0
-			".$entidade."
+			" . $entidade . "
 			GROUP BY `users_id`
 			ORDER BY conta DESC
 			LIMIT 5 ";
-			
-			$result_req = $DB->query($sql_req);		
-											
+
+			$result_req = $DB->query($sql_req);
+
 			//avg time
 			$sql_time =
-			"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
+				"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
 			FROM glpi_tickets
-			WHERE date ".$sel_date."			
+			WHERE date " . $sel_date . "			
 			AND glpi_tickets.is_deleted = 0			
-			".$entidade." ";
-			
-			$result_time = $DB->query($sql_time);		
+			" . $entidade . " ";
+
+			$result_time = $DB->query($sql_time);
 			$time_cham = $DB->fetch_assoc($result_time);
-			
+
 			$avgtime = $time_cham['avgtime'];
-			
-			
+
+
 			//count by status
 			$query_stat = "
 			SELECT
@@ -242,36 +239,34 @@ else {
 			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
-			AND glpi_tickets.date ".$sel_date."			
-			".$entidade."";
-		
+			AND glpi_tickets.date " . $sel_date . "			
+			" . $entidade . "";
+
 			$result_stat = $DB->query($query_stat);
-		
-                        $new = $DB->result($result_stat,0,'new') + 0;
-                        $assig = $DB->result($result_stat,0,'assig') + 0;
-                        $plan = $DB->result($result_stat,0,'plan') + 0;
-                        $pend = $DB->result($result_stat,0,'pend') + 0;
-                        $solve = $DB->result($result_stat,0,'solve') + 0;
-                        $close = $DB->result($result_stat,0,'close') + 0;
-						$atribuido = $DB->result($result_stat,0,'atribuido') + 0;
-						$validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
-						$publicacao = $DB->result($result_stat,0,'publicacao') + 0;
-						$parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
-						$validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
-						$resultados = $DB->result($result_stat,0,'resultados') + 0;
-						$homologacao = $DB->result($result_stat,0,'homologacao') + 0;
-						$juridico = $DB->result($result_stat,0,'juridico') + 0;
-						$validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
-						$envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
-						$formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
-						$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
-						$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
-						$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
-						$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
-						$recurso = $DB->result($result_stat,0,'recurso') + 0;
-						
-			
-			
+
+			$new = $DB->result($result_stat, 0, 'new') + 0;
+			$assig = $DB->result($result_stat, 0, 'assig') + 0;
+			$plan = $DB->result($result_stat, 0, 'plan') + 0;
+			$pend = $DB->result($result_stat, 0, 'pend') + 0;
+			$solve = $DB->result($result_stat, 0, 'solve') + 0;
+			$close = $DB->result($result_stat, 0, 'close') + 0;
+			$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
+			$validacao_tr = $DB->result($result_stat, 0, 'validacao_tr') + 0;
+			$publicacao = $DB->result($result_stat, 0, 'publicacao') + 0;
+			$parecer_habilitacao = $DB->result($result_stat, 0, 'parecer_habilitacao') + 0;
+			$validacao_tecnica = $DB->result($result_stat, 0, 'validacao_tecnica') + 0;
+			$resultados = $DB->result($result_stat, 0, 'resultados') + 0;
+			$homologacao = $DB->result($result_stat, 0, 'homologacao') + 0;
+			$juridico = $DB->result($result_stat, 0, 'juridico') + 0;
+			$validacao_interna = $DB->result($result_stat, 0, 'validacao_interna') + 0;
+			$envio_contrato = $DB->result($result_stat, 0, 'envio_contrato') + 0;
+			$formalizacao = $DB->result($result_stat, 0, 'formalizacao') + 0;
+			$pendente_unidade = $DB->result($result_stat, 0, 'pendente_unidade') + 0;
+			$publicacao_errata = $DB->result($result_stat, 0, 'publicacao_errata') + 0;
+			$prorrogacao = $DB->result($result_stat, 0, 'prorrogacao') + 0;
+			$diligencia = $DB->result($result_stat, 0, 'diligencia') + 0;
+			$recurso = $DB->result($result_stat, 0, 'recurso') + 0;
+
 			//count by type
 			$query_type = "
 			SELECT
@@ -279,28 +274,28 @@ else {
 			SUM(case when glpi_tickets.type = 2 then 1 else 0 end) AS request
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
-			AND glpi_tickets.date ".$sel_date."			
-			".$entidade."";
-		
+			AND glpi_tickets.date " . $sel_date . "			
+			" . $entidade . "";
+
 			$result_type = $DB->query($query_type);
-		
-			$incident = $DB->result($result_type,0,'incident');
-			$request = $DB->result($result_type,0,'request');
-			
+
+			$incident = $DB->result($result_type, 0, 'incident');
+			$request = $DB->result($result_type, 0, 'request');
+
 			//select groups
-			$sql_grp = 
-			"SELECT count(glpi_tickets.id) AS conta, glpi_groups.name AS name
+			$sql_grp =
+				"SELECT count(glpi_tickets.id) AS conta, glpi_groups.name AS name
 			FROM `glpi_groups_tickets`, glpi_tickets, glpi_groups
 			WHERE glpi_groups_tickets.`groups_id` = glpi_groups.id
 			AND glpi_groups_tickets.`tickets_id` = glpi_tickets.id
 			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.date ".$sel_date."
-			".$entidade."
+			AND glpi_tickets.date " . $sel_date . "
+			" . $entidade . "
 			GROUP BY name
 			ORDER BY conta DESC
-			LIMIT 5 ";			
-			
-			$result_grp = $DB->query($sql_grp);	
+			LIMIT 5 ";
+
+			$result_grp = $DB->query($sql_grp);
 
 			//logo						
 			if (file_exists('../../../../pics/logo_big.png')) {
@@ -308,18 +303,17 @@ else {
 				$imgsize = "width:100px; height:55px;";
 			}
 			//else {
-			if (!file_exists('../../../../pics/logo_big.png')) {						
-				if ($CFG_GLPI['version'] >= 0.90){					
+			if (!file_exists('../../../../pics/logo_big.png')) {
+				if ($CFG_GLPI['version'] >= 0.90) {
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "background-color:#000;";
-				}	
-				else {
+				} else {
 					$logo = "../../../../pics/logo-glpi-login.png";
 					$imgsize = "";
 				}
 			}
-		//Calculo para cotação
-		$query_chamados = "
+			//Calculo para cotação
+			$query_chamados = "
 		SELECT * 
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
@@ -328,8 +322,8 @@ else {
 		AND glpi_tickets.itilcategories_id = 189
 		$entidade
 	";
-	
-	$query_cont = "
+
+			$query_cont = "
 		SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.date $sel_date
@@ -338,46 +332,46 @@ else {
 		$entidade
 	";
 
-	$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
-	$result_cham_contratos = $DB->query($query_chamados);	
+			$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
+			$result_cham_contratos = $DB->query($query_chamados);
 
-	$qtd_dias_cotacao_1 = 0;
-	$qtd_dias_cotacao_2 = 0;
+			$qtd_dias_cotacao_1 = 0;
+			$qtd_dias_cotacao_2 = 0;
 
 
-	foreach ($result_cham_contratos as $chamado) {
+			foreach ($result_cham_contratos as $chamado) {
 
-		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
-					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] ." ) IS NULL
+				$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
-						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] .") 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END),
-					(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+					(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
-						ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = ". $chamado['ticket_id'] .") 
-					END)
-				) dias";			
-
-		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
-						THEN NOW() 
-						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") 
-					END),
-					(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
-						THEN NOW() 
-						ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") 
+						ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END)
 				) dias";
 
-		$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
-		$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
+				$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN NOW() 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END),
+					(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN NOW() 
+						ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END)
+				) dias";
 
-		$qtd_dias_cotacao_1 = intval($qtd_dias_cotacao_1) + intval($result_etapa1['dias']);
-		$qtd_dias_cotacao_2 = intval($qtd_dias_cotacao_2) + intval($result_etapa2['dias']);
-	}
+				$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
+				$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
 
-	//Calculo para dispensa
-	$query_chamados_dispensa = "
+				$qtd_dias_cotacao_1 = intval($qtd_dias_cotacao_1) + intval($result_etapa1['dias']);
+				$qtd_dias_cotacao_2 = intval($qtd_dias_cotacao_2) + intval($result_etapa2['dias']);
+			}
+
+			//Calculo para dispensa
+			$query_chamados_dispensa = "
 		SELECT * 
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
@@ -387,7 +381,7 @@ else {
 		$entidade
 	";
 
-	$query_cont_dispensa = "
+			$query_cont_dispensa = "
 		SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.date $sel_date
@@ -395,45 +389,45 @@ else {
 		AND glpi_tickets.itilcategories_id = 191
 		$entidade
 	";
-	$result_cham_dispensa_cont = $DB->query($query_cont_dispensa)->fetch_assoc();
-	$result_cham_dispensa_contratos = $DB->query($query_chamados_dispensa);	
+			$result_cham_dispensa_cont = $DB->query($query_cont_dispensa)->fetch_assoc();
+			$result_cham_dispensa_contratos = $DB->query($query_chamados_dispensa);
 
-	$qtd_dias_dispensa_1 = 0;
-	$qtd_dias_dispensa_2 = 0;
+			$qtd_dias_dispensa_1 = 0;
+			$qtd_dias_dispensa_2 = 0;
 
-	foreach ($result_cham_dispensa_contratos as $chamado) {
+			foreach ($result_cham_dispensa_contratos as $chamado) {
 
-		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
-					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] ." ) IS NULL
+				$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
-						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = ". $chamado['ticket_id'] .") 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END),
-					(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
+					(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
-						ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = ". $chamado['ticket_id'] .") 
-					END)
-				) dias";			
-
-		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
-						THEN NOW() 
-						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = ". $chamado['ticket_id'] .") 
-					END),
-					(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") IS NULL
-						THEN NOW() 
-						ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = ". $chamado['ticket_id'] .") 
+						ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END)
 				) dias";
 
-		$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
-		$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
+				$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN NOW() 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END),
+					(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN NOW() 
+						ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END)
+				) dias";
 
-		$qtd_dias_dispensa_1 = intval($qtd_dias_dispensa_1) + intval($result_etapa1['dias']);
-		$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
-	}
+				$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
+				$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
 
-	//Calculo para aditivo contrato
-	$query_chamados_aditivo = "
+				$qtd_dias_dispensa_1 = intval($qtd_dias_dispensa_1) + intval($result_etapa1['dias']);
+				$qtd_dias_dispensa_2 = intval($qtd_dias_dispensa_2) + intval($result_etapa2['dias']);
+			}
+
+			//Calculo para aditivo contrato
+			$query_chamados_aditivo = "
 		SELECT * 
 		FROM glpi_tickets 
 		WHERE glpi_tickets.date $sel_date
@@ -442,8 +436,8 @@ else {
 		AND glpi_tickets.solvedate is not null
 		$entidade
 	";
-	
-	$query_cont_aditivo = "
+
+			$query_cont_aditivo = "
 		SELECT count(DISTINCT glpi_tickets.id) as total 
 		from glpi_tickets
 		WHERE glpi_tickets.date $sel_date
@@ -453,50 +447,45 @@ else {
 		$entidade
 	";
 
-	$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
-	$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);	
-	$qtd_dias_aditivo = 0;
-	$entrouif = 0;
-	$entrouelse = 0;
-	//$qtd_dias_aditivo_2 = 0;
-	//print_r($result_cham_aditivo_contratos);exit();
-	foreach ($result_cham_aditivo_contratos as $chamado) {
+			$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
+			$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);
+			$qtd_dias_aditivo = 0;
+			$entrouif = 0;
+			$entrouelse = 0;
+			//$qtd_dias_aditivo_2 = 0;
+			//print_r($result_cham_aditivo_contratos);exit();
+			foreach ($result_cham_aditivo_contratos as $chamado) {
 
-		//print_r($chamado['content']);
-		$content = explode(' Insira Data de Inicio :', $chamado['content']);
-		$data_inicio_aditivo = date('Y-m-d H:i:s', strtotime(substr($content[1], 16, 10)));
-		$data_fim_aditivo = $chamado['solvedate'];
+				//print_r($chamado['content']);
+				$content = explode(' Insira Data de Inicio :', $chamado['content']);
+				$data_inicio_aditivo = date('Y-m-d H:i:s', strtotime(substr($content[1], 16, 10)));
+				$data_fim_aditivo = $chamado['solvedate'];
 
-		$datetime1 = new DateTime($data_inicio_aditivo);
-   		$datetime2 = new DateTime($data_fim_aditivo);
+				$datetime1 = new DateTime($data_inicio_aditivo);
+				$datetime2 = new DateTime($data_fim_aditivo);
 
-		$diferenca = date_diff($datetime1 , $datetime2);
+				$diferenca = date_diff($datetime1, $datetime2);
 
-		if( $data_inicio_aditivo >= $data_fim_aditivo )
-		{
-			$entrouif ++;
-			$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
-		}
-		else
-		{
-			$entrouelse ++;
-			$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
-		}
+				if ($data_inicio_aditivo >= $data_fim_aditivo) {
+					$entrouif++;
+					$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+				} else {
+					$entrouelse++;
+					$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+				}
+			}
 
+			//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-	}
-	
-//________________________________________________________________________________________________________________________________________________________________________________________________________________________
-
-	$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
-	$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
-	$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
-	$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
-//________________________________________________________________________________________________________________________________________________________________________________________________________________________
+			$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+			$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
+			$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
+			$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
+			//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 
-		//Calculo Leadtime
-		$query_stat_lead_time = "
+			//Calculo Leadtime
+			$query_stat_lead_time = "
 		SELECT
 		SUM(case when glpi_tickets_status.status_cod = 1 then glpi_tickets_status.data_cons else 0 end) AS new,
 		SUM(case when glpi_tickets_status.status_cod = 2 then glpi_tickets_status.data_cons else 0 end) AS assig,
@@ -550,68 +539,68 @@ else {
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets_status.data_fim is not null
-		AND glpi_tickets.date ".$sel_date."			
-		".$entidade."";
-		
-		$result_stat_lead_time = $DB->query($query_stat_lead_time);
+		AND glpi_tickets.date " . $sel_date . "			
+		" . $entidade . "";
 
-		$new_lead = number_format((($DB->result($result_stat_lead_time,0,'new') + 0) / ($DB->result($result_stat_lead_time,0,'new_count') + 0)), 2, ',', ' ') ;
-		$assig_lead = number_format((($DB->result($result_stat_lead_time,0,'assig') + 0) / ($DB->result($result_stat_lead_time,0,'assig_count') + 0)), 2, ',', ' ') ;
-		$plan_lead = number_format((($DB->result($result_stat_lead_time,0,'plan') + 0) / ($DB->result($result_stat_lead_time,0,'plan_count') + 0)), 2, ',', ' ') ;
-		$pend_lead = number_format((($DB->result($result_stat_lead_time,0,'pend') + 0) / ($DB->result($result_stat_lead_time,0,'pend_count') + 0)), 2, ',', ' ') ;
-		$solve_lead = number_format((($DB->result($result_stat_lead_time,0,'solve') + 0) / ($DB->result($result_stat_lead_time,0,'solve_count') + 0)), 2, ',', ' ') ;
-		$close_lead = number_format((($DB->result($result_stat_lead_time,0,'close') + 0) / ($DB->result($result_stat_lead_time,0,'close_count') + 0)), 2, ',', ' ') ;
-		$atribuido_lead = number_format((($DB->result($result_stat_lead_time,0,'atribuido') + 0) / ($DB->result($result_stat_lead_time,0,'atribuido_count') + 0)), 2, ',', ' ') ;
-		$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tr') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tr_count') + 0)), 2, ',', ' ') ;
-		$publicacao_lead = number_format((($DB->result($result_stat_lead_time,0,'publicacao') + 0) / ($DB->result($result_stat_lead_time,0,'publicacao_count') + 0)), 2, ',', ' ') ;
-		$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time,0,'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time,0,'parecer_habilitacao_count') + 0)), 2, ',', ' ') ;
-		$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_tecnica_count') + 0)), 2, ',', ' ') ;
-		$resultados_lead = number_format((($DB->result($result_stat_lead_time,0,'resultados') + 0) / ($DB->result($result_stat_lead_time,0,'resultados_count') + 0)), 2, ',', ' ') ;
-		$homologacao_lead = number_format((($DB->result($result_stat_lead_time,0,'homologacao') + 0) / ($DB->result($result_stat_lead_time,0,'homologacao_count') + 0)), 2, ',', ' ') ;
-		$juridico_lead = number_format((($DB->result($result_stat_lead_time,0,'juridico') + 0) / ($DB->result($result_stat_lead_time,0,'juridico_count') + 0)), 2, ',', ' ') ;
-		$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time,0,'validacao_interna') + 0) / ($DB->result($result_stat_lead_time,0,'validacao_interna_count') + 0)), 2, ',', ' ') ;
-		$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time,0,'envio_contrato') + 0) / ($DB->result($result_stat_lead_time,0,'envio_contrato_count') + 0)), 2, ',', ' ') ;
-		$formalizacao_lead = number_format((($DB->result($result_stat_lead_time,0,'formalizacao') + 0) / ($DB->result($result_stat_lead_time,0,'formalizacao_count') + 0)), 2, ',', ' ') ;
-		$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time,0,'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time,0,'pendente_unidade_count') + 0)), 2, ',', ' ') ;
-		$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time,0,'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time,0,'publicacao_errata_count') + 0)), 2, ',', ' ') ;
-		$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time,0,'prorrogacao') + 0) / ($DB->result($result_stat_lead_time,0,'prorrogacao_count') + 0)), 2, ',', ' ') ;
-		$diligencia_lead = number_format((($DB->result($result_stat_lead_time,0,'diligencia') + 0) / ($DB->result($result_stat_lead_time,0,'diligencia_count') + 0)), 2, ',', ' ') ;
-		$recurso_lead = number_format((($DB->result($result_stat_lead_time,0,'recurso') + 0) / ($DB->result($result_stat_lead_time,0,'recurso_count') + 0)), 2, ',', ' ') ;
+			$result_stat_lead_time = $DB->query($query_stat_lead_time);
 
-		//RETIRAR "NAN"
-		$new_lead != 'nan' ? $new_lead : $new_lead = 0;
-		$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
-		$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
-		$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
-		$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
-		$close_lead != 'nan' ? $close_lead : $close_lead = 0;
-		$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
-		$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
-		$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
-		$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
-		$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
-		$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
-		$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
-		$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
-		$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
-		$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
-		$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
-		$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
-		$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
-		$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
-		$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
-		$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
-		$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
-		$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
+			$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
+			$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
+			$plan_lead = number_format((($DB->result($result_stat_lead_time, 0, 'plan') + 0) / ($DB->result($result_stat_lead_time, 0, 'plan_count') + 0)), 2, ',', ' ');
+			$pend_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pend') + 0) / ($DB->result($result_stat_lead_time, 0, 'pend_count') + 0)), 2, ',', ' ');
+			$solve_lead = number_format((($DB->result($result_stat_lead_time, 0, 'solve') + 0) / ($DB->result($result_stat_lead_time, 0, 'solve_count') + 0)), 2, ',', ' ');
+			$close_lead = number_format((($DB->result($result_stat_lead_time, 0, 'close') + 0) / ($DB->result($result_stat_lead_time, 0, 'close_count') + 0)), 2, ',', ' ');
+			$atribuido_lead = number_format((($DB->result($result_stat_lead_time, 0, 'atribuido') + 0) / ($DB->result($result_stat_lead_time, 0, 'atribuido_count') + 0)), 2, ',', ' ');
+			$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tr') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tr_count') + 0)), 2, ',', ' ');
+			$publicacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_count') + 0)), 2, ',', ' ');
+			$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao_count') + 0)), 2, ',', ' ');
+			$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tecnica_count') + 0)), 2, ',', ' ');
+			$resultados_lead = number_format((($DB->result($result_stat_lead_time, 0, 'resultados') + 0) / ($DB->result($result_stat_lead_time, 0, 'resultados_count') + 0)), 2, ',', ' ');
+			$homologacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'homologacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'homologacao_count') + 0)), 2, ',', ' ');
+			$juridico_lead = number_format((($DB->result($result_stat_lead_time, 0, 'juridico') + 0) / ($DB->result($result_stat_lead_time, 0, 'juridico_count') + 0)), 2, ',', ' ');
+			$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_interna') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_interna_count') + 0)), 2, ',', ' ');
+			$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time, 0, 'envio_contrato') + 0) / ($DB->result($result_stat_lead_time, 0, 'envio_contrato_count') + 0)), 2, ',', ' ');
+			$formalizacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'formalizacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'formalizacao_count') + 0)), 2, ',', ' ');
+			$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time, 0, 'pendente_unidade_count') + 0)), 2, ',', ' ');
+			$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_errata_count') + 0)), 2, ',', ' ');
+			$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'prorrogacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'prorrogacao_count') + 0)), 2, ',', ' ');
+			$diligencia_lead = number_format((($DB->result($result_stat_lead_time, 0, 'diligencia') + 0) / ($DB->result($result_stat_lead_time, 0, 'diligencia_count') + 0)), 2, ',', ' ');
+			$recurso_lead = number_format((($DB->result($result_stat_lead_time, 0, 'recurso') + 0) / ($DB->result($result_stat_lead_time, 0, 'recurso_count') + 0)), 2, ',', ' ');
 
-
-
-		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
-
-	
+			//RETIRAR "NAN"
+			$new_lead != 'nan' ? $new_lead : $new_lead = 0;
+			$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
+			$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
+			$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
+			$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
+			$close_lead != 'nan' ? $close_lead : $close_lead = 0;
+			$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
+			$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
+			$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
+			$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
+			$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
+			$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
+			$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
+			$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
+			$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
+			$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
+			$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
+			$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
+			$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
+			$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
+			$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
+			$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
+			$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
+			$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
 
 
-$content = "
+
+			$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
+
+
+
+
+			$content = "
 <page backtop='5mm' backbottom='5mm' backleft='15mm' backright='10mm'> 
       <page_header> 
       </page_header>
@@ -622,28 +611,27 @@ $content = "
  		<!-- <div class='fluid col-md-12 report' style='margin-left: 0px; margin-top: -8px;'> -->		
 			
 			 <div id='logo' class='fluid'>
-			 	<span class='col-md-2' ><img src='".$logo."' alt='GLPI' style='".$imgsize."'> </span>
-			 	<span class='col-md-8' style='margin-top:-80px; height:60px; text-align:center; margin:auto;'><h3 style='vertical-align:top;'>". __('Summary Report','dashboard')." </h3></span>
+			 	<span class='col-md-2' ><img src='" . $logo . "' alt='GLPI' style='" . $imgsize . "'> </span>
+			 	<span class='col-md-8' style='margin-top:-80px; height:60px; text-align:center; margin:auto;'><h3 style='vertical-align:top;'>" . __('Summary Report', 'dashboard') . " </h3></span>
 			 </div>
 									
 			 <table id='data' class='table table-condensed table-striped' style='font-size: 16px; width:55%; margin:auto; margin-top:35px; margin-bottom:20px;'>			
 			 <tbody>				
 			 <tr>
-			 <td width='300'>". __('Period','dashboard').": </td>";
-			 
-			if($data_ini2 == $data_fin2) {
-				$content .= "<td width='200' align='right'>".conv_data($data_ini2)."</td>";		
-			}
-			else {
-				 $content .= "<td width='200' align='right'>".conv_data($data_ini2)." to ".conv_data($data_fin2)."</td>";
-			}	
+			 <td width='300'>" . __('Period', 'dashboard') . ": </td>";
 
-$content .= "					
+			if ($data_ini2 == $data_fin2) {
+				$content .= "<td width='200' align='right'>" . conv_data($data_ini2) . "</td>";
+			} else {
+				$content .= "<td width='200' align='right'>" . conv_data($data_ini2) . " to " . conv_data($data_fin2) . "</td>";
+			}
+
+			$content .= "					
 			 </tr>
 			
 			 <tr>
-			 <td>". __('Date').": </td>
-			 <td align='right'>".conv_data_hora(date("Y-m-d H:i"))."</td>			
+			 <td>" . __('Date') . ": </td>
+			 <td align='right'>" . conv_data_hora(date("Y-m-d H:i")) . "</td>			
 			 </tr>
 			 <tr><td>&nbsp;</td></tr>
 			 </tbody>
@@ -653,41 +641,41 @@ $content .= "
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:85%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;' >". __('Tickets','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;' >" . __('Tickets', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
 			 <tbody>			
 			 <tr>
-			 <td width='300'>". __('Tickets Total','dashboard')."</td>
-			 <td width='200' align='right'>".$total_cham."</td>			
+			 <td width='300'>" . __('Tickets Total', 'dashboard') . "</td>
+			 <td width='200' align='right'>" . $total_cham . "</td>			
 			 </tr>			
 			
 			 <tr>
-			 <td>". _n('Day','Days',2)."</td>
-			 <td align='right'>".$numdias."</td>
+			 <td>" . _n('Day', 'Days', 2) . "</td>
+			 <td align='right'>" . $numdias . "</td>
 			 </tr>	
 			
 			 <tr>
-			 <td>". __('Tickets','dashboard')." ". __('By day')." - ". __('Average')."</td>
-			 <td align='right'>".round($total_cham / $numdias,0)."</td>
+			 <td>" . __('Tickets', 'dashboard') . " " . __('By day') . " - " . __('Average') . "</td>
+			 <td align='right'>" . round($total_cham / $numdias, 0) . "</td>
 			 </tr>
 			
 			 <tr>
-			 <td>". __('Average time to closure')."</td>
-			 <td align='right'>". time_hrs($avgtime )."</td>
+			 <td>" . __('Average time to closure') . "</td>
+			 <td align='right'>" . time_hrs($avgtime) . "</td>
 			 </tr>	
 			 <tr>
-			 <td>". ('Média de dias de aditivos renovados')."</td>
-			 <td align='right'>". $aditivos_renovados."</td>
+			 <td>" . ('Média de dias de aditivos renovados') . "</td>
+			 <td align='right'>" . $aditivos_renovados . "</td>
 			 </tr>		
 			 <tr>
-			 <td>". ('Média de dias de aditivos renovados')."</td>
-			 <td align='right'>". $aditivos_dias."</td>
+			 <td>" . ('Média de dias de aditivos renovados') . "</td>
+			 <td align='right'>" . $aditivos_dias . "</td>
 			 </tr>	
 			 <tr>
-			 <td>". ('Média de dias leadtime')."</td>
-			 <td align='right'>". number_format($media_lead, 2, ',', ' ')."</td>
+			 <td>" . ('Média de dias leadtime') . "</td>
+			 <td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
 			 </tr>
 			 
 			 <tr><td>&nbsp;</td></tr>				
@@ -698,7 +686,7 @@ $content .= "
 			<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:85%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='3' style='text-align:center; background:#286090; color:#fff;'>". __('Tickets by Status','dashboard')."</th>						
+			 <th colspan='3' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets by Status', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
@@ -710,135 +698,135 @@ $content .= "
 			 </tr>
 
 			 <tr>
-			 <td>". _x('status','New')."</td>
-			 <td align='center'>".$new."</td>			
-			 <td align='center'>".$new_lead."</td>			
+			 <td>" . _x('status', 'New') . "</td>
+			 <td align='center'>" . $new . "</td>			
+			 <td align='center'>" . $new_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". __('Assigned')."</td>
-			 <td align='center'>".$assig."</td>			
-			 <td align='center'>".$assig_lead."</td>			
+			 <td>" . __('Assigned') . "</td>
+			 <td align='center'>" . $assig . "</td>			
+			 <td align='center'>" . $assig_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". __('Planned')."</td>
-			 <td align='center'>".$plan."</td>			
-			 <td align='center'>".$plan_lead."</td>			
+			 <td>" . __('Planned') . "</td>
+			 <td align='center'>" . $plan . "</td>			
+			 <td align='center'>" . $plan_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". __('Pending')."</td>
-			 <td align='center'>".$pend."</td>			
-			 <td align='center'>".$pend_lead."</td>			
+			 <td>" . __('Pending') . "</td>
+			 <td align='center'>" . $pend . "</td>			
+			 <td align='center'>" . $pend_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". __('Solved','dashboard')."</td>
-			 <td align='center'>".$solve."</td>			
-			 <td align='center'>".$solve_lead."</td>			
+			 <td>" . __('Solved', 'dashboard') . "</td>
+			 <td align='center'>" . $solve . "</td>			
+			 <td align='center'>" . $solve_lead . "</td>			
 			 </tr>	
 
 			 <tr>
-			 <td>". __('Closed')."</td>
-			 <td align='center'>".$close."</td>			
-			 <td align='center'>".$close_lead."</td>			
+			 <td>" . __('Closed') . "</td>
+			 <td align='center'>" . $close . "</td>			
+			 <td align='center'>" . $close_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Atribuido'."</td>
-			 <td align='center'>".$atribuido."</td>			
-			 <td align='center'>".$atribuido_lead."</td>			
+			 <td>" . 'Atribuido' . "</td>
+			 <td align='center'>" . $atribuido . "</td>			
+			 <td align='center'>" . $atribuido_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Validacão TR'."</td>
-			 <td align='center'>".$validacao_tr."</td>			
-			 <td align='center'>".$validacao_tr_lead."</td>			
+			 <td>" . 'Validacão TR' . "</td>
+			 <td align='center'>" . $validacao_tr . "</td>			
+			 <td align='center'>" . $validacao_tr_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Publicação'."</td>
-			 <td align='center'>".$publicacao."</td>			
-			 <td align='center'>".$publicacao_lead."</td>			
+			 <td>" . 'Publicação' . "</td>
+			 <td align='center'>" . $publicacao . "</td>			
+			 <td align='center'>" . $publicacao_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Parecer Habilitação'."</td>
-			 <td align='center'>".$parecer_habilitacao."</td>			
-			 <td align='center'>".$parecer_habilitacao_lead."</td>			
+			 <td>" . 'Parecer Habilitação' . "</td>
+			 <td align='center'>" . $parecer_habilitacao . "</td>			
+			 <td align='center'>" . $parecer_habilitacao_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Validação Técnica'."</td>
-			 <td align='center'>".$validacao_tecnica."</td>			
-			 <td align='center'>".$validacao_tecnica_lead."</td>			
+			 <td>" . 'Validação Técnica' . "</td>
+			 <td align='center'>" . $validacao_tecnica . "</td>			
+			 <td align='center'>" . $validacao_tecnica_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Resultados'."</td>
-			 <td align='center'>".$resultados."</td>			
-			 <td align='center'>".$resultados_lead."</td>			
+			 <td>" . 'Resultados' . "</td>
+			 <td align='center'>" . $resultados . "</td>			
+			 <td align='center'>" . $resultados_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Homologação'."</td>
-			 <td align='center'>".$homologacao."</td>			
-			 <td align='center'>".$homologacao_lead."</td>			
+			 <td>" . 'Homologação' . "</td>
+			 <td align='center'>" . $homologacao . "</td>			
+			 <td align='center'>" . $homologacao_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Juridico'."</td>
-			 <td align='center'>".$juridico."</td>			
-			 <td align='center'>".$juridico_lead."</td>			
+			 <td>" . 'Juridico' . "</td>
+			 <td align='center'>" . $juridico . "</td>			
+			 <td align='center'>" . $juridico_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Validação Interna'."</td>
-			 <td align='center'>".$validacao_interna."</td>			
-			 <td align='center'>".$validacao_interna_lead."</td>			
+			 <td>" . 'Validação Interna' . "</td>
+			 <td align='center'>" . $validacao_interna . "</td>			
+			 <td align='center'>" . $validacao_interna_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Envio de Contrato'."</td>
-			 <td align='center'>".$envio_contrato."</td>			
-			 <td align='center'>".$envio_contrato_lead."</td>			
+			 <td>" . 'Envio de Contrato' . "</td>
+			 <td align='center'>" . $envio_contrato . "</td>			
+			 <td align='center'>" . $envio_contrato_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Formalização'."</td>
-			 <td align='center'>".$formalizacao."</td>			
-			 <td align='center'>".$formalizacao_lead."</td>			
+			 <td>" . 'Formalização' . "</td>
+			 <td align='center'>" . $formalizacao . "</td>			
+			 <td align='center'>" . $formalizacao_lead . "</td>			
 			 </tr>
 			 
 			 <tr>
-			 <td>". 'Pendente Unidade'."</td>
-			 <td align='center'>".$pendente_unidade."</td>			
-			 <td align='center'>".$pendente_unidade_lead."</td>			
+			 <td>" . 'Pendente Unidade' . "</td>
+			 <td align='center'>" . $pendente_unidade . "</td>			
+			 <td align='center'>" . $pendente_unidade_lead . "</td>			
 			 </tr>
 			 
 			 <tr>
-			 <td>". 'Publicação de Errata'."</td>
-			 <td align='center'>".$publicacao_errata."</td>			
-			 <td align='center'>".$publicacao_errata_lead."</td>			
+			 <td>" . 'Publicação de Errata' . "</td>
+			 <td align='center'>" . $publicacao_errata . "</td>			
+			 <td align='center'>" . $publicacao_errata_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Prorrogação'."</td>
-			 <td align='center'>".$prorrogacao."</td>			
-			 <td align='center'>".$prorrogacao_lead."</td>			
+			 <td>" . 'Prorrogação' . "</td>
+			 <td align='center'>" . $prorrogacao . "</td>			
+			 <td align='center'>" . $prorrogacao_lead . "</td>			
 			 </tr>
 			 
 			 <tr>
-			 <td>". 'Diligência'."</td>
-			 <td align='center'>".$diligencia."</td>			
-			 <td align='center'>".$diligencia_lead."</td>			
+			 <td>" . 'Diligência' . "</td>
+			 <td align='center'>" . $diligencia . "</td>			
+			 <td align='center'>" . $diligencia_lead . "</td>			
 			 </tr>
 
 			 <tr>
-			 <td>". 'Recurso'."</td>
-			 <td align='center'>".$recurso."</td>			
-			 <td align='center'>".$recurso_lead."</td>			
+			 <td>" . 'Recurso' . "</td>
+			 <td align='center'>" . $recurso . "</td>			
+			 <td align='center'>" . $recurso_lead . "</td>			
 			 </tr>
 
 			 <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>								
@@ -849,18 +837,18 @@ $content .= "
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px;  margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>". __('Tickets','dashboard')." ". __('by Type','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Type', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
 			 <tbody>							
 			 <tr>
-			 <td width='300'>". __('Incident')."</td>
-			 <td width='200' align='right'>".$incident."</td>			
+			 <td width='300'>" . __('Incident') . "</td>
+			 <td width='200' align='right'>" . $incident . "</td>			
 			 </tr>				
 			 <tr>
-			 <td>". __('Request')."</td>
-			 <td align='right'>".$request."</td>			
+			 <td>" . __('Request') . "</td>
+			 <td align='right'>" . $request . "</td>			
 			 </tr>	
 			 <tr><td>&nbsp;</td></tr>
 			 </tbody> </table>
@@ -869,40 +857,40 @@ $content .= "
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - ". __('Tickets','dashboard')." ". __('by Group','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Group', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
 			 <tbody>";
-			
-			while($row = $DB->fetch_assoc($result_grp)) {
-				$content .= "<tr>
-				 <td width='300'>".$row['name']."</td>
-				 <td width='200' align='right'>".$row['conta']."</td>			
-				 </tr> ";	
-			}				 
 
-$content .= "	 	
+			while ($row = $DB->fetch_assoc($result_grp)) {
+				$content .= "<tr>
+				 <td width='300'>" . $row['name'] . "</td>
+				 <td width='200' align='right'>" . $row['conta'] . "</td>			
+				 </tr> ";
+			}
+
+			$content .= "	 	
 			 <tr><td>&nbsp;</td></tr>				
  			 </tbody> </table> 			  			 		   		    
 			
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - ". __('Tickets','dashboard')." ". __('by Technician','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Technician', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
-			 <tbody>";		
-			
-			while($row_tec = $DB->fetch_assoc($result_tec)) {
-				 $content .= "<tr>
-				 <td width='300'>".$row_tec['name']." ".$row_tec['sname']."</td>
-				 <td width='200' align='right'>".$row_tec['conta']."</td>			
-				 </tr> ";	
-			}		
+			 <tbody>";
 
-$content .= "	
+			while ($row_tec = $DB->fetch_assoc($result_tec)) {
+				$content .= "<tr>
+				 <td width='300'>" . $row_tec['name'] . " " . $row_tec['sname'] . "</td>
+				 <td width='200' align='right'>" . $row_tec['conta'] . "</td>			
+				 </tr> ";
+			}
+
+			$content .= "	
 			 <tr><td>&nbsp;</td></tr>				
 		    </tbody> </table>
 		   		    	
@@ -910,46 +898,44 @@ $content .= "
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - ". __('Tickets','dashboard')." ". __('by Requester','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 			 
-			 <tbody>";	
-			
-			while($row = $DB->fetch_assoc($result_req)) {
+			 <tbody>";
+
+			while ($row = $DB->fetch_assoc($result_req)) {
 				$content .= "<tr>
-				 <td width='300'>".$row['name']." ".$row['sname']."</td>
-				 <td width='200' align='right'>".$row['conta']."</td>			
-				 </tr> ";	
-			}		
-													
-$content .= "</tbody> </table> </page> ";		   		   			
-								
-			
-		}				
-			
-		}		
+				 <td width='300'>" . $row['name'] . " " . $row['sname'] . "</td>
+				 <td width='200' align='right'>" . $row['conta'] . "</td>			
+				 </tr> ";
+			}
 
-require_once('../inc/html2pdf/html2pdf.class.php');
+			$content .= "</tbody> </table> </page> ";
+		}
+	}
 
-//$filename = "summary_report-".date("Y-m-d_H:i").".pdf";
-$filename = "summary_report.pdf";
+	require_once('../inc/html2pdf/html2pdf.class.php');
 
-$html2pdf = new HTML2PDF('P', 'A4', 'en');
-$html2pdf->writeHTML($content);
+	//$filename = "summary_report-".date("Y-m-d_H:i").".pdf";
+	$filename = "summary_report.pdf";
 
-ob_end_clean();
-$html2pdf->Output($filename,'D');		
+	$html2pdf = new HTML2PDF('P', 'A4', 'en');
+	$html2pdf->writeHTML($content);
 
-//header("Location:".$filename);
-//Load file
-//header("Content-type: application/pdf"); 
-//header("Content-Disposition: attachment; filename=$filename"); 
-//readfile("$filename");
+	ob_end_clean();
+	$html2pdf->Output($filename, 'D');
 
-//remove pdf file from server
-//unlink($filename);
-		
-?>	
+	//header("Location:".$filename);
+	//Load file
+	//header("Content-type: application/pdf"); 
+	//header("Content-Disposition: attachment; filename=$filename"); 
+	//readfile("$filename");
+
+	//remove pdf file from server
+	//unlink($filename);
+
+	?>
 </body>
+
 </html>
