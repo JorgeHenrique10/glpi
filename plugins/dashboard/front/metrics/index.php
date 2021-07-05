@@ -9,12 +9,12 @@ if (isset($_REQUEST['ent'])) {
 	$id_grp = $_REQUEST['grp'];
 	$indexw = "indexw.php?grp=" . $id_grp;
 	$indexb = "index.php?grp=" . $id_grp;
-	include "metrics_grp.inc.php";
+	include "metrics_ent.inc.php";
 } else {
 	$id_grp = "";
 	$indexw = "indexw.php";
 	$indexb = "index.php";
-	include "metrics.inc.php";
+	include "metrics_ent.inc.php";
 }
 
 ?>
