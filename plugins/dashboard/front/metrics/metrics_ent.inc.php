@@ -429,7 +429,24 @@ $query_sat =
 	SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 	SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+	SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,			
+	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+	SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+	SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+	SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+	SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+	SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+	SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+	SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+	SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+	SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+	SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+	SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+	SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+	SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+	SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = '0' 
 	$period
@@ -442,12 +459,27 @@ $query_sat =
 	$plan = $DB->result($result_stat,0,'plan');
 	$pend = $DB->result($result_stat,0,'pend');
 	$solved = $DB->result($result_stat,0,'solve');
-	$closed = $DB->result($result_stat,0,'close'); 
+	$closed = $DB->result($result_stat,0,'close');
+	$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
+	$validacao_tr = $DB->result($result_stat, 0, 'validacao_tr') + 0;
+	$publicacao = $DB->result($result_stat, 0, 'publicacao') + 0;
+	$parecer_habilitacao = $DB->result($result_stat, 0, 'parecer_habilitacao') + 0;
+	$validacao_tecnica = $DB->result($result_stat, 0, 'validacao_tecnica') + 0;
+	$resultados = $DB->result($result_stat, 0, 'resultados') + 0;
+	$homologacao = $DB->result($result_stat, 0, 'homologacao') + 0;
+	$juridico = $DB->result($result_stat, 0, 'juridico') + 0;
+	$validacao_interna = $DB->result($result_stat, 0, 'validacao_interna') + 0;
+	$envio_contrato = $DB->result($result_stat, 0, 'envio_contrato') + 0;
+	$formalizacao = $DB->result($result_stat, 0, 'formalizacao') + 0;
+	$pendente_unidade = $DB->result($result_stat, 0, 'pendente_unidade') + 0;
+	$publicacao_errata = $DB->result($result_stat, 0, 'publicacao_errata') + 0;
+	$prorrogacao = $DB->result($result_stat, 0, 'prorrogacao') + 0;
+	$diligencia = $DB->result($result_stat, 0, 'diligencia') + 0;
+	$recurso = $DB->result($result_stat, 0, 'recurso') + 0; 
 	
 	$assigned = $assig + $plan;
-	$total = $new + $assig + $plan + $pend + $solved;
-	
-	
+	$total = $new + $assig + $plan + $closed+ $pend + $solved + $atribuido + $validacao_tr + $publicacao + $parecer_habilitacao + $validacao_tecnica + $resultados + $homologacao + $juridico + $validacao_interna + $envio_contrato + $formalizacao + $pendente_unidade + $publicacao_errata + $prorrogacao+ $diligencia +$recurso;
+		
 	//by status yesterday
 	$query_staty = "
 	SELECT 
@@ -456,7 +488,24 @@ $query_sat =
 	SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 	SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+	SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,			
+	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+	SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+	SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+	SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+	SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+	SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+	SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+	SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+	SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+	SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+	SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+	SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+	SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+	SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+	SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = '0'	
 	$periody	
@@ -470,7 +519,23 @@ $query_sat =
 	$plany = $DB->result($result_staty,0,'plan');
 	$pendy = $DB->result($result_staty,0,'pend');
 	$solvedy = $DB->result($result_staty,0,'solve');
-	$closedy = $DB->result($result_staty,0,'close'); 
+	$closedy = $DB->result($result_staty,0,'close');
+	$atribuidoy = $DB->result($result_stat, 0, 'atribuido') + 0;
+	$validacao_try = $DB->result($result_stat, 0, 'validacao_tr') + 0;
+	$publicacaoy = $DB->result($result_stat, 0, 'publicacao') + 0;
+	$parecer_habilitacaoy = $DB->result($result_stat, 0, 'parecer_habilitacao') + 0;
+	$validacao_tecnicay = $DB->result($result_stat, 0, 'validacao_tecnica') + 0;
+	$resultadosy = $DB->result($result_stat, 0, 'resultados') + 0;
+	$homologacaoy = $DB->result($result_stat, 0, 'homologacao') + 0;
+	$juridicoy = $DB->result($result_stat, 0, 'juridico') + 0;
+	$validacao_internay = $DB->result($result_stat, 0, 'validacao_interna') + 0;
+	$envio_contratoy = $DB->result($result_stat, 0, 'envio_contrato') + 0;
+	$formalizacaoy = $DB->result($result_stat, 0, 'formalizacao') + 0;
+	$pendente_unidadey = $DB->result($result_stat, 0, 'pendente_unidade') + 0;
+	$publicacao_erratay = $DB->result($result_stat, 0, 'publicacao_errata') + 0;
+	$prorrogacaoy = $DB->result($result_stat, 0, 'prorrogacao') + 0;
+	$diligenciay = $DB->result($result_stat, 0, 'diligencia') + 0;
+	$recursoy = $DB->result($result_stat, 0, 'recurso') + 0;  
 	
 	$assignedy = $assigy + $plany;
 	$totaly = $newy + $assigy + $plany + $pendy + $solvedy;
