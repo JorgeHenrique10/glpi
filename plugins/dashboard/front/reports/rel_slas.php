@@ -372,7 +372,7 @@ else {
 			
 			$('#sla')
 				.removeClass( 'display' )
-				.addClass('table table-striped table-bordered');
+				.addClass('table table-saddddddd table-bordered');
 			
 			$(document).ready(function() {
 			    $('#sla').DataTable( {    	
