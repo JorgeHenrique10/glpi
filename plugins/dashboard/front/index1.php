@@ -316,7 +316,7 @@ else {
                         <li><a href="./reports/rel_localidades.php?con=1" target="iframe1" > <?php echo _n('Location', 'Locations', 2); ?> </a></li>
                         <li><a href="./reports/rel_projects.php?con=1" target="iframe1" > <?php echo _sn('Project','Projects',2); ?> </a></li>                       
                         <li><a href="./reports/rel_satisfacao.php" target="iframe1" > <?php echo __('Satisfaction'); ?> </a></li>
-                        <li><a href="./reports/rel_tecnicos.php?con=1" target="iframe1" > <?php echo _sn('Technician','Technicians',2,'dashboard'); ?> </a></li>
+                        <li><a href="./reports/rel_tecnicos.php?con=1" target="iframe1" > <?php echo _sn('Technician','Technicians',2,'dashboard'); ?> </a></li>						
                        
 								<li class="dropdown-submenu">
                 				<a tabindex="-1" href="#"><?php echo __('Cost'); ?></a>
@@ -341,7 +341,8 @@ else {
 		                		<a tabindex="-1" href="#"><?php echo __('SLA','dashboard'); ?> </a>
 						         <ul class="dropdown-menu">
 										<li><a href="./reports/rel_sltsas.php?con=1" target="iframe1" style="color:#000;"><?php echo __('Time to own'); ?></a></li>
-										<li><a href="./reports/rel_sltsrs.php?con=1" target="iframe1" style="color:#000;"><?php echo __('Time to resolve'); ?></a></li>										
+										<li><a href="./reports/rel_sltsrs.php?con=1" target="iframe1" style="color:#000;"><?php echo __('Time to resolve'); ?></a></li>
+										<li><a href="./reports/sla_contratos.php"    target="iframe1" style="color:#000;"> <?php echo("Contratos - SLA"); ?> </a></li>										
 									</ul>
 						      </li> 
 								<li class="dropdown-submenu">

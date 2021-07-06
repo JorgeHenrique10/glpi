@@ -219,7 +219,7 @@ if(isset($_GET['con'])) {
 
 $con = $_GET['con'];
 
-if($con == "1") {
+if($con == "1") {	
 
 	if(!isset($_REQUEST['date1']))
 	{
@@ -258,8 +258,8 @@ if($con == "1") {
 	//status
 	$status = "";
 	$status_open = "('1','2','3','4')";
-	$status_close = "('5','6')";
-	$status_all = "('1','2','3','4','5','6')";
+	$status_close = "('5','6')";	
+	$status_all = "('1','2','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29')";
 	
 	
 	if(isset($_GET['stat'])) {
@@ -414,7 +414,25 @@ if($con == "1") {
 	SUM(case when glpi_tickets.status = 1 then 1 else 0 end) AS new,
 	SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
 	SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
-	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend
+	SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
+	SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
+	SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+	SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+	SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+	SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+	SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+	SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+	SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+	SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+	SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+	SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+	SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+	SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+	SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+	SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+	SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+	SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+	SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 	FROM glpi_tickets_users, glpi_tickets
 	WHERE glpi_tickets.is_deleted = '0'
 	AND glpi_tickets.date ".$datas2." 
@@ -429,7 +447,25 @@ if($con == "1") {
  	$assig = $DB->result($result_stat,0,'assig') + 0;
  	$plan = $DB->result($result_stat,0,'plan') + 0;
  	$pend = $DB->result($result_stat,0,'pend') + 0;
-   
+	$solve = $DB->result($result_stat,0,'solve') + 0;
+	$close = $DB->result($result_stat,0,'close') + 0;
+	$validacao_tr = $DB->result($result_stat,0,'validacao_tr') + 0;
+	$publicacao = $DB->result($result_stat,0,'publicacao') + 0;
+	$parecer_habilitacao = $DB->result($result_stat,0,'parecer_habilitacao') + 0;
+	$validacao_tecnica = $DB->result($result_stat,0,'validacao_tecnica') + 0;
+	$resultados = $DB->result($result_stat,0,'resultados') + 0;
+	$homologacao = $DB->result($result_stat,0,'homologacao') + 0;
+	$juridico = $DB->result($result_stat,0,'juridico') + 0;
+	$validacao_interna = $DB->result($result_stat,0,'validacao_interna') + 0;
+	$envio_contrato = $DB->result($result_stat,0,'envio_contrato') + 0;
+	$formalizacao = $DB->result($result_stat,0,'formalizacao') + 0;
+	$atribuido = $DB->result($result_stat,0,'atribuido') + 0;
+	$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+	$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+	$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+	$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+	$recurso = $DB->result($result_stat,0,'recurso') + 0;
+
 
    $query_stat_c = "
 	SELECT count( glpi_tickets.id ) AS close, glpi_tickets_users.users_id AS id
@@ -484,7 +520,7 @@ if($con == "1") {
 	if($satisfacao != '' || $satisfacao > 0) {
 
 	echo "
-	<table align='right' style='margin-bottom:10px;' width=100% border='0'>
+	<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0>
 	<tr align='left'>
 		<td colspan=2 style='horizontal-align:left;'>
 			<div id='gauge' style='width:150px; height:100px; margin-left: 30px;'></div>
@@ -554,14 +590,49 @@ if($con == "1") {
 		</tr>
 	</table>
 
-<table style='font-size: 16px; font-weight:bold; width: 50%;' border=0>
+<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0>
 	<tr>
 		  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
         <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
         <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
         <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
         <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
-	</tr>
+	</tr>";
+
+		if($ent_name['entities_id'] == 17 || $ent_name['id'] == 17 || $ent_name['id'] == 0 || $ent_name['id'] == 1 )
+		{
+			echo "
+				<tr>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação de TR').": </span>".$validacao_tr." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação').": </span>".$publicacao." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Parecer de Habilitação'). ": </span>". ($parecer_habilitacao) ."</td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Técnica').": </span>".$validacao_tecnica." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Resultados').": </span>".$resultados." </td>
+					
+				</tr>
+				<tr>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Jurídico').": </span>".$juridico." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Validação Interna').": </span>".$validacao_interna." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Envio de Contrato').": </span>".$envio_contrato." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Homologação'). ": </span>". ($homologacao) ."</td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Formalização').": </span>".$formalizacao." </td>						
+				</tr>	
+
+				<tr>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Atribuido').": </span>".$atribuido." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Pendente Unidade').": </span>".$pendente_unidade." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação de Errata').": </span>".$publicacao_errata." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Prorrogação').": </span>".$prorrogacao." </td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>
+					<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>						
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+				<tr><td>&nbsp;</td></tr>
+			";
+		}
+
+	echo "
+
 	<tr><td>&nbsp;</td></tr>
 	<tr><td>&nbsp;</td></tr>
 </table>
