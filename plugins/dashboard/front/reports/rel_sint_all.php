@@ -206,16 +206,16 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					}
 
 					if ($data_ini2 == $data_fin2) {
-						$datas2 = "LIKE '" . $data_ini2 . "%'";
+						$sel_date = "LIKE '" . $data_ini2 . "%'";
 					} else {
-						$datas2 = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+						$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
 					}
 
 					// do select
 					$post_date = $_POST["sel_date"];
 
 					if (!isset($post_date) or $post_date == "0") {
-						$sel_date = $datas2;
+						$sel_date = $sel_date;
 					} else {
 						$sel_date = $_POST["sel_date"];
 					}
@@ -288,8 +288,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			AND glpi_tickets_users.type = 2
 			" . $entidade . " 
 			GROUP BY name
-			ORDER BY conta DESC
-			LIMIT 5";
+			ORDER BY conta DESC ";
 
 						$result_tec = $DB->query($sql_tec);
 
@@ -304,8 +303,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			AND glpi_tickets.is_deleted = 0
 			" . $entidade . "
 			GROUP BY `users_id`
-			ORDER BY conta DESC
-			LIMIT 5 ";
+			ORDER BY conta DESC ";
 
 						$result_req = $DB->query($sql_req);
 
@@ -406,6 +404,122 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			GROUP BY name
 			ORDER BY conta DESC
 			LIMIT 5 ";
+			//Total de Chamados Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
+
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+
+			$distrato = $DB->result($result_sla_contrato, 0, 'distrato');
+			$dispensa = $DB->result($result_sla_contrato, 0, 'dispensa');
+			$cotacao = $DB->result($result_sla_contrato, 0, 'cotacao');
+			$aditivo = $DB->result($result_sla_contrato, 0, 'aditivo');
+			$distrato_prazo = $DB->result($result_sla_contrato, 0, 'distrato_prazo');
+			$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
+			$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
+			$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+
+			//Total de Chamados Fechado Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_fechado
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is not null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
+
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+
+			$distrato_fechado = $DB->result($result_sla_contrato, 0, 'distrato_fechado');
+			$dispensa_fechado = $DB->result($result_sla_contrato, 0, 'dispensa_fechado');
+			$cotacao_fechado = $DB->result($result_sla_contrato, 0, 'cotacao_fechado');
+			$aditivo_fechado = $DB->result($result_sla_contrato, 0, 'aditivo_fechado');
+
+			//Total de Chamados Aberto Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
+
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+
+			$distrato_aberto = $DB->result($result_sla_contrato, 0, 'distrato_aberto');
+			$dispensa_aberto = $DB->result($result_sla_contrato, 0, 'dispensa_aberto');
+			$cotacao_aberto = $DB->result($result_sla_contrato, 0, 'cotacao_aberto');
+			$aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
+
+			//Médias de Dias
+				$sql_sla_contratos_dias_distrato = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 197
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
+
+				$sql_sla_contratos_dias_dispensa = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 191
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
+
+				$sql_sla_contratos_dias_cotacao = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 190
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
+
+				$sql_sla_contratos_dias_aditivo = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 189
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
+
+				$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
+				$result_dias_dispensa = $DB->query($sql_sla_contratos_dias_dispensa);
+				$result_dias_cotacao = $DB->query($sql_sla_contratos_dias_cotacao);
+				$result_dias_aditivo = $DB->query($sql_sla_contratos_dias_aditivo);
+				
+				$dias_distrato = (int) $DB->result($result_dias_distrato, 0, 'dias');
+				$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
+				$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
+				$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
 
 						$result_grp = $DB->query($sql_grp);
 
@@ -654,63 +768,82 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		AND glpi_tickets_status.data_fim is not null
 		AND glpi_tickets.date " . $sel_date . "			
 		" . $entidade . "";
+		
+		$query_entidades_contratos = "select id from glpi_entities where id = 17 OR entities_id = 17";
 
-						$result_stat_lead_time = $DB->query($query_stat_lead_time);
+		$result_entities_contratos = $DB->query($query_entidades_contratos)->fetch_all();
+						
+		$ids_contract = [];
 
-						$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
-						$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
-						$plan_lead = number_format((($DB->result($result_stat_lead_time, 0, 'plan') + 0) / ($DB->result($result_stat_lead_time, 0, 'plan_count') + 0)), 2, ',', ' ');
-						$pend_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pend') + 0) / ($DB->result($result_stat_lead_time, 0, 'pend_count') + 0)), 2, ',', ' ');
-						$solve_lead = number_format((($DB->result($result_stat_lead_time, 0, 'solve') + 0) / ($DB->result($result_stat_lead_time, 0, 'solve_count') + 0)), 2, ',', ' ');
-						$close_lead = number_format((($DB->result($result_stat_lead_time, 0, 'close') + 0) / ($DB->result($result_stat_lead_time, 0, 'close_count') + 0)), 2, ',', ' ');
-						$atribuido_lead = number_format((($DB->result($result_stat_lead_time, 0, 'atribuido') + 0) / ($DB->result($result_stat_lead_time, 0, 'atribuido_count') + 0)), 2, ',', ' ');
-						$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tr') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tr_count') + 0)), 2, ',', ' ');
-						$publicacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_count') + 0)), 2, ',', ' ');
-						$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao_count') + 0)), 2, ',', ' ');
-						$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tecnica_count') + 0)), 2, ',', ' ');
-						$resultados_lead = number_format((($DB->result($result_stat_lead_time, 0, 'resultados') + 0) / ($DB->result($result_stat_lead_time, 0, 'resultados_count') + 0)), 2, ',', ' ');
-						$homologacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'homologacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'homologacao_count') + 0)), 2, ',', ' ');
-						$juridico_lead = number_format((($DB->result($result_stat_lead_time, 0, 'juridico') + 0) / ($DB->result($result_stat_lead_time, 0, 'juridico_count') + 0)), 2, ',', ' ');
-						$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_interna') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_interna_count') + 0)), 2, ',', ' ');
-						$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time, 0, 'envio_contrato') + 0) / ($DB->result($result_stat_lead_time, 0, 'envio_contrato_count') + 0)), 2, ',', ' ');
-						$formalizacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'formalizacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'formalizacao_count') + 0)), 2, ',', ' ');
-						$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time, 0, 'pendente_unidade_count') + 0)), 2, ',', ' ');
-						$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_errata_count') + 0)), 2, ',', ' ');
-						$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'prorrogacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'prorrogacao_count') + 0)), 2, ',', ' ');
-						$diligencia_lead = number_format((($DB->result($result_stat_lead_time, 0, 'diligencia') + 0) / ($DB->result($result_stat_lead_time, 0, 'diligencia_count') + 0)), 2, ',', ' ');
-						$recurso_lead = number_format((($DB->result($result_stat_lead_time, 0, 'recurso') + 0) / ($DB->result($result_stat_lead_time, 0, 'recurso_count') + 0)), 2, ',', ' ');
+		foreach ($result_entities_contratos as $id) {
+			$ids_contract[] = $id[0];
+		}
 
-						//RETIRAR "NAN"
-						$new_lead != 'nan' ? $new_lead : $new_lead = 0;
-						$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
-						$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
-						$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
-						$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
-						$close_lead != 'nan' ? $close_lead : $close_lead = 0;
-						$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
-						$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
-						$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
-						$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
-						$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
-						$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
-						$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
-						$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
-						$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
-						$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
-						$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
-						$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
-						$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
-						$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
-						$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
-						$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
-						$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
-						$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
+		$array_entidades = explode(',',$sel_ent);
+
+		$mostrar = FALSE;
+
+		if(sizeof(array_intersect_assoc($ids_contract, $array_entidades)) > 0 )
+		{
+			$mostrar = TRUE;
+		}
+		
+		$result_stat_lead_time = $DB->query($query_stat_lead_time);
+
+		$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
+		$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
+		$plan_lead = number_format((($DB->result($result_stat_lead_time, 0, 'plan') + 0) / ($DB->result($result_stat_lead_time, 0, 'plan_count') + 0)), 2, ',', ' ');
+		$pend_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pend') + 0) / ($DB->result($result_stat_lead_time, 0, 'pend_count') + 0)), 2, ',', ' ');
+		$solve_lead = number_format((($DB->result($result_stat_lead_time, 0, 'solve') + 0) / ($DB->result($result_stat_lead_time, 0, 'solve_count') + 0)), 2, ',', ' ');
+		$close_lead = number_format((($DB->result($result_stat_lead_time, 0, 'close') + 0) / ($DB->result($result_stat_lead_time, 0, 'close_count') + 0)), 2, ',', ' ');
+		$atribuido_lead = number_format((($DB->result($result_stat_lead_time, 0, 'atribuido') + 0) / ($DB->result($result_stat_lead_time, 0, 'atribuido_count') + 0)), 2, ',', ' ');
+		$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tr') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tr_count') + 0)), 2, ',', ' ');
+		$publicacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_count') + 0)), 2, ',', ' ');
+		$parecer_habilitacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'parecer_habilitacao_count') + 0)), 2, ',', ' ');
+		$validacao_tecnica_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tecnica') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tecnica_count') + 0)), 2, ',', ' ');
+		$resultados_lead = number_format((($DB->result($result_stat_lead_time, 0, 'resultados') + 0) / ($DB->result($result_stat_lead_time, 0, 'resultados_count') + 0)), 2, ',', ' ');
+		$homologacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'homologacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'homologacao_count') + 0)), 2, ',', ' ');
+		$juridico_lead = number_format((($DB->result($result_stat_lead_time, 0, 'juridico') + 0) / ($DB->result($result_stat_lead_time, 0, 'juridico_count') + 0)), 2, ',', ' ');
+		$validacao_interna_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_interna') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_interna_count') + 0)), 2, ',', ' ');
+		$envio_contrato_lead = number_format((($DB->result($result_stat_lead_time, 0, 'envio_contrato') + 0) / ($DB->result($result_stat_lead_time, 0, 'envio_contrato_count') + 0)), 2, ',', ' ');
+		$formalizacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'formalizacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'formalizacao_count') + 0)), 2, ',', ' ');
+		$pendente_unidade_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pendente_unidade') + 0) / ($DB->result($result_stat_lead_time, 0, 'pendente_unidade_count') + 0)), 2, ',', ' ');
+		$publicacao_errata_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao_errata') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_errata_count') + 0)), 2, ',', ' ');
+		$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'prorrogacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'prorrogacao_count') + 0)), 2, ',', ' ');
+		$diligencia_lead = number_format((($DB->result($result_stat_lead_time, 0, 'diligencia') + 0) / ($DB->result($result_stat_lead_time, 0, 'diligencia_count') + 0)), 2, ',', ' ');
+		$recurso_lead = number_format((($DB->result($result_stat_lead_time, 0, 'recurso') + 0) / ($DB->result($result_stat_lead_time, 0, 'recurso_count') + 0)), 2, ',', ' ');
+
+		//RETIRAR "NAN"
+		$new_lead != 'nan' ? $new_lead : $new_lead = 0;
+		$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
+		$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
+		$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
+		$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
+		$close_lead != 'nan' ? $close_lead : $close_lead = 0;
+		$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
+		$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
+		$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
+		$parecer_habilitacao_lead != 'nan' ? $parecer_habilitacao_lead : $parecer_habilitacao_lead = 0;
+		$validacao_tecnica_lead != 'nan' ? $validacao_tecnica_lead : $validacao_tecnica_lead = 0;
+		$resultados_lead != 'nan' ? $resultados_lead : $resultados_lead = 0;
+		$homologacao_lead != 'nan' ? $homologacao_lead : $homologacao_lead = 0;
+		$juridico_lead != 'nan' ? $juridico_lead : $juridico_lead = 0;
+		$validacao_interna_lead != 'nan' ? $validacao_interna_lead : $validacao_interna_lead = 0;
+		$envio_contrato_lead != 'nan' ? $envio_contrato_lead : $envio_contrato_lead = 0;
+		$formalizacao_lead != 'nan' ? $formalizacao_lead : $formalizacao_lead = 0;
+		$pendente_unidade_lead != 'nan' ? $pendente_unidade_lead : $pendente_unidade_lead = 0;
+		$publicacao_errata_lead != 'nan' ? $publicacao_errata_lead : $publicacao_errata_lead = 0;
+		$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
+		$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
+		$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
+		$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
+		$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
 
 
 
-						$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
+		$media_lead = ($new_lead + $assig_lead + $plan_lead + $pend_lead + $solve_lead + $close_lead + $atribuido_lead + $validacao_tr_lead + $publicacao_lead + $parecer_habilitacao_lead + $validacao_tecnica_lead + $resultados_lead + $homologacao_lead + $juridico_lead + $validacao_interna_lead + $envio_contrato_lead + $formalizacao_lead + $pendente_unidade_lead + $publicacao_errata_lead + $prorrogacao_lead + $diligencia_lead + $recurso_lead) / 22;
 
-						$content = "
+		$content = "
 		<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>	
  			<div class='btn-right'> <button class='btn btn-primary btn-sm' type='button' onclick=window.open(\"./rel_sint_all_pdf.php?con=1&date1=" . $data_ini2 . "&date2=" . $data_fin2 . "\",\"_blank\")>Export PDF</button>  </div>	
 			
@@ -926,71 +1059,114 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			 </tr>			 							
 													
 		    </tbody> </table>
-		   		    		   
-			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
-			 <thead>
-			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Type', 'dashboard') . "</th>						
-			 </tr>
-			 </thead>	
+			";
 
-			 <tbody>							
-			 <tr>
-			 <td>" . __('Incident') . "</td>
-			 <td align='right'>" . $incident . "</td>			
-			 </tr>	
-			
-			 <tr>
-			 <td>" . __('Request') . "</td>
-			 <td align='right'>" . $request . "</td>			
-			 </tr>	
-			 </tbody> </table>		   		    		    	
-		   
-			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
-			 <thead>
-			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Group', 'dashboard') . "</th>						
-			 </tr>
-			 </thead>	
+			if($mostrar)
+			{
+				$content .= "
+					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
+						<thead>
+							<tr>
+							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Incidentes </th>										
+							</tr>
+						</thead>
+						<tbody> 
+							<tr>
+								<td style='text-align:left; font-weight:bold; cursor:pointer;'> ". __('Solicitações') ." </td>
+								<td style='font-weight:bold; text-align: center; cursor:pointer;'> ".__('Total de Chamados')." </td>
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Opened','dashboard') ."</td>
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Solved','dashboard') ."</td>	
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Within','dashboard') ."</td>							
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Leadtime (dias)','dashboard') ."</td>		
+							</tr>
+								<tr>
+								<td style='vertical-align:middle;'> ". 'Cotação' ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_fechado ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dias_cotacao ." </td>                        		
+							</tr>
+							<tr>
+								<td style='vertical-align:middle;'> ". 'Dispensa de Cotação' ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_fechado ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dias_dispensa ." </td>                        		
+							</tr>
+							<tr>
+								<td style='vertical-align:middle;'> ". 'Aditivo' ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_fechado ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dias_aditivo ." </td>                        		
+							</tr>
+							<tr>
+								<td style='vertical-align:middle; '> ". 'Distrato' ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_fechado ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dias_distrato ." </td>                        		
+							</tr>
+						</tbody>
+					</table>
+				";
+			}
 
-			 <tbody>";
+			if(!$mostrar)
+			{	
 
-						while ($row = $DB->fetch_assoc($result_grp)) {
-							$content .= "<tr>
-				 <td>" . $row['name'] . "</td>
-				 <td align='right'>" . $row['conta'] . "</td>			
-				 </tr> ";
-						}
+				$content.= "
+					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
+					<thead>
+					<tr>
+					<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Group', 'dashboard') . "</th>						
+					</tr>
+					</thead>	
 
-						$content .= "	 					
- 			 </tbody> </table> 			  			 
- 			 
-			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
-			 <thead>
-			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Technician', 'dashboard') . "</th>						
-			 </tr>
-			 </thead>	
+					<tbody>";
 
-			 <tbody>";
+								while ($row = $DB->fetch_assoc($result_grp)) {
+									$content .= "<tr>
+						<td>" . $row['name'] . "</td>
+						<td align='right'>" . $row['conta'] . "</td>			
+						</tr> ";
+								}
 
-						while ($row_tec = $DB->fetch_assoc($result_tec)) {
-							$content .= "<tr>
-				 <td>" . $row_tec['name'] . " " . $row_tec['sname'] . "</td>
-				 <td align='right'>" . $row_tec['conta'] . "</td>			
-				 </tr> ";
-						}
-						$content .= "					
-		    </tbody> </table>		   		    	
-		   
-			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
-			 <thead>
-			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
-			 </tr>
-			 </thead>	
+								$content .= "	 					
+					</tbody> </table>
+				";
+			} 			  			 
+			$content.=	"	
+				<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
+				<thead>
+				<tr>
+				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Technician', 'dashboard') . "</th>						
+				</tr>
+				</thead>	
 
-			 <tbody>";
+				<tbody>";
+
+							while ($row_tec = $DB->fetch_assoc($result_tec)) {
+								$content .= "<tr>
+					<td>" . $row_tec['name'] . " " . $row_tec['sname'] . "</td>
+					<td align='right'>" . $row_tec['conta'] . "</td>			
+					</tr> ";
+							}
+							$content .= "					
+				</tbody> </table>
+
+				<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
+				<thead>
+				<tr>
+				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
+				</tr>
+				</thead>	
+
+				<tbody>";
 
 						while ($row_req = $DB->fetch_assoc($result_req)) {
 							$content .= "<tr>
