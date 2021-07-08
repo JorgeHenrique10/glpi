@@ -734,7 +734,6 @@ else {
 				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
 				AND glpi_tickets.itilcategories_id = 197
 				AND glpi_tickets.date ".$sel_date."
 				".$entidade;
@@ -743,7 +742,6 @@ else {
 				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
 				AND glpi_tickets.itilcategories_id = 191
 				AND glpi_tickets.date ".$sel_date."
 				".$entidade;
@@ -752,7 +750,6 @@ else {
 				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
 				AND glpi_tickets.itilcategories_id = 190
 				AND glpi_tickets.date ".$sel_date."
 				".$entidade;
@@ -761,7 +758,6 @@ else {
 				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
 				AND glpi_tickets.itilcategories_id = 189
 				AND glpi_tickets.date ".$sel_date."
 				".$entidade;
@@ -776,23 +772,17 @@ else {
 			$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
 			$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
 
-			$query_entidades_contratos = "select id from glpi_entities where id = 17 OR entities_id = 17";
 
-			$result_entities_contratos = $DB->query($query_entidades_contratos)->fetch_all();
-							
-			$ids_contract = [];
+			$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
 
-			foreach ($result_entities_contratos as $id) {
-				$ids_contract[] = $id[0];
-			}
-
-			$array_entidades = explode(',', $_SESSION['id_entity_sintetico']);
-
-			$mostrar = FALSE;
-
-			if(sizeof(array_intersect_assoc($ids_contract, $array_entidades)) > 0 )
-			{
-				$mostrar = TRUE;
+			$result_contratos = $DB->query($query_contratos);
+			$sel_ent_contratos = $result_contratos->fetch_all();
+		
+			$mostrar = false;
+			foreach ($sel_ent_contratos as $item) {
+				if ($item[0] == 17 || $item[1] == 17) {
+					$mostrar = true;
+				}
 			}
 						$result_stat_lead_time = $DB->query($query_stat_lead_time);
 

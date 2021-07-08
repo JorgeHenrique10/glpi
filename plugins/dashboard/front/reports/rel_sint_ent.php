@@ -492,7 +492,6 @@ $result_ent = $DB->query($sql_ent);
 			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
-			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.itilcategories_id = 197
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
@@ -501,7 +500,6 @@ $result_ent = $DB->query($sql_ent);
 			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
-			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.itilcategories_id = 191
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
@@ -510,7 +508,6 @@ $result_ent = $DB->query($sql_ent);
 			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
-			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.itilcategories_id = 190
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
@@ -519,7 +516,6 @@ $result_ent = $DB->query($sql_ent);
 			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
-			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.itilcategories_id = 189
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
@@ -781,25 +777,19 @@ $result_ent = $DB->query($sql_ent);
 		AND glpi_tickets_status.data_fim is not null
 		AND glpi_tickets.date " . $sel_date . "			
 		" . $entidade . "";
-		$query_entidades_contratos = "select id from glpi_entities where id = 17 OR entities_id = 17";
 
-		$result_entities_contratos = $DB->query($query_entidades_contratos)->fetch_all();
-						
-		$ids_contract = [];
+		$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
 
-		foreach ($result_entities_contratos as $id) {
-			$ids_contract[] = $id[0];
+		$result_contratos = $DB->query($query_contratos);
+		$sel_ent_contratos = $result_contratos->fetch_all();
+	
+		$mostrar = false;
+		foreach ($sel_ent_contratos as $item) {
+			if ($item[0] == 17 || $item[1] == 17) {
+				$mostrar = true;
+			}
 		}
-
-		$array_entidades = explode(',',$sel_ent);
-
-		$mostrar = FALSE;
-
-		if(sizeof(array_intersect_assoc($ids_contract, $array_entidades)) > 0 )
-		{
-			$mostrar = TRUE;
-		}
-								$result_stat_lead_time = $DB->query($query_stat_lead_time);
+						$result_stat_lead_time = $DB->query($query_stat_lead_time);
 
 						$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
 						$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
