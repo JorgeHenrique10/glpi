@@ -301,7 +301,6 @@ $aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
         SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
-        AND glpi_tickets.solvedate is null
         AND glpi_tickets.itilcategories_id = 197
         AND glpi_tickets.date ".$datas2."
         ".$entidade;
@@ -310,7 +309,6 @@ $aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
         SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
-        AND glpi_tickets.solvedate is null
         AND glpi_tickets.itilcategories_id = 191
         AND glpi_tickets.date ".$datas2."
         ".$entidade;
@@ -319,7 +317,6 @@ $aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
         SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
-        AND glpi_tickets.solvedate is null
         AND glpi_tickets.itilcategories_id = 190
         AND glpi_tickets.date ".$datas2."
         ".$entidade;
@@ -328,7 +325,6 @@ $aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
         SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
-        AND glpi_tickets.solvedate is null
         AND glpi_tickets.itilcategories_id = 189
         AND glpi_tickets.date ".$datas2."
         ".$entidade;
