@@ -93,6 +93,7 @@ if (isset($_REQUEST['ent'])) {
 			text-align: left;
 		}
 	</style>
+
 </head>
 
 <body class="black" onload="reloadPage(); initSpark('<?php echo $quantm2; ?>'); initSparkDay('<?php echo $quantd2; ?>'); initGauge('0','100','<?php echo $gauge_val; ?>'); initPie('<?php echo $res_days; ?>'); initFunnel('<?php echo $sta_values; ?>','<?php echo $sta_labels; ?>'); initRag('<?php echo $types; ?>','<?php echo $rag_labels; ?>'); initSingle1('<?php echo $satisf; ?>');">
@@ -136,9 +137,9 @@ if (isset($_REQUEST['ent'])) {
 
 					<div class="row-status">
 						<div class="carosel-root">
-							<div class="carosel">
+							<div id="div-carrosel" class="carosel">
 								<!--NOVO -->
-								<div style="min-height: 0px;" class="col-lg-5 cf-item-status tickets new carosel-item item-1">
+								<div style="min-height: 0px;" onclick="tooltip(1)" id="novoId" status="1" class="col-lg-5 cf-item-status tickets new carosel-item item-1">
 									<header>
 										<p><span></span><?php echo _x('status', 'New'); ?></p>
 									</header>
@@ -149,7 +150,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- ATRIBUÍDO -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets assign carosel-item item-2">
+								<div style="min-height: 100px;" onclick="tooltip(2)" class="col-lg-5 cf-item-status tickets assign carosel-item item-2">
 									<header>
 										<p><span></span><?php echo __('Assigned'); ?></p>
 									</header>
@@ -160,7 +161,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- PENDENTE -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets pending carosel-item item-3">
+								<div style="min-height: 100px;" onclick="tooltip(4)" class="col-lg-5 cf-item-status tickets pending carosel-item item-3">
 									<header>
 										<p><span></span><?php echo __('Pending'); ?></p>
 									</header>
@@ -188,7 +189,7 @@ if (isset($_REQUEST['ent'])) {
 								?>
 
 								<!-- CLOSED -->
-								<div style="min-height:100px;" class="col-lg-5 cf-item-status tickets closed carosel-item item-4">
+								<div style="min-height:100px;" onclick="tooltip(6)" class="col-lg-5 cf-item-status tickets closed carosel-item item-4">
 									<header>
 										<p><span></span><?php echo $tit_notopen; ?></p>
 									</header>
@@ -204,7 +205,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- ATRIBUIDO -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-5">
+								<div style="min-height: 100px;" onclick="tooltip(23)" class="col-lg-5 cf-item-status tickets all carosel-item item-5">
 									<header>
 										<p><span></span><?php echo __('Atribuido'); ?></p>
 									</header>
@@ -215,7 +216,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- Validacao TR -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-6">
+								<div style="min-height: 100px;" onclick="tooltip(13)" class="col-lg-5 cf-item-status tickets all carosel-item item-6">
 									<header>
 										<p><span></span><?php echo ('Validacao TR'); ?></p>
 									</header>
@@ -226,7 +227,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- publicacao -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-7">
+								<div style="min-height: 100px;" onclick="tooltip(14)" class="col-lg-5 cf-item-status tickets all carosel-item item-7">
 									<header>
 										<p><span></span><?php echo ('Publicação'); ?></p>
 									</header>
@@ -236,7 +237,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- parecer habilitacao -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-8">
+								<div style="min-height: 100px;" onclick="tooltip(15)" class="col-lg-5 cf-item-status tickets all carosel-item item-8">
 									<header>
 										<p><span></span><?php echo ('Parecer de Habilitação'); ?></p>
 									</header>
@@ -246,7 +247,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- Validação Técnica -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-9">
+								<div style="min-height: 100px;" onclick="tooltip(16)" class="col-lg-5 cf-item-status tickets all carosel-item item-9">
 									<header>
 										<p><span></span><?php echo ('Validação Técnica'); ?></p>
 									</header>
@@ -256,7 +257,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- Resultados -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-10">
+								<div style="min-height: 100px;" onclick="tooltip(17)" class="col-lg-5 cf-item-status tickets all carosel-item item-10">
 									<header>
 										<p><span></span><?php echo ('Resultados'); ?></p>
 									</header>
@@ -266,7 +267,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- Homologação -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-11">
+								<div style="min-height: 100px;" onclick="tooltip(18)" class="col-lg-5 cf-item-status tickets all carosel-item item-11">
 									<header>
 										<p><span></span><?php echo ('Homologação'); ?></p>
 									</header>
@@ -276,7 +277,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- Jurídico -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-12">
+								<div style="min-height: 100px;" onclick="tooltip(19)" class="col-lg-5 cf-item-status tickets all carosel-item item-12">
 									<header>
 										<p><span></span><?php echo ('Jurídico'); ?></p>
 									</header>
@@ -286,7 +287,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- validacao_interna -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-13">
+								<div style="min-height: 100px;" onclick="tooltip(20)" class="col-lg-5 cf-item-status tickets all carosel-item item-13">
 									<header>
 										<p><span></span><?php echo ('Validação Interna'); ?></p>
 									</header>
@@ -296,7 +297,7 @@ if (isset($_REQUEST['ent'])) {
 									</div>
 								</div>
 								<!-- envio_contrato -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-14">
+								<div style="min-height: 100px;" onclick="tooltip(21)" class="col-lg-5 cf-item-status tickets all carosel-item item-14">
 									<header>
 										<p><span></span><?php echo ('Envio de Contrato'); ?></p>
 									</header>
@@ -307,7 +308,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- formalizacao -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-15">
+								<div style="min-height: 100px;" onclick="tooltip(22)" class="col-lg-5 cf-item-status tickets all carosel-item item-15">
 									<header>
 										<p><span></span><?php echo ('Formalização'); ?></p>
 									</header>
@@ -318,7 +319,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- pendente_unidade -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-16">
+								<div style="min-height: 100px;" onclick="tooltip(24)" class="col-lg-5 cf-item-status tickets all carosel-item item-16">
 									<header>
 										<p><span></span><?php echo ('Pendente Unidade'); ?></p>
 									</header>
@@ -329,7 +330,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- publicacao_errata -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-17">
+								<div style="min-height: 100px;" onclick="tooltip(25)" class="col-lg-5 cf-item-status tickets all carosel-item item-17">
 									<header>
 										<p><span></span><?php echo ('Publicação Errata'); ?></p>
 									</header>
@@ -340,7 +341,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- prorrogacao -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-18">
+								<div style="min-height: 100px;" onclick="tooltip(26)" class="col-lg-5 cf-item-status tickets all carosel-item item-18">
 									<header>
 										<p><span></span><?php echo ('Prorrogação'); ?></p>
 									</header>
@@ -351,7 +352,7 @@ if (isset($_REQUEST['ent'])) {
 								</div>
 
 								<!-- diligencia -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-19">
+								<div style="min-height: 100px;" onclick="tooltip(27)" class="col-lg-5 cf-item-status tickets all carosel-item item-19">
 									<header>
 										<p><span></span><?php echo ('Diligência'); ?></p>
 									</header>
@@ -363,7 +364,7 @@ if (isset($_REQUEST['ent'])) {
 
 
 								<!-- recurso -->
-								<div style="min-height: 100px;" class="col-lg-5 cf-item-status tickets all carosel-item item-20">
+								<div style="min-height: 100px;" onclick="tooltip(28)" class="col-lg-5 cf-item-status tickets all carosel-item item-20">
 									<header>
 										<p><span></span><?php echo ('Recurso'); ?></p>
 									</header>
@@ -584,6 +585,9 @@ if (isset($_REQUEST['ent'])) {
 		</div> <!-- //end container -->
 
 	</div>
+	<div id="tooltipWrapper" onclick="document.getElementById('tooltipWrapper').style.display='none'" style="width:500px; height:500px; background-color: white;">
+		<span id="spanStatusId"></span>
+	</div>
 
 </body>
 <script>
@@ -610,34 +614,6 @@ if (isset($_REQUEST['ent'])) {
 		position: relative;
 	}
 
-	/* .carosel {
-  border: 1px dotted #111;
-} */
-
-	/* .carosel .carosel-item {
-  height: 150px;
-  line-height: 150px;
-  text-align: center;
-  border: 1px solid #000;
-  margin-right: 30px;
-} */
-
-	/* .carosel-item.item-1 {
-  background: orange;
-}
-
-.carosel-item.item-2 {
-  background: skyblue;
-}
-
-.carosel-item.item-3 {
-  background: teal;
-}
-
-.carosel-item.item-4 {
-  background: silver;
-} */
-
 	.carosel-nav {
 		position: absolute;
 		text-align: center;
@@ -657,6 +633,48 @@ if (isset($_REQUEST['ent'])) {
 	.carosel-nav-right {
 		right: 3px;
 	}
+
+	#tooltipWrapper {
+		display: none;
+
+	}
 </style>
+<script>
+	function closesDiv() {
+		document.getElement
+	}
+
+	function tooltip(id) {
+
+
+		var status = id;
+		var tooltipWrapper = document.getElementById("tooltipWrapper");
+		console.log(status)
+		var currentMousePos = {
+			x: -1,
+			y: -1
+		};
+		currentMousePos.x = event.pageX;
+		currentMousePos.y = event.pageY;
+		console.log(currentMousePos.x + " " + currentMousePos.y)
+		tooltipWrapper.style.display = "block";
+		tooltipWrapper.style.zIndex = 9999;
+		tooltipWrapper.style.position = "absolute";
+		tooltipWrapper.style.top = currentMousePos.y + "px";
+		tooltipWrapper.style.left = currentMousePos.x + "px";
+		tooltipWrapper.children[0].innerHTML = status;
+
+
+		<?php
+
+			$query = "select glpi_tickets.name, glpi_tickets.date_creation, glpi_tickets_status.data_inicio
+			from glpi_tickets
+			left join glpi_tickets_status on glpi_tickets.id = glpi_tickets_status.ticket_id
+			where glpi_tickets.status = 4 and glpi_tickets.is_deleted = '0';"
+
+		?>
+
+	}
+</script>
 
 </html>

@@ -451,8 +451,9 @@ $query_sat =
 	WHERE glpi_tickets.is_deleted = '0' 
 	$period
 	$entidade ";
-	
+
 	$result_stat = $DB->query($query_stat);
+
 	
 	$new = $DB->result($result_stat,0,'new');
 	$assig = $DB->result($result_stat,0,'assig');
@@ -511,7 +512,6 @@ $query_sat =
 	$periody	
 	$entidade ";
 	
-	 
 	$result_staty = $DB->query($query_staty);
 	
 	$newy = $DB->result($result_staty,0,'new');
