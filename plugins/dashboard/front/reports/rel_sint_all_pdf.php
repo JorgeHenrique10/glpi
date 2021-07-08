@@ -1124,6 +1124,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 							 <tr>&nbsp;&nbsp;&nbsp;</tr>
 						 </tbody>
 					 </table>
+					 <br><br>
 				 ";
 			 }
  
@@ -1177,7 +1178,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 			 

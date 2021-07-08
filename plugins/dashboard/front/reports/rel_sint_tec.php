@@ -344,16 +344,17 @@ WHERE id = " . $id_tec . " ";
 
 	//requester
 	$sql_req = "SELECT count(glpi_tickets.id) AS conta, glpi_users.firstname AS name, glpi_users.realname AS sname
-FROM `glpi_tickets_users`, glpi_tickets, glpi_users
-WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`			
-AND glpi_tickets_users.`users_id` = glpi_users.id
-AND glpi_tickets_users.type = 2
-AND glpi_tickets.date " . $sel_date . "	
-" . $entidade . "						
-AND glpi_tickets_users.tickets_id IN (SELECT id FROM glpi_tickets_users gtu WHERE gtu.users_id = " . $id_tec . " AND gtu.type = 1)
-GROUP BY name
-ORDER BY conta DESC
-LIMIT 5";
+	FROM `glpi_tickets_users` , glpi_tickets, glpi_users
+	WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`			
+	AND glpi_tickets_users.`users_id` = glpi_users.id
+	AND glpi_tickets_users.type = 1
+	AND glpi_tickets.users_id_lastupdater = " . $id_tec . "		
+	AND glpi_tickets.date " . $sel_date . "	
+	" . $entidade . "
+	GROUP BY name
+	ORDER BY conta DESC";
+
+	$result_req = $DB->query($sql_req);
 
 	$result_req = $DB->query($sql_req);
 
@@ -1256,8 +1257,7 @@ $status_contratos
 							<tr>&nbsp;&nbsp;&nbsp;</tr>
 						</tbody>
 					</table>
-					<br>
-					<br>
+					
 				";
 			}
 

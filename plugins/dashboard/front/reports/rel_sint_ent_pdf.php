@@ -1,7 +1,7 @@
 <?php
 
-include ("../../../../inc/includes.php");
-include ("../../../../inc/config.php");
+include("../../../../inc/includes.php");
+include("../../../../inc/config.php");
 include "../inc/functions.php";
 
 global $DB;
@@ -9,131 +9,134 @@ global $DB;
 Session::checkLoginUser();
 Session::checkRight("profile", READ);
 
-if(!empty($_REQUEST['submit']))
-{
-    $data_ini =  $_REQUEST['date1'];
-    $data_fin = $_REQUEST['date2'];
+if (!empty($_POST['submit'])) {
+	$data_ini =  $_POST['date1'];
+	$data_fin = $_POST['date2'];
+} else {
+	$data_ini = date("Y-m-01");
+	$data_fin = date("Y-m-d");
 }
 
-else {
-    $data_ini = date("Y-m-01");
-    $data_fin = date("Y-m-d");
-    }
-
-if(!isset($_REQUEST["sel_date"])) {
-	$id_date = $_REQUEST["date"];
+if (!isset($_POST["sel_date"])) {
+	$id_date = $_GET["date"];
+} else {
+	$id_date = $_POST["sel_date"];
 }
 
-else {
-	$id_date = $_REQUEST["sel_date"];
+
+# entity
+$sql_e = "SELECT value FROM glpi_plugin_dashboard_config WHERE name = 'entity' AND users_id = " . $_SESSION['glpiID'] . "";
+$result_e = $DB->query($sql_e);
+$sel_ent = $DB->result($result_e, 0, 'value');
+
+if ($sel_ent == '' || $sel_ent == -1) {
+
+	//	$sel_ent = 0;
+	$entities = $_SESSION['glpiactiveentities'];
+	$ent = implode(",", $entities);
+
+	$entidade = "AND glpi_tickets.entities_id IN (" . $ent . ") ";
+	$entidade_d = "AND entities_id IN (" . $ent . ") ";
+	$entidade_dw = "WHERE entities_id IN (" . $ent . ") ";
+} else {
+	$entidade = "AND glpi_tickets.entities_id IN (" . $sel_ent . ") ";
+	$entidade_d = "AND entities_id IN (" . $sel_ent . ") ";
+	$entidade_dw = "WHERE entities_id IN (" . $sel_ent . ") ";
 }
+
+$entidade = "AND glpi_tickets.entities_id IN (" . $_SESSION['id_entity_sintetico'] . ") ";
+$_SESSION['id_entity_sintetico'] = NULL;
 
 ?>
+<html>
 
 <head>
-<title> GLPI - <?php echo __('Summary Report','dashboard')." - ". __('Entity') ?> </title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-<meta http-equiv="content-language" content="en-us" />
-<meta charset="utf-8">
+	<title> GLPI - <?php echo __('Summary Report', 'dashboard') ?> </title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<meta http-equiv="content-language" content="en-us" />
+	<meta charset="utf-8">
 
-<link rel="icon" href="../img/dash.ico" type="image/x-icon" />
-<link rel="shortcut icon" href="../img/dash.ico" type="image/x-icon" />
-<link href="../css/styles.css" rel="stylesheet" type="text/css" />
-<link href="../css/bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="../css/bootstrap-responsive.css" rel="stylesheet" type="text/css" />
-<link href="../css/font-awesome.css" type="text/css" rel="stylesheet" />
+	<link rel="icon" href="../img/dash.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="../img/dash.ico" type="image/x-icon" />
+	<link href="../css/styles.css" rel="stylesheet" type="text/css" />
+	<link href="../css/bootstrap.css" rel="stylesheet" type="text/css" />
+	<script src="../js/bootstrap.min.js"></script>
 
-<script language="javascript" src="../js/jquery.js"></script>
-<script src="../js/bootstrap.min.js"></script>
+	<style type="text/css">
+		select {
+			width: 60px;
+		}
 
-<style type="text/css">	
-	select { width: 60px; }
-	table.dataTable { empty-cells: show; }
-   a:link, a:visited, a:active { text-decoration: none;}
-</style>
+		table.dataTable {
+			empty-cells: show;
+		}
 
-<?php echo '<link rel="stylesheet" type="text/css" href="../css/style-'.$_SESSION['style'].'">';  ?> 
+		a:link,
+		a:visited,
+		a:active {
+			text-decoration: none;
+		}
+	</style>
+
+	<?php echo '<link rel="stylesheet" type="text/css" href="../css/style-' . $_SESSION['style'] . '">';  ?>
 </head>
 
 <body style="background-color: #fff !important;">
-<?php
-		
-		$con = $_REQUEST['con'];
-		if($con == "1") {
-		
-		if(!isset($_REQUEST['date1']))
-		{
-		    $data_ini2 = $_REQUEST['date1'];
-		    $data_fin2 = $_REQUEST['date2'];
+	<?php
+
+	$con = $_REQUEST['con'];
+	if ($con == "1") {
+
+		if (!isset($_REQUEST['date1'])) {
+			$data_ini2 = $_REQUEST['date1'];
+			$data_fin2 = $_REQUEST['date2'];
+		} else {
+			$data_ini2 = $_REQUEST['date1'];
+			$data_fin2 = $_REQUEST['date2'];
 		}
-		
-		else {
-		    $data_ini2 = $_REQUEST['date1'];
-		    $data_fin2 = $_REQUEST['date2'];
+
+		if ($data_ini2 == $data_fin2) {
+			$datas2 = "LIKE '" . $data_ini2 . "%'";
+		} else {
+			$datas2 = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
 		}
-		
-		if($data_ini2 == $data_fin2) {
-			$datas2 = "LIKE '".$data_ini2."%'";
-		}
-		
-		else {
-			$datas2 = "BETWEEN '".$data_ini2." 00:00:00' AND '".$data_fin2." 23:59:59'";
-		}
-		
+
 		// do select
 		$post_date = $_REQUEST["sel_date"];
-		
-		if(!isset($post_date) or $post_date == "0") {
-		    $sel_date = $datas2;
-		}
-		
-		else {
-		    $sel_date = $_REQUEST["sel_date"];
-		}
-		
-		switch($post_date) {
-		
-          case ("1") :
-             $data_ini2 = date('Y-m-01');
-             $data_fin2 = date('Y-m-d');
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '". $data_fin2 ." 23:59:59'";
-          break;
-          case ("2") :
-             $data_ini2 = date('Y-m-d', strtotime('-1 week'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("3") :
-             $data_ini2 = date('Y-m-d', strtotime('-15 day'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("4") :
-              $data_ini2 = date('Y-m-d', strtotime('-1 month'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;
-          case ("5") :
-              $data_ini2 = date('Y-m-d', strtotime('-3 month'));
-              $sel_date = "BETWEEN '" . $data_ini2 ." 00:00:00' AND '".$data_fin2." 23:59:59'";
-          break;		
-		}
-		
-		
-		//selected entity	
-		$id_ent = $_REQUEST["sel_ent"];
-		$id_ent =$_SESSION['id_entity_sintetico'];
-		$entidade = "AND glpi_tickets.entities_id = ".$id_ent."";
-		
-		//entity name
-		$sql_entname = "
-		SELECT id, name, completename AS cname
-		FROM `glpi_entities`
-		WHERE id = ".$id_ent."
-		ORDER BY `cname` ASC ";
 
-		$result_entname = $DB->query($sql_entname);
-		$entname = $DB->result($result_entname,0,'cname');
+		if (!isset($post_date) or $post_date == "0") {
+			$sel_date = $datas2;
+		} else {
+			$sel_date = $_REQUEST["sel_date"];
+		}
 
-		
+		switch ($post_date) {
+
+			case ("1"):
+				$data_ini2 = date('Y-m-01');
+				$data_fin2 = date('Y-m-d');
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("2"):
+				$data_ini2 = date('Y-m-d', strtotime('-1 week'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("3"):
+				$data_ini2 = date('Y-m-d', strtotime('-15 day'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("4"):
+				$data_ini2 = date('Y-m-d', strtotime('-1 month'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+			case ("5"):
+				$data_ini2 = date('Y-m-d', strtotime('-3 month'));
+				$sel_date = "BETWEEN '" . $data_ini2 . " 00:00:00' AND '" . $data_fin2 . " 23:59:59'";
+				break;
+		}
+
+
 		// Chamados
 		$sql_cham = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_tickets.date AS date,
 		 glpi_tickets.solvedate AS solvedate, glpi_tickets.status AS status
@@ -176,26 +179,22 @@ else {
 			AND glpi_tickets_users.type = 2
 			" . $entidade . " 
 			GROUP BY name
-			ORDER BY conta DESC
-			LIMIT 5";
+			ORDER BY conta DESC";
 
 			$result_tec = $DB->query($sql_tec);
 
 			//requester
-			$sql_req =
-				"SELECT count( glpi_tickets.id ) AS conta, glpi_tickets_users.`users_id` AS id,  glpi_users.firstname AS name, glpi_users.realname AS sname
-			FROM `glpi_tickets_users`, glpi_tickets, glpi_users
+			$sql_req = "SELECT count(glpi_tickets.id) AS conta, glpi_users.firstname AS name, glpi_users.realname AS sname
+			FROM `glpi_tickets_users` , glpi_tickets, glpi_users
 			WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
-			AND glpi_tickets.date " . $sel_date . "
+			AND glpi_tickets.date ".$sel_date."
 			AND glpi_tickets_users.`users_id` = glpi_users.id
 			AND glpi_tickets_users.type = 1
-			AND glpi_tickets.is_deleted = 0
-			" . $entidade . "
-			GROUP BY `users_id`
-			ORDER BY conta DESC
-			LIMIT 5 ";
-
-			$result_req = $DB->query($sql_req);
+			".$entidade." 
+			GROUP BY name
+			ORDER BY conta DESC";
+			
+			$result_req = $DB->query($sql_req);	
 
 			//avg time
 			$sql_time =
@@ -294,124 +293,123 @@ else {
 			GROUP BY name
 			ORDER BY conta DESC
 			LIMIT 5 ";
+			//Total de Chamados Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		//Total de Chamados Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$distrato = $DB->result($result_sla_contrato, 0, 'distrato');
+			$dispensa = $DB->result($result_sla_contrato, 0, 'dispensa');
+			$cotacao = $DB->result($result_sla_contrato, 0, 'cotacao');
+			$aditivo = $DB->result($result_sla_contrato, 0, 'aditivo');
+			$distrato_prazo = $DB->result($result_sla_contrato, 0, 'distrato_prazo');
+			$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
+			$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
+			$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
 
-		$distrato = $DB->result($result_sla_contrato, 0, 'distrato');
-		$dispensa = $DB->result($result_sla_contrato, 0, 'dispensa');
-		$cotacao = $DB->result($result_sla_contrato, 0, 'cotacao');
-		$aditivo = $DB->result($result_sla_contrato, 0, 'aditivo');
-		$distrato_prazo = $DB->result($result_sla_contrato, 0, 'distrato_prazo');
-		$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
-		$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
-		$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+			//Total de Chamados Fechado Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_fechado
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is not null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		//Total de Chamados Fechado Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_fechado
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.solvedate is not null
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$distrato_fechado = $DB->result($result_sla_contrato, 0, 'distrato_fechado');
+			$dispensa_fechado = $DB->result($result_sla_contrato, 0, 'dispensa_fechado');
+			$cotacao_fechado = $DB->result($result_sla_contrato, 0, 'cotacao_fechado');
+			$aditivo_fechado = $DB->result($result_sla_contrato, 0, 'aditivo_fechado');
 
-		$distrato_fechado = $DB->result($result_sla_contrato, 0, 'distrato_fechado');
-		$dispensa_fechado = $DB->result($result_sla_contrato, 0, 'dispensa_fechado');
-		$cotacao_fechado = $DB->result($result_sla_contrato, 0, 'cotacao_fechado');
-		$aditivo_fechado = $DB->result($result_sla_contrato, 0, 'aditivo_fechado');
+			//Total de Chamados Aberto Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		//Total de Chamados Aberto Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.solvedate is null
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$distrato_aberto = $DB->result($result_sla_contrato, 0, 'distrato_aberto');
+			$dispensa_aberto = $DB->result($result_sla_contrato, 0, 'dispensa_aberto');
+			$cotacao_aberto = $DB->result($result_sla_contrato, 0, 'cotacao_aberto');
+			$aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
 
-		$distrato_aberto = $DB->result($result_sla_contrato, 0, 'distrato_aberto');
-		$dispensa_aberto = $DB->result($result_sla_contrato, 0, 'dispensa_aberto');
-		$cotacao_aberto = $DB->result($result_sla_contrato, 0, 'cotacao_aberto');
-		$aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
+			//Médias de Dias
+				$sql_sla_contratos_dias_distrato = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 197
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-		//Médias de Dias
-			$sql_sla_contratos_dias_distrato = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
-				AND glpi_tickets.itilcategories_id = 197
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_dispensa = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 191
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_dispensa = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
-				AND glpi_tickets.itilcategories_id = 191
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_cotacao = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 190
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_cotacao = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
-				AND glpi_tickets.itilcategories_id = 190
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_aditivo = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.solvedate is null
+					AND glpi_tickets.itilcategories_id = 189
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_aditivo = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate is null
-				AND glpi_tickets.itilcategories_id = 189
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
-
-			$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
-			$result_dias_dispensa = $DB->query($sql_sla_contratos_dias_dispensa);
-			$result_dias_cotacao = $DB->query($sql_sla_contratos_dias_cotacao);
-			$result_dias_aditivo = $DB->query($sql_sla_contratos_dias_aditivo);
-			
-			$dias_distrato = (int) $DB->result($result_dias_distrato, 0, 'dias');
-			$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
-			$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
-			$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
-				$result_grp = $DB->query($sql_grp);
+				$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
+				$result_dias_dispensa = $DB->query($sql_sla_contratos_dias_dispensa);
+				$result_dias_cotacao = $DB->query($sql_sla_contratos_dias_cotacao);
+				$result_dias_aditivo = $DB->query($sql_sla_contratos_dias_aditivo);
+				
+				$dias_distrato = (int) $DB->result($result_dias_distrato, 0, 'dias');
+				$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
+				$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
+				$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
+			$result_grp = $DB->query($sql_grp);
 
 			//logo						
 			if (file_exists('../../../../pics/logo_big.png')) {
@@ -597,7 +595,6 @@ else {
 			$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 			$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 			$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
-			
 			//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 
@@ -659,132 +656,141 @@ else {
 		AND glpi_tickets.date " . $sel_date . "			
 		" . $entidade . "";
 
-		//Total de Chamados Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			//Total de Chamados Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$distrato = $DB->result($result_sla_contrato, 0, 'distrato');
-		$dispensa = $DB->result($result_sla_contrato, 0, 'dispensa');
-		$cotacao = $DB->result($result_sla_contrato, 0, 'cotacao');
-		$aditivo = $DB->result($result_sla_contrato, 0, 'aditivo');
-		$distrato_prazo = $DB->result($result_sla_contrato, 0, 'distrato_prazo');
-		$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
-		$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
-		$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+			$distrato = $DB->result($result_sla_contrato, 0, 'distrato');
+			$dispensa = $DB->result($result_sla_contrato, 0, 'dispensa');
+			$cotacao = $DB->result($result_sla_contrato, 0, 'cotacao');
+			$aditivo = $DB->result($result_sla_contrato, 0, 'aditivo');
+			$distrato_prazo = $DB->result($result_sla_contrato, 0, 'distrato_prazo');
+			$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
+			$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
+			$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
 
-		//Total de Chamados Fechado Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_fechado,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_fechado
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.solvedate is not null
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			//Total de Chamados Fechado Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_fechado,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_fechado
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is not null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$distrato_fechado = $DB->result($result_sla_contrato, 0, 'distrato_fechado');
-		$dispensa_fechado = $DB->result($result_sla_contrato, 0, 'dispensa_fechado');
-		$cotacao_fechado = $DB->result($result_sla_contrato, 0, 'cotacao_fechado');
-		$aditivo_fechado = $DB->result($result_sla_contrato, 0, 'aditivo_fechado');
+			$distrato_fechado = $DB->result($result_sla_contrato, 0, 'distrato_fechado');
+			$dispensa_fechado = $DB->result($result_sla_contrato, 0, 'dispensa_fechado');
+			$cotacao_fechado = $DB->result($result_sla_contrato, 0, 'cotacao_fechado');
+			$aditivo_fechado = $DB->result($result_sla_contrato, 0, 'aditivo_fechado');
 
-		//Total de Chamados Aberto Contratos
-		$sql_sla_contratos = 
-		"SELECT 
-			COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_aberto,
-			COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
-		FROM glpi_tickets
-		WHERE glpi_tickets.is_deleted = 0
-		AND glpi_tickets.solvedate is null
-		AND glpi_tickets.date ".$sel_date."
-		".$entidade;
+			//Total de Chamados Aberto Contratos
+			$sql_sla_contratos = 
+			"SELECT 
+				COUNT(IF(glpi_tickets.itilcategories_id = 197, glpi_tickets.itilcategories_id, NULL)) AS distrato_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao_aberto,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
+			FROM glpi_tickets
+			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
+			AND glpi_tickets.date ".$sel_date."
+			".$entidade;
 
-		$result_sla_contrato = $DB->query($sql_sla_contratos);		
-		$conta_cons_contrato = $DB->numrows($result_sla_contrato);
+			$result_sla_contrato = $DB->query($sql_sla_contratos);		
+			$conta_cons_contrato = $DB->numrows($result_sla_contrato);
 
-		$distrato_aberto = $DB->result($result_sla_contrato, 0, 'distrato_aberto');
-		$dispensa_aberto = $DB->result($result_sla_contrato, 0, 'dispensa_aberto');
-		$cotacao_aberto = $DB->result($result_sla_contrato, 0, 'cotacao_aberto');
-		$aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
+			$distrato_aberto = $DB->result($result_sla_contrato, 0, 'distrato_aberto');
+			$dispensa_aberto = $DB->result($result_sla_contrato, 0, 'dispensa_aberto');
+			$cotacao_aberto = $DB->result($result_sla_contrato, 0, 'cotacao_aberto');
+			$aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
 
-		//Médias de Dias
-			$sql_sla_contratos_dias_distrato = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.itilcategories_id = 197
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+			//Médias de Dias
+				$sql_sla_contratos_dias_distrato = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.itilcategories_id = 197
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_dispensa = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.itilcategories_id = 191
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_dispensa = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.itilcategories_id = 191
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_cotacao = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.itilcategories_id = 190
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_cotacao = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.itilcategories_id = 190
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$sql_sla_contratos_dias_aditivo = "
-				SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
-				FROM glpi_tickets
-				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.itilcategories_id = 189
-				AND glpi_tickets.date ".$sel_date."
-				".$entidade;
+				$sql_sla_contratos_dias_aditivo = "
+					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					FROM glpi_tickets
+					WHERE glpi_tickets.is_deleted = 0
+					AND glpi_tickets.itilcategories_id = 189
+					AND glpi_tickets.date ".$sel_date."
+					".$entidade;
 
-			$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
-			$result_dias_dispensa = $DB->query($sql_sla_contratos_dias_dispensa);
-			$result_dias_cotacao = $DB->query($sql_sla_contratos_dias_cotacao);
-			$result_dias_aditivo = $DB->query($sql_sla_contratos_dias_aditivo);
-			
-			$dias_distrato = (int) $DB->result($result_dias_distrato, 0, 'dias');
-			$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
-			$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
-			$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
+				$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
+				$result_dias_dispensa = $DB->query($sql_sla_contratos_dias_dispensa);
+				$result_dias_cotacao = $DB->query($sql_sla_contratos_dias_cotacao);
+				$result_dias_aditivo = $DB->query($sql_sla_contratos_dias_aditivo);
+				
+				$dias_distrato = (int) $DB->result($result_dias_distrato, 0, 'dias');
+				$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
+				$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
+				$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
 
+				$query_entidades_contratos = "select id from glpi_entities where id = 17 OR entities_id = 17";
 
-			$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
+				$result_entities_contratos = $DB->query($query_entidades_contratos)->fetch_all();
+								
+				$ids_contract = [];
 
-			$result_contratos = $DB->query($query_contratos);
-			$sel_ent_contratos = $result_contratos->fetch_all();
-		
-			$mostrar = false;
-			foreach ($sel_ent_contratos as $item) {
-				if ($item[0] == 17 || $item[1] == 17) {
-					$mostrar = true;
+				foreach ($result_entities_contratos as $id) {
+					$ids_contract[] = $id[0];
 				}
-			}
-						$result_stat_lead_time = $DB->query($query_stat_lead_time);
+
+				$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
+
+				$result_contratos = $DB->query($query_contratos);
+				$sel_ent_contratos = $result_contratos->fetch_all();
+			
+				$mostrar = false;
+				foreach ($sel_ent_contratos as $item) {
+					if ($item[0] == 17 || $item[1] == 17) {
+						$mostrar = true;
+					}
+				}
+			$result_stat_lead_time = $DB->query($query_stat_lead_time);
 
 			$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
 			$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
@@ -1119,8 +1125,7 @@ else {
 							 <tr>&nbsp;&nbsp;&nbsp;</tr>
 						 </tbody>
 					 </table>
-					 <br>
-					 <br>
+					 <br><br>
 				 ";
 			 }
  
@@ -1159,7 +1164,6 @@ else {
 				 <tbody>";
 			 
 
-
 			while ($row_tec = $DB->fetch_assoc($result_tec)) {
 				$content .= "<tr>
 				 <td width='300'>" . $row_tec['name'] . " " . $row_tec['sname'] . "</td>
@@ -1175,38 +1179,44 @@ else {
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Requester', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 			 
-			 <tbody>";	
-			
-			while($row = $DB->fetch_assoc($result_req)) {
+			 <tbody>";
+
+			while ($row = $DB->fetch_assoc($result_req)) {
 				$content .= "<tr>
-				 <td width='300'>".$row['name']." ".$row['sname']."</td>
-				 <td width='200' align='right'>".$row['conta']."</td>			
-				 </tr> ";	
-			}		
-													
-$content .= "</tbody> </table> </page> ";		   		   											
-			
-		}							
-	}		
+				 <td width='300'>" . $row['name'] . " " . $row['sname'] . "</td>
+				 <td width='200' align='right'>" . $row['conta'] . "</td>			
+				 </tr> ";
+			}
 
-require_once('../inc/html2pdf/html2pdf.class.php');
+			$content .= "</tbody> </table> </page> ";
+		}
+	}
 
-$filename = "summary_report_entity.pdf";
+	require_once('../inc/html2pdf/html2pdf.class.php');
 
-$html2pdf = new HTML2PDF('P', 'A4', 'en');
-$html2pdf->writeHTML($content);
+	//$filename = "summary_report-".date("Y-m-d_H:i").".pdf";
+	$filename = "summary_report.pdf";
 
-ob_end_clean();
-$html2pdf->Output($filename,'D');		
+	$html2pdf = new HTML2PDF('P', 'A4', 'en');
+	$html2pdf->writeHTML($content);
 
-//header("Location:".$filename);
+	ob_end_clean();
+	$html2pdf->Output($filename, 'D');
 
-		
-?>	
+	//header("Location:".$filename);
+	//Load file
+	//header("Content-type: application/pdf"); 
+	//header("Content-Disposition: attachment; filename=$filename"); 
+	//readfile("$filename");
+
+	//remove pdf file from server
+	//unlink($filename);
+
+	?>
 </body>
-</html>
 
+</html>

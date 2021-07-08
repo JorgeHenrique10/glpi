@@ -1062,8 +1062,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 							<tr>&nbsp;&nbsp;&nbsp;</tr>
 						</tbody>
 					</table>
-					<br>
-					<br>
+					<br><br><br><br><br><br>
 				";
 			}
 

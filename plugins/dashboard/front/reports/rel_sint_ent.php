@@ -317,7 +317,7 @@ $result_ent = $DB->query($sql_ent);
 			AND glpi_tickets_users.type = 1
 			".$entidade." 
 			GROUP BY name
-		ORDER BY conta DESC";
+			ORDER BY conta DESC";
 			
 			$result_req = $DB->query($sql_req);		
 											
@@ -1165,7 +1165,7 @@ $result_ent = $DB->query($sql_ent);
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Technician', 'dashboard') . "</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . __('Tickets', 'dashboard') . " " . __('by Technician', 'dashboard') . "</th>						
 			 </tr>
 			 </thead>	
 
@@ -1196,7 +1196,7 @@ $content .= "
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 			 <thead>
 			 <tr>
-			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - ". __('Tickets','dashboard')." ". __('by Requester','dashboard')."</th>						
+			 <th colspan='2' style='text-align:center; background:#286090; color:#fff;'>". __('Tickets','dashboard')." ". __('by Requester','dashboard')."</th>						
 			 </tr>
 			 </thead>	
 
