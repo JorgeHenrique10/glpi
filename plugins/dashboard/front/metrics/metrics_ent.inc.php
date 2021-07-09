@@ -511,7 +511,7 @@ $query_sat =
 	WHERE glpi_tickets.is_deleted = '0'	
 	$periody	
 	$entidade ";
-	
+
 	$result_staty = $DB->query($query_staty);
 	
 	$newy = $DB->result($result_staty,0,'new');

@@ -189,12 +189,12 @@ if (isset($_REQUEST['ent'])) {
 								?>
 
 								<!-- CLOSED -->
-								<div style="min-height:100px;" onclick="tooltip(6)" class="col-lg-5 cf-item-status tickets closed carosel-item item-4">
+								<div style="min-height:100px;" class="col-lg-5 cf-item-status tickets closed carosel-item item-4">
 									<header>
 										<p><span></span><?php echo $tit_notopen; ?></p>
 									</header>
 									<div class="content">
-										<div class="metric5"><?php echo $notopen; ?></div>
+										<div class="metric5" onmouseover="tooltip(6)"><?php echo $notopen; ?></div>
 										<?php
 										if ($count_notop < 5) {
 											echo "<div class='metric-small5'>";
@@ -585,8 +585,7 @@ if (isset($_REQUEST['ent'])) {
 		</div> <!-- //end container -->
 
 	</div>
-	<div id="tooltipWrapper" onclick="document.getElementById('tooltipWrapper').style.display='none'" style="width:500px; height:500px; background-color: white;">
-		<span id="spanStatusId"></span>
+	<div id="tooltipWrapper" onclick="document.getElementById('tooltipWrapper').style.display='none'">
 	</div>
 
 </body>
@@ -610,6 +609,10 @@ if (isset($_REQUEST['ent'])) {
 </script>
 
 <style>
+	* {
+		box-sizing: border-box;
+	}
+
 	.carosel-root {
 		position: relative;
 	}
@@ -635,19 +638,66 @@ if (isset($_REQUEST['ent'])) {
 	}
 
 	#tooltipWrapper {
+		padding: 20px;
 		display: none;
-
+		background-color: rgba(0, 0, 0, 0.95);
+		width: 500px;
+		height: 500px;
 	}
+
+	.overflowy {
+		margin-top: 10px;
+		padding-right: 10px;
+		display: flex;
+		flex-direction: column;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		max-height: 370px;
+	}
+
+	.tooltip-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		grid-gap: 20px;
+		margin-bottom: 10px;
+		align-items: center;
+	}
+
+	.tooltip-grid.white {
+		color: #fff;
+	}
+
+	.tooltip-grid.border {
+		padding-bottom: 10px;
+		border-bottom: 0.5px solid rgba(242, 242, 242, 0.3);
+	}
+
+	::-webkit-scrollbar {
+			width: 12px;
+		}
+
+		/* Track */
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+		}
+
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			background: rgba(242, 242, 242, 0.2);
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+		}
+
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(242, 242, 242, 0.2);
+		}
+
 </style>
 <script>
-	function closesDiv() {
-		document.getElement
-	}
-
-	function tooltip(id) {
-
-
-		var status = id;
+	function tooltip(statusId) {
 		var tooltipWrapper = document.getElementById("tooltipWrapper");
 		console.log(status)
 		var currentMousePos = {
@@ -656,24 +706,20 @@ if (isset($_REQUEST['ent'])) {
 		};
 		currentMousePos.x = event.pageX;
 		currentMousePos.y = event.pageY;
-		console.log(currentMousePos.x + " " + currentMousePos.y)
 		tooltipWrapper.style.display = "block";
 		tooltipWrapper.style.zIndex = 9999;
 		tooltipWrapper.style.position = "absolute";
 		tooltipWrapper.style.top = currentMousePos.y + "px";
 		tooltipWrapper.style.left = currentMousePos.x + "px";
-		tooltipWrapper.children[0].innerHTML = status;
 
+		 tooltipWrapper.innerHTML = "<h1>Carregando...</h1>";
 
-		<?php
-
-			$query = "select glpi_tickets.name, glpi_tickets.date_creation, glpi_tickets_status.data_inicio
-			from glpi_tickets
-			left join glpi_tickets_status on glpi_tickets.id = glpi_tickets_status.ticket_id
-			where glpi_tickets.status = 4 and glpi_tickets.is_deleted = '0';"
-
-		?>
-
+		$.ajax({
+			type: "GET",
+			url: `get-infos-by-status.php?status=${statusId}`,
+		}).done((html) => {
+			tooltipWrapper.innerHTML = html;
+		})
 	}
 </script>
 
