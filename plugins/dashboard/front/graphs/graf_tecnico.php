@@ -332,36 +332,36 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 
 						//count by status
 						$query_stat = "
-SELECT 
-SUM(case when glpi_tickets.status = 1 then 1 else 0 end) AS new,
-SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
-SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
-SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
-SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
-SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
-SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
-SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
-SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
-SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
-SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
-SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
-SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
-SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
-SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
-SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
-SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
-SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
-SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
-SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
-SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
-FROM glpi_tickets_users, glpi_tickets
-WHERE glpi_tickets.is_deleted = '0'
-AND glpi_tickets.date " . $datas . "
-AND glpi_tickets_users.users_id = " . $id_tec . "
-AND glpi_tickets_users.type = 2
-" . $entidade_age . "
-AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
+						SELECT 
+						SUM(case when glpi_tickets.status = 1 then 1 else 0 end) AS new,
+						SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
+						SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
+						SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
+						SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
+						SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+						SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+						SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+						SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+						SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+						SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+						SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+						SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+						SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+						SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+						SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+						SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+						SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+						SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+						SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+						SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+						SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
+						FROM glpi_tickets_users, glpi_tickets
+						WHERE glpi_tickets.is_deleted = '0'
+						AND glpi_tickets.date " . $datas . "
+						AND glpi_tickets_users.users_id = " . $id_tec . "
+						AND glpi_tickets_users.type = 2
+						" . $entidade_age . "
+						AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 
 						$result_stat = $DB->query($query_stat);
 
@@ -407,214 +407,214 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 
 						if ($exibir) {
 							$status_contratos = "<div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#F9E79F'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer5' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Validação de TR</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A2D9CE'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer6' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Publicação</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#1A5276'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer7' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Parecer de Habilitação</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#85929E'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer8' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Validação Técnica</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#1F618D'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer9' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Resultados</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer10' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Jurídico</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer11' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Validação Interna</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#AED6F1'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer12' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Envio de Contrato</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#F7DC6F'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer13' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Homologação</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#F5CBA7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer14' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Formalização</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Atribuido</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer16' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Pendente Unidade</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer17' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Publicação de Errata</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer18' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Prorrogação</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer19' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Diligência</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  <div class='col-sm-3 col-md-3'>
-				 <div class='dashbox shad panel panel-default db-yellow'>
-					<div class='panel-body_2'>
-					   <div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
-							<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
-					   </div>
-			   		<div class='panel-right'>
-							<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
-         				<span class='date'><b>Recurso</b></span>
-					   </div>
-					</div>
-				 </div>
-			  </div>
-			  ";
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#F9E79F'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer5' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Validação de TR</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A2D9CE'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer6' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Publicação</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#1A5276'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer7' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Parecer de Habilitação</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#85929E'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer8' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Validação Técnica</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#1F618D'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer9' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Resultados</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer10' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Jurídico</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#FADBD8'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer11' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Validação Interna</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#AED6F1'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer12' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Envio de Contrato</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#F7DC6F'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer13' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Homologação</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#F5CBA7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer14' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Formalização</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Atribuido</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer16' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Pendente Unidade</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer17' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Publicação de Errata</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer18' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Prorrogação</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer19' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Diligência</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-sm-3 col-md-3'>
+								<div class='dashbox shad panel panel-default db-yellow'>
+									<div class='panel-body_2'>
+									<div class='panel-left yellow yellowbg' style = 'margin-top: -5px; margin-left: -5px;'>
+											<i class='fa fa-file fa-3x fa2' style='color:#A3E4D7'></i>
+									</div>
+									<div class='panel-right'>
+											<div id='odometer15' class='odometer' style='font-size: 22px; margin-top: 1px;'>   </div><p></p>
+										<span class='date'><b>Recurso</b></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							";
 
 						}
 

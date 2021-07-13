@@ -83,7 +83,10 @@ $(function () {
             },
             plotOptions: {
              
-                showInLegend: true
+                showInLegend: true,
+                series: {
+                    groupPadding: 0.1
+                    }
             },
 
             credits: {

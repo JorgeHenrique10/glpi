@@ -72,49 +72,150 @@ $(function () {
 		// Build the chart
         $('#graftime').highcharts({
             chart: {
-            type: 'pie',
-            options3d: {
-				enabled: false,
-                alpha: 45,
-                beta: 0
-            },
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false
-            },
+            type: 'column',
+            plotBorderColor: '#ffffff',
+            plotBorderWidth: 0
+            },              
             title: {
-                text: '".__('Ticket Solving Period','dashboard')."'
+                text: 'Tempo de Solução dos Chamados'
             },
 
             tooltip: {
-        	    pointFormat: '{series.name}: <b>{point.y} - ({point.percentage:.1f}%)</b>'
+        	    pointFormat: '{series.name}: <b>{point.y}</b>'
             },
             plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    size: '85%',
-                    innerSize: 90,
-                    depth: 40,
-                    dataLabels: {
-									format: '{point.y} - ({point.percentage:.1f}%)',
-                   		   style: {
-                        			color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                        				}
-                    },
-                showInLegend: true
-                }
+             
+                showInLegend: true,
+                series: {
+                    groupPadding: 0.07
+                    }
             },
-            series: [{
-                type: 'pie',
-                name: '".__('Tickets','dashboard')."',
- 					 data: [ ['< 1 " .__('day','dashboard')."',  ".$quant2[0]." ], ['1 " .__('day','dashboard')."',  ".$quant2[1]." ], ['2 " .__('days','dashboard')."',  ".$quant2[2]." ],
-                	['3 " .__('days','dashboard')."', ".$quant2[3]." ], ['4 " .__('days','dashboard')."',  ".$quant2[4]." ],
-                	['5 " .__('days','dashboard')."',  ".$quant2[5]." ], ['6 " .__('days','dashboard')."',  ".$quant2[6]." ],
-                	['7 " .__('days','dashboard')."',  ".$quant2[7]." ], ['8+ " .__('days','dashboard')."', ".$quant2[$conta_q]." ]		
-                  ].filter(function(d) {return d[1] > 0})
-            }]
+
+            credits: {
+                enabled: false
+            },
+            xAxis:{
+                min:1,
+                categories:['','']
+
+            },
+            labels: {
+                overflow: 'justify'
+            },
+            stackLabels: {
+            enabled: true,
+            y:0,
+            },
+            yAxis:{
+                title:{
+                    text:''
+                }             
+            },
+            series: [                
+                {     
+                    name: '< 1 Dia',
+                    data: ['< 1 " .__('day','dashboard')."',  ".$quant2[0]."],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '1 Dia',
+                    data: ['1 " .__('days','dashboard')."',  ".$quant2[1]." ],
+                    color: 'cyan',
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '2 Dias',
+                    data: ['2 " .__('days','dashboard')."', ".$quant2[2]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '3 Dias',
+                    data: ['3 " .__('days','dashboard')."', ".$quant2[3]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '4 Dias',
+                    data: ['4 " .__('days','dashboard')."', ".$quant2[4]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '5 Dias',
+                    data: ['5 " .__('days','dashboard')."', ".$quant2[5]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '6 Dias',
+                    data: ['6 " .__('days','dashboard')."', ".$quant2[6]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '7 Dias',
+                    data: ['7 " .__('days','dashboard')."', ".$quant2[7]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '8 Dias',
+                    data: ['8+" .__('days','dashboard')."', ".$quant2[$conta_q]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                }
+            ]
         });
     });
 		</script>"; 
-?>
+    //<1 = [0] - 1 [1]
+
+    //<1 = [0] - 1 [1]
