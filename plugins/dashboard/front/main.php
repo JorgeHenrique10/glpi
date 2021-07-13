@@ -333,6 +333,42 @@ AND glpi_tickets.time_to_resolve < NOW()
 $result_due = $DB->query($sql_due);
 $total_due = $DB->fetch_assoc($result_due);
 
+
+$query_atraso_contrato = 
+	"Select COUNT(IF(diffs > time, id, NULL)) AS atraso FROM 
+	(SELECT glpi_tickets.id, glpi_status_time.time, 
+	glpi_tickets.status, max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
+	TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs
+	FROM glpi_tickets
+	inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
+	inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
+	WHERE glpi_tickets.status NOT IN (5,6) 
+	AND data_cons is null
+	AND glpi_tickets.is_deleted = 0 
+	$entidade
+	group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
+	order by id) as Tabela";
+
+$atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
+$atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
+// print_r($atrasados_retorno_total['atraso']); exit;
+
+$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
+
+$result_contratos = $DB->query($query_contratos);
+$sel_ent_contratos = $result_contratos->fetch_all();
+
+$status_contratos = '';
+
+$entidades_sel = explode(',', $sel_ent);
+
+$exibir = false;
+foreach ($sel_ent_contratos as $item) {
+	if ($item[0] == 17 || $item[1] == 17) {
+		$exibir = true;
+	}
+}
+
 ?>
 <div class="site-holder">
 <!-- top -->
@@ -444,6 +480,7 @@ $total_due = $DB->fetch_assoc($result_due);
 	    odometer2.innerHTML = <?php echo $total_mes['total']; ?>;
 	    odometer3.innerHTML = <?php echo $total_ano['total']; ?>;
 	    odometer4.innerHTML = <?php echo $total_due['total']; ?>;
+	    odometer4.innerHTML = <?php print_r($exibir ? $atrasados_retorno_total['atraso'] : $total_due['total']); ?>;
 	    odometer5.innerHTML = <?php echo $total_ano_ab['total']; ?>;
 	    odometer6.innerHTML = <?php echo $total_users['total']; ?>;
 	}, 1000);

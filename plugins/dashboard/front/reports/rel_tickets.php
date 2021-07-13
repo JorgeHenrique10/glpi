@@ -274,7 +274,10 @@ function margins() {
 					$id_due = "AND time_to_resolve >= solvedate"; 
 					}
 			}
-			else { $id_due = ''; }										
+			else { $id_due = ''; }
+			
+			if($_GET['stat'])
+				$id_sta = "AND glpi_tickets.status = ".$_GET['stat'];
 			?>
 			
 			</td>

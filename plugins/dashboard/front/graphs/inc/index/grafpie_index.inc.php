@@ -17,18 +17,21 @@ ORDER BY ordenador  ASC ";
 $result2 = $DB->query($query2) or die('erro');
 
 $arr_grf2 = array();
+$arr_grf2_cod = array();
+
 while ($row_result = $DB->fetch_assoc($result2)) {
     $v_row_result = $row_result['nome'];
     $arr_grf2[$v_row_result] = $row_result['tick'];
+    $arr_grf2_cod[] = $row_result['stat'];
+
 }
 
 $grf2 = array_keys($arr_grf2);
 $quant2 = array_values($arr_grf2);
 $conta = count($arr_grf2);
-
 $categorias = implode("','", $grf2);
 
-//print_r($categorias );exit;
+// print_r($arr_grf2_cod);exit;
 
 echo "
 <script type='text/javascript'>
@@ -54,13 +57,10 @@ $(function () {
 	            verticalAlign: 'top',
 	            floating: true,
                adjustChartSize: true,
-	            borderWidth: 0	
-             
+	            borderWidth: 0             
             },
             xAxis :{
             categories: ['" . $categorias . "'],
-
-
             },
             credits: {
                 enabled: false
@@ -83,6 +83,18 @@ $(function () {
             }
                     },
             plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                        colorByPoint: true, 
+                    point: {
+                           events: {
+                               click: function () {
+                                   window.open(this.options.url);
+                                   //location.href = this.options.url;
+                               }
+                           }
+                       }
+                   }
                   
             },
             series: [{
@@ -90,12 +102,18 @@ $(function () {
                 data: [
                     {
                         name: '" . Ticket::getStatus($grf2[0]) . "',
-                        y: " . $quant2[0] . ",                     
-                        selected: false
+                        y: " . $quant2[0] . ",   
+                        url:'reports/rel_tickets.php?con=1&stat=" . $arr_grf2_cod[0] . "',                                    
+                        selected: false,
+                        
                     },";
 
 for ($i = 1; $i < $conta; $i++) {
-    echo '[ "' . Ticket::getStatus($grf2[$i]) . '", ' . $quant2[$i] . '],';
+    echo '{ 
+            name: "' . Ticket::getStatus($grf2[$i]) . '",
+            y: ' . $quant2[$i] . ', 
+            url:"reports/rel_tickets.php?con=1&stat='. $arr_grf2_cod[$i]. '" 
+        }, ';
 }
 
 echo " ],

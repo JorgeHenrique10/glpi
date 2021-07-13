@@ -32,7 +32,7 @@ AND status NOT IN (5,6) ";
 $query_s = $DB->query($sql_s);
 
 $week = $DB->result($query_s,0,'conta');
-
+// print_r($week);exit;
 //quinzena
 $sql_q = "
 SELECT DATE_FORMAT(date, '%b-%d') as data, COUNT(id) as conta
