@@ -269,7 +269,8 @@ else {
 		$status = "";
 		$status_open = "('2','1','3','4')";
 		$status_close = "('5','6')";
-		$status_all = "('2','1','3','4','5','6')";
+		$status_all = "('2','1','3','4','5','6','13','14','15','16','17','18','19','20','21','22','23')";
+		$status_all_not_close = "('2','1','3','4','13','14','15','16','17','18','19','20','21','22','23')";
 
 		if(isset($_GET['stat'])) {
 
@@ -294,7 +295,7 @@ else {
 		FROM glpi_tickets
 		WHERE glpi_tickets.date ".$sel_date."
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.status IN ".$status."
+		AND glpi_tickets.status IN ".$status_all_not_close."
 		".$entidade."
 		ORDER BY id DESC ";
 
@@ -306,7 +307,7 @@ else {
 		"SELECT count(id) AS total
 		FROM glpi_tickets
 		WHERE date ".$sel_date."
-		AND glpi_tickets.status IN ".$status."
+		AND glpi_tickets.status IN ".$status_all."
 		AND glpi_tickets.is_deleted = 0
 		".$entidade." ";
 
@@ -318,14 +319,29 @@ else {
 
 
 		//count by status
-		$query_stat = "
-		SELECT
+		$query_stat = "SELECT
 		SUM(case when glpi_tickets.status = 1 then 1 else 0 end) AS new,
 		SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
 		SUM(case when glpi_tickets.status = 3 then 1 else 0 end) AS plan,
 		SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 		SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
-		SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close
+		SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+		SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
+		SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
+		SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
+		SUM(case when glpi_tickets.status = 16 then 1 else 0 end) AS validacao_tecnica,
+		SUM(case when glpi_tickets.status = 17 then 1 else 0 end) AS resultados,
+		SUM(case when glpi_tickets.status = 18 then 1 else 0 end) AS homologacao,
+		SUM(case when glpi_tickets.status = 19 then 1 else 0 end) AS juridico,
+		SUM(case when glpi_tickets.status = 20 then 1 else 0 end) AS validacao_interna,
+		SUM(case when glpi_tickets.status = 21 then 1 else 0 end) AS envio_contrato,
+		SUM(case when glpi_tickets.status = 22 then 1 else 0 end) AS formalizacao,
+		SUM(case when glpi_tickets.status = 23 then 1 else 0 end) AS atribuido,
+		SUM(case when glpi_tickets.status = 24 then 1 else 0 end) AS pendente_unidade,
+		SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
+		SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
+		SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
+		SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
 		FROM glpi_tickets
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets.date ".$sel_date."
@@ -339,6 +355,22 @@ else {
                 $pend = $DB->result($result_stat,0,'pend') + 0;
                 $solve = $DB->result($result_stat,0,'solve') + 0;
                 $close = $DB->result($result_stat,0,'close') + 0;
+				$validacao_tr = $DB->result($result_stat, 0, 'validacao_tr') + 0;
+				$publicacao = $DB->result($result_stat, 0, 'publicacao') + 0;
+				$parecer_habilitacao = $DB->result($result_stat, 0, 'parecer_habilitacao') + 0;
+				$validacao_tecnica = $DB->result($result_stat, 0, 'validacao_tecnica') + 0;
+				$resultados = $DB->result($result_stat, 0, 'resultados') + 0;
+				$homologacao = $DB->result($result_stat, 0, 'homologacao') + 0;
+				$juridico = $DB->result($result_stat, 0, 'juridico') + 0;
+				$validacao_interna = $DB->result($result_stat, 0, 'validacao_interna') + 0;
+				$envio_contrato = $DB->result($result_stat, 0, 'envio_contrato') + 0;
+				$formalizacao = $DB->result($result_stat, 0, 'formalizacao') + 0;
+				$atribuido = $DB->result($result_stat, 0, 'atribuido') + 0;
+				$pendente_unidade = $DB->result($result_stat,0,'pendente_unidade') + 0;
+				$publicacao_errata = $DB->result($result_stat,0,'publicacao_errata') + 0;
+				$prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
+				$diligencia = $DB->result($result_stat,0,'diligencia') + 0;
+				$recurso = $DB->result($result_stat,0,'recurso') + 0;
 
 
 		//chamados abertos
@@ -346,7 +378,7 @@ else {
 		FROM glpi_tickets
 		WHERE glpi_tickets.date ".$sel_date."
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.status IN ".$status_open."
+		AND glpi_tickets.status IN ".$status_all."
 		".$entidade." ";
 
 		$result_ab = $DB->query($sql_ab) or die ("erro_ab");
@@ -380,13 +412,13 @@ else {
 			}
 		}
 		else { $barra = 0;}
-
+$total_cham2=$total_cham-$close;
 		//listar chamados
 		echo "
 		<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>
 
 		<table class='col-md-12 col-sm-12 fluid'  style='font-size: 18px; font-weight:bold;' cellpadding = 1px>
-			<td colspan='2' style='font-size: 18px; font-weight:bold; vertical-align:middle;'><span style='color:#000;'> ". __('Tickets','dashboard').":</span> ".$total_cham." </td>
+			<td colspan='2' style='font-size: 18px; font-weight:bold; vertical-align:middle;'><span style='color:#000;'> ". __('Tickets','dashboard').":</span> ".$total_cham2." </td>
 			<td colspan='2' style='font-size: 18px; font-weight:bold; vertical-align:middle; width:200px;'><span style='color:#000;'>
 			". __('Period','dashboard') .": </span>" . conv_data($data_ini2) ." a ". conv_data($data_fin2)."
 			</td>
@@ -408,13 +440,31 @@ else {
 			</tr>
 		</table>
 
-		<table style='font-size: 16px; font-weight:bold; width: 50%;' border=0>
+		<table style='font-size: 16px; font-weight:bold; width: 90%;' border=0>
 			<tr>
 				  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
 		        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
 		        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 		        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
-		        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
+				<td><span style='color: #000;'>Fechado </span><b>".$close." </b></td>
+				<td><span style='color: #000;'>Validação TR </span><b>".$validacao_tr." </b></td>
+				<td><span style='color: #000;'>Publicação </span><b>".$publicacao." </b></td>
+				<td><span style='color: #000;'>Parecer Habilitação </span><b>".$parecer_habilitacao." </b></td>
+				<td><span style='color: #000;'>Validacao Técnica </span><b>".$validacao_tecnica." </b></td>
+				<td><span style='color: #000;'>Resultados </span><b>".$resultados." </b></td>
+				<td><span style='color: #000;'>Homologação </span><b>".$homologacao." </b></td>
+			</tr>
+			<tr>
+			<td><span style='color: #000;'>Jurídico </span><b>".$juridico." </b></td>
+			<td><span style='color: #000;'>Validação Interna </span><b>".$validacao_interna." </b></td>
+			<td><span style='color: #000;'>Envio Contrato </span><b>".$envio_contrato." </b></td>
+			<td><span style='color: #000;'>Formalização </span><b>".$formalizacao." </b></td>
+			<td><span style='color: #000;'>Atribuído </span><b>".$atribuido." </b></td>
+			<td><span style='color: #000;'>Pendente Unidade </span><b>".$pendente_unidade." </b></td>
+			<td><span style='color: #000;'>Publicacao Errata </span><b>".$publicacao_errata." </b></td>
+			<td><span style='color: #000;'>Prorrogação </span><b>".$prorrogacao." </b></td>
+			<td><span style='color: #000;'>Diligência </span><b>".$diligencia." </b></td>
+			<td><span style='color: #000;'>Recurso </span><b>".$recurso." </b></td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr><td>&nbsp;</td></tr>
@@ -443,6 +493,17 @@ else {
 		    if($status1 == "4" ) { $status1 = "waiting";}
 		    if($status1 == "5" ) { $status1 = "solved";}
 		    if($status1 == "6" ) { $status1 = "closed";}
+			if($status1 == "13" ) { $status1 = "validacao_tr";}
+		    if($status1 == "14" ) { $status1 = "publicacao";}
+		    if($status1 == "15" ) { $status1 = "parecer_habilitacao";}
+		    if($status1 == "16" ) { $status1 = "validacao_tecnica";}
+		    if($status1 == "17" ) { $status1 = "resultados";}
+		    if($status1 == "18" ) { $status1 = "homologacao";}
+		    if($status1 == "19" ) { $status1 = "juridico";}
+		    if($status1 == "20" ) { $status1 = "validacao_interna";}
+		    if($status1 == "21" ) { $status1 = "envio_contrato";}
+		    if($status1 == "22" ) { $status1 = "formalizacao";}
+		    if($status1 == "23" ) { $status1 = "atribuido";}
 
 			//requerente
 /*			$sql_user = "SELECT glpi_tickets.id AS id, glpi_users.firstname AS name, glpi_users.realname AS sname

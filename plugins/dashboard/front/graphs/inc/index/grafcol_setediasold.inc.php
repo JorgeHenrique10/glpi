@@ -21,26 +21,22 @@ while ($row_result = $DB->fetch_assoc($query_tecd)){
 
 $datas = json_encode($arr_data);	
 	
-//aditivo 
-$DB->data_seek($query_tecd, 0);
 
+//REQUESTS 
+$DB->data_seek($query_tecd, 0);
 
 while ($row = $DB->fetch_assoc($query_tecd)) { 
 	
 	$sql_tec = "
-    SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(glpi_tickets.id) as conta1, 
-    SUM(case when glpi_itilcategories.id = 189 then 1 else 0 end) AS conta 
-    FROM glpi_tickets
-    INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
-    WHERE glpi_tickets.is_deleted = 0
+	SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(id) as conta1, SUM(case when glpi_tickets.type = 2 then 1 else 0 end) AS conta
+	FROM glpi_tickets
+	WHERE glpi_tickets.is_deleted = 0	
 	AND DATE_FORMAT( date, '%Y-%m-%d' ) = '".$row['data']."'
 	". $entidade ."
 	GROUP BY data ";
-	
 	$query_tec = $DB->query($sql_tec);	
 	
 	$row_result = $DB->fetch_assoc($query_tec);	
-
 	$v_row_result = $row_result['data'];
 	
 	if($row_result['conta'] != '') {
@@ -62,16 +58,14 @@ else {
 	$quanta2 = implode(',',$quanta);		
 }
 
-//cotacao
+//INCIDENTS
 $DB->data_seek($query_tecd, 0);
 while ($row = $DB->fetch_assoc($query_tecd))	{ 
 
 	$sql_teci = "
-    SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(glpi_tickets.id) as conta1, 
-    SUM(case when glpi_itilcategories.id = 190 then 1 else 0 end) AS conta 
-    FROM glpi_tickets
-    INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
-    WHERE glpi_tickets.is_deleted = 0	
+	SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(id) as conta1, SUM(case when glpi_tickets.type = 1 then 1 else 0 end) AS conta
+	FROM glpi_tickets
+	WHERE glpi_tickets.is_deleted = 0	
 	AND DATE_FORMAT( date, '%Y-%m-%d' ) = '".$row['data']."'
 	". $entidade ."
 	GROUP BY data ";
@@ -97,90 +91,11 @@ if( empty($arr_grfi) ) {
 }
 else {
 	$quanti = array_values($arr_grfi);
-	$quanti2 = implode(',',$quanti);
-}
-
-
-
-//distrato
-$DB->data_seek($query_tecd, 0);
-while ($row = $DB->fetch_assoc($query_tecd))	{ 
-
-	$sql_tecz = "
-    SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(glpi_tickets.id) as conta1, 
-    SUM(case when glpi_itilcategories.id = 197 then 1 else 0 end) AS conta 
-    FROM glpi_tickets
-    INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
-    WHERE glpi_tickets.is_deleted = 0	
-	AND DATE_FORMAT( date, '%Y-%m-%d' ) = '".$row['data']."'
-	". $entidade ."
-	GROUP BY data ";
-		
-	$query_tecz = $DB->query($sql_tecz);
-	
-	$row_result = $DB->fetch_assoc($query_tecz);	
-	$v_row_result = $row_result['data'];
-	
-	if($row_result['conta'] != '') {
-		$arr_grfz[$v_row_result] = $row_result['conta'];
-	}
-	else {
-		$arr_grfz[$v_row_result] = 0;
-	}	
-}	
-
-$quantiz = array();
-
-if( empty($arr_grfz) ) {
-	$quantiz = 0;
-	$quanti2z = 0;
-}
-else {
-	$quantiz = array_values($arr_grfz);
-	$quanti2z = implode(',',$quantiz);
-}
-//dispensa
-$DB->data_seek($query_tecd, 0);
-while ($row = $DB->fetch_assoc($query_tecd))	{ 
-
-	$sql_tecc = "
-    SELECT DATE_FORMAT(date, '%Y-%m-%d') as data, COUNT(glpi_tickets.id) as conta1, 
-    SUM(case when glpi_itilcategories.id = 191 then 1 else 0 end) AS conta 
-    FROM glpi_tickets
-    INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
-    WHERE glpi_tickets.is_deleted = 0	
-	AND DATE_FORMAT( date, '%Y-%m-%d' ) = '".$row['data']."'
-	". $entidade ."
-	GROUP BY data ";
-		
-	$query_tecc = $DB->query($sql_tecc);
-	
-	$row_result = $DB->fetch_assoc($query_tecc);	
-	$v_row_result = $row_result['data'];
-	
-	if($row_result['conta'] != '') {
-		$arr_grfc[$v_row_result] = $row_result['conta'];
-	}
-	else {
-		$arr_grfc[$v_row_result] = 0;
-	}	
-}	
-
-$quantic = array();
-
-if( empty($arr_grfc) ) {
-	$quantic = 0;
-	$quanti2c = 0;
-}
-else {
-	$quantic = array_values($arr_grfc);
-	$quanti2c = implode(',',$quantic);
-}
-
+	$quanti2 = implode(',',$quanti);}
 
 
 //echo "teste <br>";
-
+//print_r($quanti);
 
 echo "<script type='text/javascript'>
 
@@ -280,17 +195,11 @@ $(function () {
             },
             series: [
                 {
-                name: 'Aditivo',
+                name: '". __('Request') ."',
 					 data: [$quanta2] },
 					{
-                name: 'Cotação',
-                data: [$quanti2] },
-                {
-                    name: 'Dispensa',
-                    data: [$quanti2c] },
-                    {
-                        name: 'Distrato',
-                        data: [$quanti2z] }]
+                name: '". __('Incident') ."',
+                data: [$quanti2] }]
             
         });
     });

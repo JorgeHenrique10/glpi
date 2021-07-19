@@ -615,6 +615,8 @@ foreach ($sel_ent_contratos as $item) {
       <!-- /widget-header -->      
 			<div id="graf7"> 
 				<?php
+					echo "teste";
+
 					include ("graphs/inc/index/grafcol_setedias.inc.php");
 				?> 	 				              
 			</div> 
@@ -646,6 +648,21 @@ foreach ($sel_ent_contratos as $item) {
 			<div id="graf8"> 
 				<?php
 					include ("graphs/inc/index/grafpie_time.inc.php");
+				?> 	 				              
+			</div> 
+  		</div>      
+	</div> 
+
+	<div class="col-sm-6 col-md-6"> 	 				              
+   	<div id="tickets_time" class="widget widget-table action-table striped card1" >
+	      <div class="widget-header wpurple">                
+	      	<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i>Tempo médio por Status</h3>
+	      	 <span  class="fa fa-times hide-widget"></span>             
+	      </div> 
+	      <!-- /widget-header -->
+			<div id="graf_media_status"> 
+				<?php
+					include ("graphs/inc/index/grafpie_time_status.inc.php");
 				?> 	 				              
 			</div> 
   		</div>      

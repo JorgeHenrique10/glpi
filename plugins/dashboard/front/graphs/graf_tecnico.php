@@ -298,9 +298,8 @@ ORDER BY name ASC ";
 							echo '<script language="javascript"> alert(" ' . __('Select a technician', 'dashboard') . ' "); </script>';
 							echo '<script language="javascript"> location.href="graf_tecnico.php"; </script>';
 						}
-
-						// nome do tecnico
-						$sql_nm = "
+// nome do tecnico
+$sql_nm = "
 SELECT DISTINCT glpi_users.`id` AS id , glpi_users.firstname AS name, glpi_users.`realname` AS sname, glpi_users.picture
 FROM `glpi_users` , glpi_tickets_users
 WHERE glpi_tickets_users.users_id = glpi_users.id
@@ -308,11 +307,10 @@ AND glpi_users.id = " . $id_tec . "
 AND glpi_tickets_users.type = 2
 ORDER BY glpi_users.firstname ASC ";
 
-						$result_nm = $DB->query($sql_nm);
-						$tec_name = $DB->fetch_assoc($result_nm);
+$result_nm = $DB->query($sql_nm);
+$tec_name = $DB->fetch_assoc($result_nm);
 
-
-						if ($data_ini == $data_fin) {
+if ($data_ini == $data_fin) {
 							$datas = "LIKE '" . $data_ini . "%'";
 						} else {
 							$datas = "BETWEEN '" . $data_ini . " 00:00:00' AND '" . $data_fin . " 23:59:59'";
