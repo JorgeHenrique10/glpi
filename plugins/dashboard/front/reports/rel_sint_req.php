@@ -367,7 +367,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets_users.users_id = " . $id_req . "
 			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.date " . $sel_date . "			
+			AND glpi_tickets.solvedate " . $sel_date . "			
 			" . $entidade . " ";
 
 						$result_time = $DB->query($sql_time);
@@ -528,8 +528,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
-	AND glpi_tickets.solvedate is not null
-	AND glpi_tickets.date ".$sel_date."
+	AND glpi_tickets.solvedate ".$sel_date."
 	AND glpi_tickets_users.type = 1
 	AND glpi_tickets_users.tickets_id = glpi_tickets.id
 	AND glpi_tickets_users.users_id = " . $id_req . "
@@ -553,7 +552,6 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
-	AND glpi_tickets.solvedate is null
 	AND glpi_tickets.date ".$sel_date."
 	AND glpi_tickets_users.type = 1
 	AND glpi_tickets_users.tickets_id = glpi_tickets.id
@@ -576,7 +574,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_itilcategories.id = glpi_tickets.itilcategories_id			
 			AND glpi_tickets.itilcategories_id = 197
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.solvedate ".$sel_date."
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets_users.tickets_id = glpi_tickets.id
 			AND glpi_tickets_users.users_id = " . $id_req . "
@@ -588,7 +586,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_itilcategories.id = glpi_tickets.itilcategories_id			
 			AND glpi_tickets.itilcategories_id = 191
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.solvedate ".$sel_date."
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets_users.tickets_id = glpi_tickets.id
 			AND glpi_tickets_users.users_id = " . $id_req . "
@@ -600,7 +598,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_itilcategories.id = glpi_tickets.itilcategories_id			
 			AND glpi_tickets.itilcategories_id = 190
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.solvedate ".$sel_date."
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets_users.tickets_id = glpi_tickets.id
 			AND glpi_tickets_users.users_id = " . $id_req . "
@@ -612,7 +610,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
 			AND glpi_tickets.itilcategories_id = 189
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.solvedate ".$sel_date."
 			AND glpi_tickets_users.type = 1
 			AND glpi_tickets_users.tickets_id = glpi_tickets.id
 			AND glpi_tickets_users.users_id = " . $id_req . "
@@ -651,7 +649,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			FROM glpi_tickets_status 
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
+			WHERE glpi_tickets.solvedate $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 189
 			AND glpi_tickets_users.type = 1
@@ -663,7 +661,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
+			WHERE glpi_tickets.solvedate $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 189
 			AND glpi_tickets_users.type = 1
@@ -715,7 +713,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			FROM glpi_tickets_status 
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
+			WHERE glpi_tickets.solvedate $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 191
 			AND glpi_tickets_users.type = 1
@@ -727,7 +725,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 			INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 			INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
-			WHERE glpi_tickets.date $sel_date
+			WHERE glpi_tickets.solvedate $sel_date
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 191
 			AND glpi_tickets_users.type = 1
@@ -776,7 +774,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		SELECT * 
 		FROM glpi_tickets		
 		INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
-		WHERE glpi_tickets.date $sel_date
+		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
 		AND glpi_tickets.itilcategories_id = 189
 		AND glpi_tickets.solvedate is not null
@@ -788,7 +786,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 	SELECT count(DISTINCT glpi_tickets.id) as total 
 	FROM glpi_tickets		
 	INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
-	WHERE glpi_tickets.date $sel_date
+	WHERE glpi_tickets.solvedate $sel_date
 	AND glpi_tickets.is_deleted = 0
 	AND glpi_tickets.itilcategories_id = 189
 	AND glpi_tickets.solvedate is not null
@@ -891,8 +889,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 						INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 						WHERE glpi_tickets.is_deleted = '0'
-						AND glpi_tickets_status.data_fim is not null
-						AND glpi_tickets.date " . $sel_date . "
+						AND glpi_tickets.solvedate " . $sel_date . "
 						AND glpi_tickets_users.users_id = " . $id_req . "			
 						" . $entidade . "";
 
