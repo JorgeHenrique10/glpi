@@ -473,7 +473,7 @@ else {
 			</li>		
 			
 			<!-- Relatórios Contrato list -->
-			<li class="dropdown menu"><a href="#" data-toggle="dropdown" class="dropdown-toggle" style="color:#fff;"><span class="text-nav1"><i class='fa fa-file-text'></i>&nbsp; Relatórios Contrato &nbsp;<b class="caret"></b></span></a>
+			<li class="dropdown menu"><a href="#" data-toggle="dropdown" class="dropdown-toggle" style="color:#fff;"><span class="text-nav1"><i class='fa fa-file-text'></i>&nbsp; Relatórios Contratos &nbsp;<b class="caret"></b></span></a>
               <ul class="dropdown-menu multi-level" role="menu">
                 
                   <!-- Content container to add padding -->
