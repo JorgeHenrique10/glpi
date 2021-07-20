@@ -1960,7 +1960,7 @@ left: 90%;
 }	
 
 .iframe {
-	min-height:4100px;
+  min-height: px !important;
 }
 
 .iframe-side { 

@@ -139,7 +139,7 @@ function margins() {
    
 </head>
 
-<body style="background-color: #e5e5e5;">
+<body  style="background-color: #e5e5e5;">
 
 <div id='content' >
 <div id='container-fluid' style="margin: <?php echo margins(); ?> ;">
@@ -527,20 +527,53 @@ if($con == "1") {
 	}
 	
 	
+	$id_ident =  $_REQUEST['status'];
 	// Chamados
-	$sql_cham = 
-	"SELECT id, entities_id, name, date, closedate, solvedate, status, users_id_recipient, requesttypes_id, priority, itilcategories_id, type, time_to_resolve 
-	FROM glpi_tickets
-	WHERE glpi_tickets.is_deleted = 0
-	".$entidade."
-	".$period."
-	".$id_sta."
-	".$id_due."
-	AND glpi_tickets.requesttypes_id LIKE '%".$id_req."'
-	AND glpi_tickets.priority LIKE '%".$id_pri."'
-	AND glpi_tickets.itilcategories_id LIKE '%".$id_cat."'
-	AND glpi_tickets.type LIKE '%".$id_tip."'
-	ORDER BY id DESC ";
+	if($id_ident =99)
+	{
+		$sql_cham =
+		"Select id, entities_id, name, date, closedate, solvedate, status, users_id_recipient, requesttypes_id, priority, itilcategories_id, type, time_to_resolve
+		FROM 
+		(SELECT glpi_tickets.id, glpi_status_time.time as time, 
+		max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
+		TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs, 
+		glpi_tickets.entities_id, glpi_tickets.name, glpi_tickets.date, glpi_tickets.closedate, glpi_tickets.solvedate, glpi_tickets.status, glpi_tickets.users_id_recipient, 
+		glpi_tickets.requesttypes_id, glpi_tickets.priority, glpi_tickets.itilcategories_id, glpi_tickets.type, glpi_tickets.time_to_resolve
+		FROM glpi_tickets
+		inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
+		inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
+		WHERE glpi_tickets.status NOT IN (5,6) 
+		AND data_cons is null
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id in (189,190,191,197) 
+		".$entidade."
+		".$period."
+		".$id_sta."
+		".$id_due."
+		AND glpi_tickets.requesttypes_id LIKE '%".$id_req."'
+		AND glpi_tickets.priority LIKE '%".$id_pri."'
+		AND glpi_tickets.itilcategories_id LIKE '%".$id_cat."'
+		AND glpi_tickets.type LIKE '%".$id_tip."'
+		group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
+		order by id) as Tabela
+		WHERE diffs > time
+		";
+
+	}else{
+		$sql_cham = 
+		"SELECT id, entities_id, name, date, closedate, solvedate, status, users_id_recipient, requesttypes_id, priority, itilcategories_id, type, time_to_resolve 
+		FROM glpi_tickets		
+		WHERE glpi_tickets.is_deleted = 0
+		".$entidade."
+		".$period."
+		".$id_sta."
+		".$id_due."
+		AND glpi_tickets.requesttypes_id LIKE '%".$id_req."'
+		AND glpi_tickets.priority LIKE '%".$id_pri."'
+		AND glpi_tickets.itilcategories_id LIKE '%".$id_cat."'
+		AND glpi_tickets.type LIKE '%".$id_tip."'
+		ORDER BY id DESC ";
+	}
 	
 	$result_cham = $DB->query($sql_cham);
 	
@@ -722,8 +755,8 @@ if($consulta > 0) {
 			<tbody>
 		";
 	
-	
-	while($row = $DB->fetch_assoc($result_cham)){
+	$cont = 0;
+	while($row = $DB->fetch_assoc($result_cham)){	
 		
 		$status1 = $row['status']; 
 	
@@ -850,6 +883,7 @@ if($consulta > 0) {
 		</tr>";
 }
 
+
 echo "</tbody>
 		</table>
 		</div>";	
@@ -936,6 +970,8 @@ $(document).ready(function() {
         
     } );
 } );		
+
+
 </script>  
 
 <?php
