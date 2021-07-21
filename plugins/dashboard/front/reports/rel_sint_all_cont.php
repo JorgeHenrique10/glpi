@@ -111,7 +111,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						<div id="titulo_rel"> <?php echo __('Summary Report', 'dashboard') . '  ' . __('', 'dashboard') ?> </div>
 						<div id="datas-tec" class="span12 fluid">
-							<form id="form1" name="form1" class="form_rel" method="post" action="rel_sint_all.php?con=1">
+							<form id="form1" name="form1" class="form_rel" method="post" action="rel_sint_all_cont.php?con=1">
 								<table border="0" cellspacing="0" cellpadding="3" bgcolor="#efefef">
 									<tr>
 										<td style="width: 310px;">

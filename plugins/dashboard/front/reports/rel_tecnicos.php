@@ -576,7 +576,7 @@ else { $barra_due = 0;}
 		<tr>
 			<td style='vertical-align:middle; text-align:left;'><i class='del fa fa-times' style='cursor:pointer;' title='". __('Hide') ."'>&nbsp;&nbsp;&nbsp; </i>
 				<img class='avatar2' width='40px' height='43px' src='".User::getURLForPicture($id_tec['picture'])."'></img>&nbsp;&nbsp;
-				<a href='rel_tecnico.php?con=1&sel_tec=". $id_tec['id'] ."&date1=".$data_ini."&date2=".$data_fin."' target='_blank' >" . $id_tec['fname'].' '.$id_tec['rname']. ' ('.$id_tec['id'].")</a>
+				<a href='rel_tecnico_cont.php?con=1&sel_tec=". $id_tec['id'] ."&date1=".$data_ini."&date2=".$data_fin."' target='_blank' >" . $id_tec['fname'].' '.$id_tec['rname']. ' ('.$id_tec['id'].")</a>
 			</td>
 			<td style='vertical-align:middle; text-align:center;'> ". $total ." </td>
 			<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>

@@ -562,7 +562,7 @@ else {
 						      </li>
                         <li><a href="./reports/rel_localidade.php" target="iframe1" > <?php echo __('by Location','dashboard'); ?> </a></li>
                         <li><a href="./reports/rel_usuario.php" target="iframe1" > <?php echo __('by Requester','dashboard'); ?> </a></li>
-                        <li><a href="./reports/rel_tecnico.php" target="iframe1" > <?php echo __('by Technician','dashboard'); ?> </a></li>                
+						<li><a href="./reports/rel_tecnico_cont.php" target="iframe1" > <?php echo __('by Technician','dashboard'); ?> </a></li>                      
                         </li>
 
 								<li class="dropdown-submenu">

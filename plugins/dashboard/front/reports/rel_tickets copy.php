@@ -501,7 +501,7 @@ if($con == "1") {
 		$id_ent = $_REQUEST["sel_ent"]; 
 		$entidade = "AND glpi_tickets.entities_id IN (".$id_ent.") ";
 	}
-	
+	print_r($entidade);exit;
 	$arr_param = array($id_ent, $id_sta, $id_req, $id_pri, $id_cat, $id_tip);
 	
 	//dates
@@ -574,7 +574,7 @@ if($con == "1") {
 		AND glpi_tickets.type LIKE '%".$id_tip."'
 		ORDER BY id DESC ";
 	}
-	
+	print_r($sql_cham);exit;
 	$result_cham = $DB->query($sql_cham);
 	
 	$consulta1 = 

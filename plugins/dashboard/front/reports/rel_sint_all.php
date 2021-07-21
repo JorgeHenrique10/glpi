@@ -443,7 +443,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.solvedate is not null
-			AND glpi_tickets.date ".$sel_date."
+			AND glpi_tickets.solvedate ".$sel_date."
 			".$entidade;
 
 			$result_sla_contrato = $DB->query($sql_sla_contratos);		
@@ -481,7 +481,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 197
-					AND glpi_tickets.date ".$sel_date."
+					AND glpi_tickets.solvedate ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_dispensa = "
@@ -489,7 +489,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 191
-					AND glpi_tickets.date ".$sel_date."
+					AND glpi_tickets.solvedate ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_cotacao = "
@@ -497,7 +497,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 190
-					AND glpi_tickets.date ".$sel_date."
+					AND glpi_tickets.solvedate ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_aditivo = "
@@ -505,7 +505,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 189
-					AND glpi_tickets.date ".$sel_date."
+					AND glpi_tickets.solvedate ".$sel_date."
 					".$entidade;
 
 				$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
@@ -599,7 +599,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		SELECT * 
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-		WHERE glpi_tickets.date $sel_date
+		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
 		AND glpi_tickets.itilcategories_id = 191
 		$entidade
@@ -608,7 +608,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 						$query_cont_dispensa = "
 		SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-		WHERE glpi_tickets.date $sel_date
+		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
 		AND glpi_tickets.itilcategories_id = 191
 		$entidade
@@ -763,7 +763,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets_status.data_fim is not null
-		AND glpi_tickets.date " . $sel_date . "			
+		AND glpi_tickets.solvedate " . $sel_date . "			
 		" . $entidade . "";
 		
 		$result_stat_lead_time = $DB->query($query_stat_lead_time);
