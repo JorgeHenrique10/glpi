@@ -92,7 +92,7 @@ $result_ent = $DB->query($sql_ent);
 					<a href="../index.php"><i class="fa fa-home" style="font-size:14pt; margin-left:20px;"></i><span></span></a>					
 					<div id="titulo_rel"> <?php echo __('Summary Report','dashboard') .' - ' .__('Entity'); ?> </div>		
 						<div id="datas-tec" class="span12 fluid" >			
-						    <form id="form1" name="form1" class="form_rel" method="post" action="rel_sint_ent.php?con=1">
+						    <form id="form1" name="form1" class="form_rel" method="post" action="rel_sint_ent_cont.php?con=1">
 							    <table border="0" cellspacing="0" cellpadding="3" bgcolor="#efefef" >
 								    <tr>
 										<td style="width: 310px;">
@@ -487,7 +487,7 @@ $result_ent = $DB->query($sql_ent);
 
 	//Médias de Dias
 		$sql_sla_contratos_dias_distrato = "
-			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+			SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 197
@@ -495,7 +495,7 @@ $result_ent = $DB->query($sql_ent);
 			".$entidade;
 
 		$sql_sla_contratos_dias_dispensa = "
-			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+			SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 191
@@ -503,7 +503,7 @@ $result_ent = $DB->query($sql_ent);
 			".$entidade;
 
 		$sql_sla_contratos_dias_cotacao = "
-			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+			SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 190
@@ -511,7 +511,7 @@ $result_ent = $DB->query($sql_ent);
 			".$entidade;
 
 		$sql_sla_contratos_dias_aditivo = "
-			SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+			SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.itilcategories_id = 189
@@ -548,12 +548,12 @@ $result_ent = $DB->query($sql_ent);
 
 						//Calculo para cotação
 						$query_chamados = "
-		SELECT * 
+		SELECT DISTINCT ticket_id
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.itilcategories_id = 190
 		$entidade
 	";
 
@@ -562,7 +562,7 @@ $result_ent = $DB->query($sql_ent);
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.itilcategories_id = 190
 		$entidade
 	";
 
@@ -606,7 +606,7 @@ $result_ent = $DB->query($sql_ent);
 
 						//Calculo para dispensa
 						$query_chamados_dispensa = "
-		SELECT * 
+		SELECT DISTINCT ticket_id
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
@@ -709,7 +709,7 @@ $result_ent = $DB->query($sql_ent);
 
 						//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-						$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+						$aditivos_renovados = (($qtd_dias_cotacao_1 + $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 + $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
 						$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 						$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 						$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');

@@ -520,7 +520,7 @@ if($con == "1") {
 	}
 	
 	elseif($id_sta1 == 6) {
-		$period = "AND glpi_tickets.closedate ".$datas2." ";	
+		$period = "AND glpi_tickets.solvedate ".$datas2." ";	
 	}	
 	
 	else {

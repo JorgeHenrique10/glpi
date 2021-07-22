@@ -189,6 +189,23 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 				<?php
 
+				function get_total_days($start, $end, $holidays = [], $weekends = ['Sat', 'Sun']){
+
+					$start = new \DateTime($start);
+					$end   = new \DateTime($end);
+					$end->modify('+1 day');
+
+					$total_days = $end->diff($start)->days;
+					$period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
+
+					foreach($period as $dt) {
+						if (in_array($dt->format('D'),  $weekends) || in_array($dt->format('Y-m-d'), $holidays)){
+							$total_days--;
+						}
+					}
+					return $total_days;
+				}
+
 				if (isset($_GET['con'])) {
 					$con = $_GET['con'];
 				} else {
@@ -475,7 +492,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 			//Médias de Dias
 				$sql_sla_contratos_dias_distrato = "
-					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 197
@@ -483,7 +500,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					".$entidade;
 
 				$sql_sla_contratos_dias_dispensa = "
-					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 191
@@ -491,7 +508,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					".$entidade;
 
 				$sql_sla_contratos_dias_cotacao = "
-					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 190
@@ -499,7 +516,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					".$entidade;
 
 				$sql_sla_contratos_dias_aditivo = "
-					SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+					SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 189
@@ -536,23 +553,26 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						//Calculo para cotação
 						$query_chamados = "
-		SELECT * 
+		SELECT DISTINCT ticket_id
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.itilcategories_id = 190
 		$entidade
 	";
+
+	
 
 						$query_cont = "
 		SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.itilcategories_id = 190
 		$entidade
 	";
+	
 
 						$result_cham_cont = $DB->query($query_cont)->fetch_assoc();
 						$result_cham_contratos = $DB->query($query_chamados);
@@ -573,6 +593,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 						ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END)
 				) dias";
+				
 
 							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
@@ -585,6 +606,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					END)
 				) dias";
 
+
 							$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 							$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
 
@@ -594,7 +616,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						//Calculo para dispensa
 						$query_chamados_dispensa = "
-		SELECT * 
+		SELECT DISTINCT ticket_id
 		FROM glpi_tickets_status 
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.solvedate $sel_date
@@ -618,6 +640,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 						$qtd_dias_dispensa_2 = 0;
 
 						foreach ($result_cham_dispensa_contratos as $chamado) {
+
 
 							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
@@ -686,20 +709,43 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$datetime1 = new DateTime($data_inicio_aditivo);
 			$datetime2 = new DateTime($data_fim_aditivo);
 
-			$diferenca = date_diff($datetime1, $datetime2);
+			// print_r(substr($content[1], 16, 10)); print_r(' <--> ');  print_r($data_inicio_aditivo); print_r(' <--> '); print_r($data_fim_aditivo); print_r(': ');
+			// print_r($diferenca); print_r(' <--> ');  print_r($chamado['id']);
+			// print_r('<br>');
+			$matches;
+			$regex = "/[0-9]{2}\-[0-9]{2}\-[0-9]{4}/";
+			$title = 'svvkldjkljdsklvjkldvlksdjv> 10-01-2000 ssgdfdsgsdgdgsdg';
+			preg_match_all ($regex, $chamado['content'], $matches);
+			
+			$diferenca = get_total_days($matches[0][0], $data_fim_aditivo);
+
+			// $diferenca = date_diff($datetime1, $datetime2);
+			// if ($data_inicio_aditivo >= $data_fim_aditivo) {
+			// 	$entrouif++;
+			// 	$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+			// } else {
+			// 	$entrouelse++;
+			// 	$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+			// }
 
 			if ($data_inicio_aditivo >= $data_fim_aditivo) {
 				$entrouif++;
-				$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+				$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca;
 			} else {
 				$entrouelse++;
-				$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+				$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca;
 			}
 		}
 
+		//print_r($qtd_dias_aditivo); exit;
+
+
+		
+
 		//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-		$aditivos_renovados = (($qtd_dias_cotacao_1 - $qtd_dias_cotacao_2) + ($qtd_dias_dispensa_1 - $qtd_dias_dispensa_2)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+		$aditivos_renovados = (($qtd_dias_cotacao_2 + $qtd_dias_cotacao_1) + ($qtd_dias_dispensa_2 + $qtd_dias_dispensa_1)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+
 		$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 		$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 		$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');

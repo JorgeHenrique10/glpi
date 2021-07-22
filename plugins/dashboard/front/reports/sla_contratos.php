@@ -298,35 +298,35 @@ $aditivo_aberto = $DB->result($result_sla_contrato, 0, 'aditivo_aberto');
 
 //Médias de Dias
     $sql_sla_contratos_dias_distrato = "
-        SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+        SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
         AND glpi_tickets.itilcategories_id = 197
-        AND glpi_tickets.date ".$datas2."
+        AND glpi_tickets.solvedate ".$datas2."
         ".$entidade;
 
     $sql_sla_contratos_dias_dispensa = "
-        SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+        SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
         AND glpi_tickets.itilcategories_id = 191
-        AND glpi_tickets.date ".$datas2."
+        AND glpi_tickets.solvedate ".$datas2."
         ".$entidade;
 
     $sql_sla_contratos_dias_cotacao = "
-        SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+        SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
         AND glpi_tickets.itilcategories_id = 190
-        AND glpi_tickets.date ".$datas2."
+        AND glpi_tickets.solvedate ".$datas2."
         ".$entidade;
 
     $sql_sla_contratos_dias_aditivo = "
-        SELECT AVG(DATEDIFF(if(solvedate is null, now(), solvedate), date)) dias
+        SELECT AVG(TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date)) dias
         FROM glpi_tickets
         WHERE glpi_tickets.is_deleted = 0
         AND glpi_tickets.itilcategories_id = 189
-        AND glpi_tickets.date ".$datas2."
+        AND glpi_tickets.solvedate ".$datas2."
         ".$entidade;
 
     $result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
