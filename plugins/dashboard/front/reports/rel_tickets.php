@@ -489,7 +489,8 @@ if($con == "1") {
 
 		if(in_array(0,$user_ents)) {
 			$id_ent = 0 ;
-			$entidade = '';
+			//print_r($ents);exit;
+			$entidade = "AND glpi_tickets.entities_id IN (".$ents.")";
 		}
 		else {			
 			$id_ent = implode(',',$_SESSION['glpiactiveentities']); 
