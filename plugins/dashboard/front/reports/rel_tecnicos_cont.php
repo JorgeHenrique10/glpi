@@ -152,7 +152,7 @@ else {
 			<a href="../index.php"><i class="fa fa-home" style="font-size:14pt; margin-left:25px;"></i><span></span></a>
 				<div id="titulo_rel" > <?php echo __('Tickets','dashboard') .'  '. __('Technician group') ?> </div>
 					<div id="datas-tec" class="col-md-12 col-sm-12 fluid" >
-					<form id="form1" name="form1" class="form_rel" method="post" action="rel_tecnicos.php?con=1">
+					<form id="form1" name="form1" class="form_rel" method="post" action="rel_tecnicos_cont.php?con=1">
 
 						<table border="0" cellspacing="0" cellpadding="3" bgcolor="#efefef" >
 				    		<tr>
@@ -302,7 +302,7 @@ AND glpi_profiles_users.users_id = glpi_tickets_users.users_id
 AND glpi_tickets.is_deleted = 0
 AND glpi_tickets_users.type = 2
 AND glpi_tickets.date ". $datas2 ."
-". $entidade_u ."
+". $entidade ."
 ". $grupo_tec ."
 ". $grupo_tec1 ."
 GROUP BY id
@@ -492,34 +492,35 @@ else { $barra = 0;}
 
 
 //chamados atrasados contratos
-// $query_atraso_contrato =
-// "Select COUNT(IF(diffs > time, id, NULL)) AS atraso FROM 
-// (SELECT glpi_tickets.id, glpi_status_time.time, 
-// glpi_tickets.status, max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
-// TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs
-// FROM glpi_tickets
-// inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
-// inner join glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
-// inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
-// WHERE glpi_tickets.status NOT IN (5,6) 
-// AND data_cons is null
-// AND glpi_tickets.is_deleted = 0
-// AND glpi_tickets_users.users_id = ".$id_tec['id']." 
-// ". $entidade ."
-// ". $grupo_tic ."
-// ". $grupo_tic1 ."
-// group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
-// order by id) as Tabela";
+$query_atraso_contrato =
+"Select COUNT(IF(diffs > time, id, NULL)) AS atraso FROM 
+(SELECT glpi_tickets.id, glpi_status_time.time, 
+glpi_tickets.status, max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
+TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs
+FROM glpi_tickets
+inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
+inner join glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
+inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
+WHERE glpi_tickets.status NOT IN (5,6) 
+AND data_cons is null
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets_users.users_id = ".$id_tec['id']." 
+". $entidade ."
+". $grupo_tic ."
+". $grupo_tic1 ."
+group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
+order by id) as Tabela";
+$atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
+$atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
 
-// $atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
-// $atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
+// print_r($query_atraso_contrato);
+// print_r($atrasados_retorno_total['atraso']);
 
-// //print_r($entidade);
-// $exibir = false;
-// if( mb_strpos($id_ent['cname'], 'CONTRATOS') ) 
-// {
-// 	$exibir = true;
-// }
+$exibir = false;
+if( mb_strpos($id_ent['cname'], 'CONTRATOS') ) 
+{
+	$exibir = true;
+}
 
 //chamados atrasados
 $sql_due = "
@@ -549,6 +550,7 @@ $data_due = $DB->fetch_assoc($result_due);
  
 $atrasados = $data_due['total'];
 
+$atrasados = $atrasados_retorno_total['atraso'];
 
 // backlog acumulado
 $sql_bac = "SELECT count( glpi_tickets.id ) AS total, glpi_tickets_users.users_id AS id

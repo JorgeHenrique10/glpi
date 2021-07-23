@@ -263,6 +263,9 @@ else {
 		    	$status = $status_all;
 		    }
 
+
+
+
 		// Chamados
 		$sql_cham =
 		"SELECT id, name AS descr, date, closedate, solvedate, status , actiontime AS act, itilcategories_id AS cat, TYPE, FROM_UNIXTIME( UNIX_TIMESTAMP( `glpi_tickets`.`solvedate` ) , '%Y-%m' ) AS date_unix, glpi_tickets.solve_delay_stat AS time_sec
@@ -449,7 +452,7 @@ else {
 		<table style='font-size: 16px; width: 100%;' border=0>
 			<tr>
 				<td style='font-weight:bold;'><span style='color: #000;'>". _x('status','New').": </span>".$new." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Assigned'). ": </span>". ($assig + $plan) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Processando (Atribuído):'). ": </span>". ($assig + $plan) ."</td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pending').": </span>".$pend." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Solved','dashboard').": </span>".$solve." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>

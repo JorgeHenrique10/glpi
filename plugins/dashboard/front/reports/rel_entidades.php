@@ -304,6 +304,32 @@ if(isset($_GET['con'])) {
 			$pendentes = $data_pen['total'];*/
 
 
+			//chamados atrasados contratos
+			$query_atraso_contrato =
+			"Select COUNT(IF(diffs > time, id, NULL)) AS atraso FROM 
+			(SELECT glpi_tickets.id, glpi_status_time.time, 
+			glpi_tickets.status, max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
+			TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs
+			FROM glpi_tickets
+			inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
+			inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
+			WHERE glpi_tickets.status NOT IN (5,6) 
+			AND data_cons is null
+			AND glpi_tickets.is_deleted = 0 
+			AND glpi_tickets.entities_id = " . $id_ent['id'] . "
+			group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
+			order by id) as Tabela";
+				
+
+			$atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
+			$atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
+
+			$exibir = false;
+			if( mb_strpos($id_ent['cname'], 'CONTRATOS') ) 
+			{
+				$exibir = true;
+			}
+			
 			//chamados atrasados
 			$sql_due = "
 			SELECT count( glpi_tickets.id ) AS total, glpi_tickets.id as ID
@@ -375,6 +401,7 @@ if(isset($_GET['con'])) {
 				if($barra < 0) { $cor = "progress-bar-danger"; $barra = 0;  }
 			}
 			
+			
 			else { $barra = 0;}
 		
 				echo "
@@ -382,7 +409,7 @@ if(isset($_GET['con'])) {
 					<td style='vertical-align:middle; text-align:left;'><a href='rel_entidade.php?con=1&sel_ent=". $id_ent['id'] ."&date1=".$data_ini."&date2=".$data_fin."' target='_blank' >" . $id_ent['name'] ."</a></td>
 					<td style='vertical-align:middle; text-align:center;'> ". $chamados ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>
-					<td style='vertical-align:middle; text-align:center;'> ". $atrasados ." </td>
+					<td style='vertical-align:middle; text-align:center;'> ". ($exibir ? $atrasados_retorno_total['atraso'] : $atrasados) ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $solucionados ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>			
 					<td style='vertical-align:middle; text-align:center;'> 

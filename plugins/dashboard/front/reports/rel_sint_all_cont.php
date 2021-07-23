@@ -942,11 +942,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			 <tr>
 			 <td>" . ('Média de dias de aditivos renovados') . "</td>
 			 <td align='right'>" . $aditivos_dias . "</td>
-			 </tr>		
-			 <tr>
-			 <td>" . ('Média de dias leadtime') . "</td>
-			 <td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
-			 </tr>			
+			 </tr>				
 		    </tbody> </table>		   		    
 
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>

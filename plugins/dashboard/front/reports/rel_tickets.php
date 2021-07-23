@@ -693,7 +693,7 @@ if($consulta > 0) {
 	<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0 >
 		<tr>
 			  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
-	        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
+	        <td><span style='color: #000;'>". __('Processando (Atribuído)'). ": </span><b>". ($assig + $plan) ."</b></td>
 	        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 	        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
 	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>	        
