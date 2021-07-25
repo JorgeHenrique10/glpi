@@ -504,6 +504,7 @@ else { $barra = 0;}
 // WHERE glpi_tickets.status NOT IN (5,6) 
 // AND data_cons is null
 // AND glpi_tickets.is_deleted = 0
+// AND glpi_status_time.time != 0
 // AND glpi_tickets_users.users_id = ".$id_tec['id']." 
 // ". $entidade ."
 // ". $grupo_tic ."

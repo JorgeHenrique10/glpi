@@ -284,7 +284,6 @@ $sql_sla_contratos =
     COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 FROM glpi_tickets
 WHERE glpi_tickets.is_deleted = 0
-AND glpi_tickets.solvedate is null
 AND glpi_tickets.date ".$datas2."
 ".$entidade;
 

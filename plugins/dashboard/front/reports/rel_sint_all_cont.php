@@ -310,8 +310,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 						$result_tec = $DB->query($sql_tec);
 
 						//requester
-						$sql_req =
-							"SELECT count( glpi_tickets.id ) AS conta, glpi_tickets_users.`users_id` AS id,  glpi_users.firstname AS name, glpi_users.realname AS sname
+			$sql_req = "SELECT count( glpi_tickets.id ) AS conta, glpi_tickets_users.`users_id` AS id,  glpi_users.firstname AS name, glpi_users.realname AS sname
 			FROM `glpi_tickets_users`, glpi_tickets, glpi_users
 			WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 			AND glpi_tickets.date " . $sel_date . "
@@ -370,7 +369,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			" . $entidade . "";
 
 						$result_stat = $DB->query($query_stat);
-						//print_r($result_stat->fetch_array());
+
 						$new = $DB->result($result_stat, 0, 'new') + 0;
 						$assig = $DB->result($result_stat, 0, 'assig') + 0;
 						$plan = $DB->result($result_stat, 0, 'plan') + 0;
@@ -429,10 +428,10 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
 				COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
 				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+				COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.date ".$sel_date."
@@ -709,24 +708,12 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$datetime1 = new DateTime($data_inicio_aditivo);
 			$datetime2 = new DateTime($data_fim_aditivo);
 
-			// print_r(substr($content[1], 16, 10)); print_r(' <--> ');  print_r($data_inicio_aditivo); print_r(' <--> '); print_r($data_fim_aditivo); print_r(': ');
-			// print_r($diferenca); print_r(' <--> ');  print_r($chamado['id']);
-			// print_r('<br>');
 			$matches;
 			$regex = "/[0-9]{2}\-[0-9]{2}\-[0-9]{4}/";
 			$title = 'svvkldjkljdsklvjkldvlksdjv> 10-01-2000 ssgdfdsgsdgdgsdg';
 			preg_match_all ($regex, $chamado['content'], $matches);
 			
 			$diferenca = get_total_days($matches[0][0], $data_fim_aditivo);
-
-			// $diferenca = date_diff($datetime1, $datetime2);
-			// if ($data_inicio_aditivo >= $data_fim_aditivo) {
-			// 	$entrouif++;
-			// 	$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
-			// } else {
-			// 	$entrouelse++;
-			// 	$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
-			// }
 
 			if ($data_inicio_aditivo >= $data_fim_aditivo) {
 				$entrouif++;
@@ -735,12 +722,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				$entrouelse++;
 				$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca;
 			}
-		}
-
-		//print_r($qtd_dias_aditivo); exit;
-
-
-		
+		}		
 
 		//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -805,10 +787,10 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 		FROM glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-		INNER JOIN glpi_itilcategories on glpi_tickets.itilcategories_id = glpi_itilcategories.id
+		-- INNER JOIN glpi_itilcategories on glpi_tickets.itilcategories_id = glpi_itilcategories.id
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets_status.data_fim is not null
-		AND glpi_itilcategories.id = 190
+		-- AND glpi_itilcategories.id = 190
 		AND glpi_tickets.solvedate " . $sel_date . "			
 		" . $entidade . "";
 		

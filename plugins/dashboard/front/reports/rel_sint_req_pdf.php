@@ -409,7 +409,6 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
-	AND glpi_tickets.solvedate is null
 	AND glpi_tickets.date ".$sel_date."
 	AND glpi_tickets_users.type = 1
 	AND glpi_tickets_users.tickets_id = glpi_tickets.id

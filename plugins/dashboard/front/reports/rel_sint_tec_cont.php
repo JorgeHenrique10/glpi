@@ -229,13 +229,33 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		
 		
 		<?php
+
+		function get_total_days($start, $end, $holidays = [], $weekends = ['Sat', 'Sun']){
+
+			$start = new \DateTime($start);
+			$end   = new \DateTime($end);
+			$end->modify('+1 day');
+
+			$total_days = $end->diff($start)->days;
+			$period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
+
+			foreach($period as $dt) {
+				if (in_array($dt->format('D'),  $weekends) || in_array($dt->format('Y-m-d'), $holidays)){
+					$total_days--;
+				}
+			}
+			return $total_days;
+		}
+				
+		if (isset($_GET['con'])) {
+			$con = $_GET['con'];
+		} else {
+			$con = '';
+		}
 		
-		if(isset($_GET['con'])){$con = $_GET['con'];}
-		else {$con = '';}
+		if ($con == "1") {
 		
-		if($con == "1") {
-		
-		if(!isset($_REQUEST['date1']))
+		if (!isset($_REQUEST['date1']))
 		{
 		    $data_ini2 = $_GET['date1'];
 		    $data_fin2 = $_GET['date2'];
@@ -298,7 +318,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		AND glpi_tickets_users.type = 2
 		AND glpi_tickets_users.users_id = ". $id_tec ."
 		AND glpi_tickets.is_deleted = 0
-		AND glpi_tickets.date ".$sel_date."
+		AND glpi_tickets.solvedate ".$sel_date."
 		".$entidade."
 		GROUP BY id
 		ORDER BY id DESC ";
@@ -350,6 +370,7 @@ WHERE id = " . $id_tec . " ";
 	AND glpi_tickets_users.type = 1
 	AND glpi_tickets.users_id_lastupdater = " . $id_tec . "		
 	AND glpi_tickets.date " . $sel_date . "	
+	AND glpi_tickets.is_deleted = 0
 	" . $entidade . "
 	GROUP BY name
 	ORDER BY conta DESC";
@@ -492,10 +513,10 @@ LIMIT 5 ";
 		COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
 		COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
 		COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+		COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
@@ -551,7 +572,7 @@ LIMIT 5 ";
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
-	AND glpi_tickets.solvedate ".$sel_date."
+	AND glpi_tickets.date ".$sel_date."
 	AND glpi_tickets_users.type = 2
 	AND glpi_tickets_users.tickets_id = glpi_tickets.id
 	AND glpi_tickets_users.users_id = " . $id_tec . "
@@ -793,8 +814,6 @@ AND glpi_tickets_users.users_id = " . $id_tec . "
 $entidade
 ";
 
-	// print_r($query_cont_aditivo);
-	// exit;
 	$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
 	$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);
 	$qtd_dias_aditivo = 0;
@@ -812,20 +831,26 @@ $entidade
 		$datetime1 = new DateTime($data_inicio_aditivo);
 		$datetime2 = new DateTime($data_fim_aditivo);
 
-		$diferenca = date_diff($datetime1, $datetime2);
+		$matches;
+		$regex = "/[0-9]{2}\-[0-9]{2}\-[0-9]{4}/";
+		$title = 'svvkldjkljdsklvjkldvlksdjv> 10-01-2000 ssgdfdsgsdgdgsdg';
+		preg_match_all ($regex, $chamado['content'], $matches);
+		
+		$diferenca = get_total_days($matches[0][0], $data_fim_aditivo);
 
 		if ($data_inicio_aditivo >= $data_fim_aditivo) {
 			$entrouif++;
-			$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+			$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca;
 		} else {
 			$entrouelse++;
-			$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+			$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca;
 		}
 	}
 
 	//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 	$aditivos_renovados = (($qtd_dias_cotacao_2 + $qtd_dias_cotacao_1) + ($qtd_dias_dispensa_2 + $qtd_dias_dispensa_1)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+
 	$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 	$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 	$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
@@ -1146,13 +1171,6 @@ $entidade
 <td>" . ('Média de dias de aditivos renovados') . "</td>
 <td align='right'>" . $aditivos_dias . "</td>
 </tr>		
-<tr>
-<td>" . ('Média de dias leadtime') . "</td>
-<td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
-</tr>			
-
-
-
 </tbody> </table>		   		    
 
 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
@@ -1223,34 +1241,43 @@ $status_contratos
 							<tr>
 								<td style='text-align:left; font-weight:bold; cursor:pointer;'> ". __('Solicitações') ." </td>
 								<td style='font-weight:bold; text-align: center; cursor:pointer;'> ".__('Total de Chamados')." </td>
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Opened','dashboard') ."</td>
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Solved','dashboard') ."</td>	
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Within','dashboard') ."</td>							
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Leadtime (dias)','dashboard') ."</td>		
 							</tr>
 								<tr>
 								<td style='vertical-align:middle;'> ". 'Cotação' ." </td>
-								<td style='vertical-align:middle; text-align:center;'> ". $cotacao ." </td>								 
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_prazo ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_cotacao ." </td>                        		
 							</tr>
 							<tr>
 								<td style='vertical-align:middle;'> ". 'Dispensa de Cotação' ." </td>
-								<td style='vertical-align:middle; text-align:center;'> ". $dispensa ." </td>					 
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_prazo ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_dispensa ." </td>                        		
 							</tr>
 							<tr>
 								<td style='vertical-align:middle;'> ". 'Aditivo' ." </td>
-								<td style='vertical-align:middle; text-align:center;'> ". $aditivo ." </td>								 
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_prazo ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_aditivo ." </td>                        		
 							</tr>
 							<tr>
 								<td style='vertical-align:middle; '> ". 'Distrato' ." </td>
-								<td style='vertical-align:middle; text-align:center;'> ". $distrato ." </td>								 
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_aberto ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_prazo ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_distrato ." </td>                        		
 							</tr>
-							<tr>&nbsp;&nbsp;&nbsp;</tr>
 						</tbody>
 					</table>
 					

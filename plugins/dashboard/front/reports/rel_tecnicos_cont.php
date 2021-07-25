@@ -504,7 +504,9 @@ inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.
 WHERE glpi_tickets.status NOT IN (5,6) 
 AND data_cons is null
 AND glpi_tickets.is_deleted = 0
+AND glpi_status_time.time != 0
 AND glpi_tickets_users.users_id = ".$id_tec['id']." 
+AND glpi_tickets.date ".$datas2."
 ". $entidade ."
 ". $grupo_tic ."
 ". $grupo_tic1 ."
@@ -515,6 +517,7 @@ $atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
 
 // print_r($query_atraso_contrato);
 // print_r($atrasados_retorno_total['atraso']);
+// print_r($id_tec['id']);
 
 $exibir = false;
 if( mb_strpos($id_ent['cname'], 'CONTRATOS') ) 

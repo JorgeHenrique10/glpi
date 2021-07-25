@@ -316,7 +316,9 @@ if(isset($_GET['con'])) {
 			WHERE glpi_tickets.status NOT IN (5,6) 
 			AND data_cons is null
 			AND glpi_tickets.is_deleted = 0 
+			AND glpi_status_time.time != 0
 			AND glpi_tickets.entities_id = " . $id_ent['id'] . "
+			AND glpi_tickets.date ".$datas2."
 			group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
 			order by id) as Tabela";
 				

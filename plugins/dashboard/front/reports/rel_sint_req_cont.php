@@ -201,7 +201,8 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 											$DB->data_seek($result_tec, 0);
 
-											while ($row_result = $DB->fetch_assoc($result_tec)) {
+											while ($row_result = $DB->fetch_assoc($result_tec)) 
+											{
 												$v_row_result = $row_result['id'];
 												$arr_tec[$v_row_result] = $row_result['name'] . " " . $row_result['sname'] . " (" . $row_result['id'] . ")";
 											}
@@ -235,6 +236,23 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 
 				<?php
+
+				function get_total_days($start, $end, $holidays = [], $weekends = ['Sat', 'Sun']){
+
+					$start = new \DateTime($start);
+					$end   = new \DateTime($end);
+					$end->modify('+1 day');
+
+					$total_days = $end->diff($start)->days;
+					$period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
+
+					foreach($period as $dt) {
+						if (in_array($dt->format('D'),  $weekends) || in_array($dt->format('Y-m-d'), $holidays)){
+							$total_days--;
+						}
+					}
+					return $total_days;
+				}
 
 				if (isset($_GET['con'])) {
 					$con = $_GET['con'];
@@ -325,6 +343,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 					$conta_cham = $DB->fetch_assoc($result_cham2);
 
 					$total_cham = $conta_cham['total'];
+
 					//$numdias = $conta_cham['numdias'];
 
 
@@ -349,12 +368,12 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`			
 			AND glpi_tickets_users.`users_id` = glpi_users.id
 			AND glpi_tickets_users.type = 1
-			AND glpi_tickets.date " . $sel_date . "	
+			AND glpi_tickets.date " . $sel_date . "
+			AND glpi_tickets.is_deleted = 0	
 			" . $entidade . "						
 			AND glpi_tickets_users.tickets_id IN (SELECT id FROM glpi_tickets_users gtu WHERE gtu.users_id = " . $id_req . " AND gtu.type = 1)
 			GROUP BY name
-			ORDER BY conta DESC
-			LIMIT 5";
+			ORDER BY conta DESC";
 
 						$result_req = $DB->query($sql_req);
 
@@ -385,6 +404,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			SUM(case when glpi_tickets.status = 4 then 1 else 0 end) AS pend,
 			SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve,
 			SUM(case when glpi_tickets.status = 6 then 1 else 0 end) AS close,
+			SUM(case when glpi_tickets.status = 12 then 1 else 0 end) AS qualificacao,
 			SUM(case when glpi_tickets.status = 13 then 1 else 0 end) AS validacao_tr,
 			SUM(case when glpi_tickets.status = 14 then 1 else 0 end) AS publicacao,
 			SUM(case when glpi_tickets.status = 15 then 1 else 0 end) AS parecer_habilitacao,
@@ -469,7 +489,6 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 						$result_cat = $DB->query($query_cat) or die('erro');
 
-
 						//select groups
 						$sql_grp =
 							"SELECT count(glpi_tickets.id) AS conta, glpi_groups.name AS name
@@ -493,10 +512,10 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		COUNT(IF(glpi_tickets.itilcategories_id = 191, glpi_tickets.itilcategories_id, NULL)) AS dispensa,
 		COUNT(IF(glpi_tickets.itilcategories_id = 190, glpi_tickets.itilcategories_id, NULL)) AS cotacao,
 		COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 197 && datediff(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 191 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 190 && datediff(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 189 && datediff(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+		COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
+		COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
@@ -625,6 +644,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
 		$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
 		$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
+
 
 						//logo						
 						if (file_exists('../../../../pics/logoverde.svg')) {
@@ -777,7 +797,6 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 		WHERE glpi_tickets.solvedate $sel_date
 		AND glpi_tickets.is_deleted = 0
 		AND glpi_tickets.itilcategories_id = 189
-		AND glpi_tickets.solvedate is not null
 		AND glpi_tickets_users.type = 1
 		AND glpi_tickets_users.users_id = " . $id_req . "
 				$entidade
@@ -789,14 +808,11 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 	WHERE glpi_tickets.solvedate $sel_date
 	AND glpi_tickets.is_deleted = 0
 	AND glpi_tickets.itilcategories_id = 189
-	AND glpi_tickets.solvedate is not null
 	AND glpi_tickets_users.type = 1
 	AND glpi_tickets_users.users_id = " . $id_req . "
 	$entidade
 	";
 
-						// print_r($query_cont_aditivo);
-						// exit;
 						$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
 						$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);
 						$qtd_dias_aditivo = 0;
@@ -814,20 +830,26 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 							$datetime1 = new DateTime($data_inicio_aditivo);
 							$datetime2 = new DateTime($data_fim_aditivo);
 
-							$diferenca = date_diff($datetime1, $datetime2);
+							$matches;
+							$regex = "/[0-9]{2}\-[0-9]{2}\-[0-9]{4}/";
+							$title = 'svvkldjkljdsklvjkldvlksdjv> 10-01-2000 ssgdfdsgsdgdgsdg';
+							preg_match_all ($regex, $chamado['content'], $matches);
+							
+							$diferenca = get_total_days($matches[0][0], $data_fim_aditivo);
 
 							if ($data_inicio_aditivo >= $data_fim_aditivo) {
 								$entrouif++;
-								$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca->d;
+								$qtd_dias_aditivo = $qtd_dias_aditivo + $diferenca;
 							} else {
 								$entrouelse++;
-								$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca->d;
+								$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca;
 							}
 						}
 
 						//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 						$aditivos_renovados = (($qtd_dias_cotacao_2 + $qtd_dias_cotacao_1) + ($qtd_dias_dispensa_2 + $qtd_dias_dispensa_1)) / ($result_cham_cont['total'] + $result_cham_dispensa_cont['total']);
+
 						$aditivos_renovados = number_format($aditivos_renovados, 2, ',', ' ');
 						$aditivos_dias = $qtd_dias_aditivo / $result_cham_aditivo_cont['total'];
 						$aditivos_dias = number_format($aditivos_dias, 2, ',', ' ');
@@ -889,6 +911,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 						INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 						INNER JOIN glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets_status.ticket_id
 						WHERE glpi_tickets.is_deleted = '0'
+						AND glpi_tickets_status.data_fim is not null
 						AND glpi_tickets.solvedate " . $sel_date . "
 						AND glpi_tickets_users.users_id = " . $id_req . "			
 						" . $entidade . "";
@@ -959,103 +982,102 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 
 						if ($exibir) {
 							$status_contratos =
-								"
-						
-			 <tr>
-			 <td>" . 'Atribuido' . "</td>
-			 <td align='center'>" . $atribuido . "</td>			
-			 <td align='center'>" . $atribuido_lead . "</td>			
-			 </tr>
+								"						
+								<tr>
+								<td>" . 'Atribuido' . "</td>
+								<td align='center'>" . $atribuido . "</td>			
+								<td align='center'>" . $atribuido_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Validacão TR' . "</td>
-			 <td align='center'>" . $validacao_tr . "</td>			
-			 <td align='center'>" . $validacao_tr_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Validacão TR' . "</td>
+								<td align='center'>" . $validacao_tr . "</td>			
+								<td align='center'>" . $validacao_tr_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Publicação' . "</td>
-			 <td align='center'>" . $publicacao . "</td>			
-			 <td align='center'>" . $publicacao_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Publicação' . "</td>
+								<td align='center'>" . $publicacao . "</td>			
+								<td align='center'>" . $publicacao_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Parecer Habilitação' . "</td>
-			 <td align='center'>" . $parecer_habilitacao . "</td>			
-			 <td align='center'>" . $parecer_habilitacao_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Parecer Habilitação' . "</td>
+								<td align='center'>" . $parecer_habilitacao . "</td>			
+								<td align='center'>" . $parecer_habilitacao_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Validação Técnica' . "</td>
-			 <td align='center'>" . $validacao_tecnica . "</td>			
-			 <td align='center'>" . $validacao_tecnica_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Validação Técnica' . "</td>
+								<td align='center'>" . $validacao_tecnica . "</td>			
+								<td align='center'>" . $validacao_tecnica_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Resultados' . "</td>
-			 <td align='center'>" . $resultados . "</td>			
-			 <td align='center'>" . $resultados_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Resultados' . "</td>
+								<td align='center'>" . $resultados . "</td>			
+								<td align='center'>" . $resultados_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Homologação' . "</td>
-			 <td align='center'>" . $homologacao . "</td>			
-			 <td align='center'>" . $homologacao_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Homologação' . "</td>
+								<td align='center'>" . $homologacao . "</td>			
+								<td align='center'>" . $homologacao_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Juridico' . "</td>
-			 <td align='center'>" . $juridico . "</td>			
-			 <td align='center'>" . $juridico_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Juridico' . "</td>
+								<td align='center'>" . $juridico . "</td>			
+								<td align='center'>" . $juridico_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Validação Interna' . "</td>
-			 <td align='center'>" . $validacao_interna . "</td>			
-			 <td align='center'>" . $validacao_interna_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Validação Interna' . "</td>
+								<td align='center'>" . $validacao_interna . "</td>			
+								<td align='center'>" . $validacao_interna_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Envio de Contrato' . "</td>
-			 <td align='center'>" . $envio_contrato . "</td>			
-			 <td align='center'>" . $envio_contrato_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Envio de Contrato' . "</td>
+								<td align='center'>" . $envio_contrato . "</td>			
+								<td align='center'>" . $envio_contrato_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Formalização' . "</td>
-			 <td align='center'>" . $formalizacao . "</td>			
-			 <td align='center'>" . $formalizacao_lead . "</td>			
-			 </tr>
-			 
-			 <tr>
-			 <td>" . 'Pendente Unidade' . "</td>
-			 <td align='center'>" . $pendente_unidade . "</td>			
-			 <td align='center'>" . $pendente_unidade_lead . "</td>			
-			 </tr>
-			 
-			 <tr>
-			 <td>" . 'Publicação de Errata' . "</td>
-			 <td align='center'>" . $publicacao_errata . "</td>			
-			 <td align='center'>" . $publicacao_errata_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Formalização' . "</td>
+								<td align='center'>" . $formalizacao . "</td>			
+								<td align='center'>" . $formalizacao_lead . "</td>			
+								</tr>
+								
+								<tr>
+								<td>" . 'Pendente Unidade' . "</td>
+								<td align='center'>" . $pendente_unidade . "</td>			
+								<td align='center'>" . $pendente_unidade_lead . "</td>			
+								</tr>
+								
+								<tr>
+								<td>" . 'Publicação de Errata' . "</td>
+								<td align='center'>" . $publicacao_errata . "</td>			
+								<td align='center'>" . $publicacao_errata_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Prorrogação' . "</td>
-			 <td align='center'>" . $prorrogacao . "</td>			
-			 <td align='center'>" . $prorrogacao_lead . "</td>			
-			 </tr>
-			 
-			 <tr>
-			 <td>" . 'Diligência' . "</td>
-			 <td align='center'>" . $diligencia . "</td>			
-			 <td align='center'>" . $diligencia_lead . "</td>			
-			 </tr>
+								<tr>
+								<td>" . 'Prorrogação' . "</td>
+								<td align='center'>" . $prorrogacao . "</td>			
+								<td align='center'>" . $prorrogacao_lead . "</td>			
+								</tr>
+								
+								<tr>
+								<td>" . 'Diligência' . "</td>
+								<td align='center'>" . $diligencia . "</td>			
+								<td align='center'>" . $diligencia_lead . "</td>			
+								</tr>
 
-			 <tr>
-			 <td>" . 'Recurso' . "</td>
-			 <td align='center'>" . $recurso . "</td>			
-			 <td align='center'>" . $recurso_lead . "</td>			
-			 </tr>			 							
+								<tr>
+								<td>" . 'Recurso' . "</td>
+								<td align='center'>" . $recurso . "</td>			
+								<td align='center'>" . $recurso_lead . "</td>			
+								</tr>			 							
 																					
 								";
 						}
@@ -1127,14 +1149,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			 <tr>
 			 <td>" . ('Média de dias de aditivos renovados') . "</td>
 			 <td align='right'>" . $aditivos_dias . "</td>
-			 </tr>		
-			 <tr>
-			 <td>" . ('Média de dias leadtime') . "</td>
-			 <td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
-			 </tr>			
-
-			
-
+			 </tr>
 		    </tbody> </table>		   		    
 
 			 <table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
@@ -1186,6 +1201,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 			 <td align='center'>" . $close . "</td>			
 			 <td align='center'>" . $close_lead . "</td>			
 			 </tr>
+
 			$status_contratos
 
 			</tbody> </table>
