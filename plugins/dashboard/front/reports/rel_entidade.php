@@ -429,13 +429,7 @@ else {
 				<td colspan='3' style='font-size: 16px; vertical-align:middle; width:200px;'><span style='color:#000;'>
 				".__('Period', 'dashboard') .": </span> " . conv_data($data_ini2) ." a ". conv_data($data_fin2)."
 				</td>
-				<td style='vertical-align:middle; width: 190px;'>
-					<div class='progress' style='margin-top: 19px;'>
-						<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='width: ".$barra."%;'>
-		    				".$barra." % ".__('Closed', 'dashboard') ."
-		    			</div>
-					</div>
-				</td>
+				
 			</tr>
 		</table>
 
@@ -452,7 +446,7 @@ else {
 		<table style='font-size: 16px; width: 100%;' border=0>
 			<tr>
 				<td style='font-weight:bold;'><span style='color: #000;'>". _x('status','New').": </span>".$new." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Processando (Atribuído):'). ": </span>". ($assig + $plan) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Processando (Atribuído)'). ": </span>". ($assig + $plan) ."</td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pending').": </span>".$pend." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Solved','dashboard').": </span>".$solve." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>

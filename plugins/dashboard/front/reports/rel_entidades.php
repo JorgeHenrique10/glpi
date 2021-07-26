@@ -222,7 +222,7 @@ if(isset($_GET['con'])) {
 						<th style='text-align:center; cursor:pointer;'> ". __('Solved','dashboard') ."</th>	
 						<th style='text-align:center; cursor:pointer;'> ". __('Closed','dashboard') ."</th>									
 						<th style='text-align:center; '> % ". __('Closed','dashboard') ."</th>
-						<th style='text-align:center; '>". __('Backlog','dashboard') ."</th>";
+					";
 		
 						echo "</tr>
 				</thead>
@@ -267,7 +267,7 @@ if(isset($_GET['con'])) {
 			AND glpi_entities.id = ".$id_ent['id']."
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.status = 5
-			AND glpi_tickets.solvedate ".$datas2." ";
+			AND glpi_tickets.date ".$datas2." ";
 			
 			$result_sol = $DB->query($sql_sol) or die ("erro_ab");
 			$data_sol = $DB->fetch_assoc($result_sol);
@@ -322,7 +322,6 @@ if(isset($_GET['con'])) {
 			group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
 			order by id) as Tabela";
 				
-
 			$atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
 			$atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
 
@@ -421,7 +420,7 @@ if(isset($_GET['con'])) {
 					 		</div>		
 						</div>			
 				   </td>
-				   <td style='vertical-align:middle; text-align:center;'><h4><span class='".$back_cor_ac."'>". $backlog_ac ."</span></h4></td> ";			
+			 ";			
 						
 			echo "</tr>";
 				

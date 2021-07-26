@@ -1198,7 +1198,7 @@ $sel_ent_contratos = $result_contratos->fetch_all();
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Incidentes </th>										
+							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
 							</tr>
 						</thead>
 						<tbody> 

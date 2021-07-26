@@ -347,8 +347,8 @@ echo "
 				<th style='text-align:center; cursor:pointer;'> ". __('Late') ."</th>
 				<th style='text-align:center; cursor:pointer;'> ". __('Solved','dashboard') ."</th>
 				<th style='text-align:center; cursor:pointer;'> ". __('Closed','dashboard') ."</th>				
-				<th style='text-align:center; '> % ". __('Closed','dashboard') ."</th> 
-				<th style='text-align:center; cursor:pointer;'> ". __('Backlog','dashboard') ."</th>";
+				<!-- <th style='text-align:center; '> % ". __('Closed','dashboard') ."</th> -->
+				<th style='text-align:center; cursor:pointer;'> Pendente </th>";
 				
 				if($sats != '') {
 					echo "<th style='text-align:center; '> ". __('Satisfaction','dashboard') ."</th>";
@@ -403,7 +403,7 @@ $abertos = $data_ab['total'];
 $sql_sol = "SELECT count( glpi_tickets.id ) AS total, glpi_tickets_users.users_id AS id
 FROM glpi_tickets_users, glpi_tickets, glpi_users". $glpi_groups ."
 WHERE glpi_tickets.id = glpi_tickets_users.tickets_id
-AND glpi_tickets.solvedate ".$datas2."
+AND glpi_tickets.date ".$datas2."
 AND glpi_tickets_users.users_id = ".$id_tec['id']."
 AND glpi_tickets.status = 5
 AND glpi_tickets_users.users_id = glpi_users.id
@@ -619,16 +619,16 @@ else { $barra_due = 0;}
 		   <td style='vertical-align:middle; text-align:center;'> ". $atrasados ." </td>
 			<td style='vertical-align:middle; text-align:center;'> ". $solucionados ." </td>
 			<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>			
-			<td style='vertical-align:middle; text-align:center;'>
+		<!--	<td style='vertical-align:middle; text-align:center;'>
 				<div class='progress' style='margin-top: 5px; margin-bottom: 5px;'>
 					<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='color:".$text_color."; width: ".$width."%;'>
 			 			".$barra."%
 			 		</div>
 				</div>
-		   </td>
+		   </td> -->
 		   
 		   </td>
-			<td style='vertical-align:middle; text-align:center;'><h4><span class='".$back_cor_ac."'>". $backlog_ac ."</span></h4></td> ";			
+			<td style='vertical-align:middle; text-align:center;'><span>". ($total - $abertos)."</span></td> ";			
 
 /*
 <td style='vertical-align:middle; text-align:center;'>

@@ -471,7 +471,7 @@ if($con == "1") {
 	SELECT count( glpi_tickets.id ) AS close, glpi_tickets_users.users_id AS id
 	FROM glpi_tickets_users, glpi_tickets
 	WHERE glpi_tickets.is_deleted = '0'
-	AND glpi_tickets.closedate ".$datas2." 
+	AND glpi_tickets.date ".$datas2." 
 	AND glpi_tickets_users.users_id = ".$id_tec."
 	AND glpi_tickets_users.type = 2
 	AND glpi_tickets.status = 6
@@ -486,7 +486,7 @@ if($con == "1") {
 	SELECT SUM(case when glpi_tickets.status = 5 then 1 else 0 end) AS solve
 	FROM glpi_tickets_users, glpi_tickets
 	WHERE glpi_tickets.is_deleted = '0'
-	AND (glpi_tickets.solvedate ".$datas2." OR glpi_tickets.closedate ".$datas2.") 
+	AND (glpi_tickets.date ".$datas2." OR glpi_tickets.date ".$datas2.") 
 	AND glpi_tickets_users.users_id = ".$id_tec."
 	AND glpi_tickets_users.type = 2
 	".$entidade_age."
@@ -500,17 +500,14 @@ if($con == "1") {
 	echo "
 	<div class='well info_box fluid col-md-12 report' style='margin-left: -1px;'>
 	<table class='fluid'  style='width:100%; font-size: 18px; font-weight:bold;' cellpadding = 1px>
-		<tr style='width: 450px;'>
+		<tr style='width: 450px; '>
 			<td><img class='avatar2' width='40px' height='43px' src='".User::getURLForPicture($row['picture'])."'></img></td>
 			<td style='vertical-align:middle;'> <span style='color: #000;'>".__('Technician','dashboard').": </span>". $row['firstname'] ." ". $row['realname']. "</td>
 			<td style='vertical-align:middle; ' colspan=2> <span style='color: #000;'>".__('Tickets','dashboard').": </span>". $conta_cons ."</td>
 			<td colspan='3' style='font-size: 18px; font-weight:bold; vertical-align:middle; width:200px;'><span style='font-size: 18px; color:#000;'>".__('Period', 'dashboard') .": </span> " . conv_data($data_ini2) ." a ". conv_data($data_fin2)."
 
 			<td style='vertical-align:middle; width: 190px; '>
-				<div class='progress' style='margin-top: 19px;'>
-					<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='width: ".$barra."%;'>
-			 			".$barra." % ".__('Closed', 'dashboard') ."
-			 		</div>
+				
 				</div>
 			</td>
 		</tr>
@@ -523,32 +520,15 @@ if($con == "1") {
 	<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0>
 	<tr align='left'>
 		<td colspan=2 style='horizontal-align:left;'>
-			<div id='gauge' style='width:150px; height:100px; margin-left: 30px;'></div>
+			
 
-			 <!-- gauge -->
-		    <script>
-		    var g = new JustGage({
-		    id: \"gauge\",
-		    value: ".$satisfacao.",
-		    min: 0,
-		    max: 100,
-		    title: \" ". __('Satisfaction','dashboard') ." - %\",
-		    label: \" \",
-		       levelColors: [
-		          \"#ff0000\",
-		          \"#FB8300\",
-		          \"#F9C800\",
-		          \"#9FCA0C\"
-		        ]
-
-		    });
-		    </script>
+	
         </td>
 
 		<tr>
 
 			<td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
-			<td><span style='color: #000;'>". __('Processando (Atribuído):'). ": </span><b>". ($assig + $plan) ."</b></td>
+			<td><span style='color: #000;'>". __('Processando (Atribuído)'). ": </span><b>". ($assig + $plan) ."</b></td>
 			<td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 			<td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
 			<td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>
