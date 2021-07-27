@@ -693,7 +693,7 @@ if($consulta > 0) {
 	<table style='font-size: 16px; font-weight:bold; width: 100%;' border=0 >
 		<tr>
 			  <td><span style='color: #000;'>". _x('status','New').": </span><b>".$new." </b></td>
-	        <td><span style='color: #000;'>". __('Processando (Atribuído)'). ": </span><b>". ($assig + $plan) ."</b></td>
+	        <td><span style='color: #000;'>". __('Assigned'). ": </span><b>". ($assig + $plan) ."</b></td>
 	        <td><span style='color: #000;'>". __('Pending').": </span><b>".$pend." </b></td>
 	        <td><span style='color: #000;'>". __('Solved','dashboard').": </span><b>".$solve." </b></td>
 	        <td><span style='color: #000;'>". __('Closed').": </span><b>".$close." </b></td>	        
@@ -740,7 +740,7 @@ if($consulta > 0) {
 					<tr>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('ID')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Status')." </th>
-						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th>
+						<!-- <th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th> -->
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Source')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Priority')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Category')." </th>
@@ -852,7 +852,7 @@ if($consulta > 0) {
 		<tr style='font-weight:normal;'>
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])."</td>
-			<td style='vertical-align:middle;'> ". $type ." </td>
+			<!-- <td style='vertical-align:middle;'> ". $type ." </td> -->
 			<td style='vertical-align:middle;'> ". $row_req['name'] ." </td>
 			<td style='vertical-align:middle;text-align:center;'> ". $pri ." </td>
 			<td style='vertical-align:middle; max-width:150px;'> ". $row_cat['name'] ." </td>		

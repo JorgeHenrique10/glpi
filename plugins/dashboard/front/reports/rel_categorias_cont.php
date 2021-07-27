@@ -309,7 +309,8 @@ echo "
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Tickets')." </th>
 						<th style='text-align:center; cursor:pointer;'> ". __('Opened','dashboard') ."</th>
 						<th style='text-align:center; cursor:pointer;'> ". __('Solved','dashboard') ."</th>	
-						<th style='text-align:center; cursor:pointer;'> ". __('Closed','dashboard') ."</th>															
+						<th style='text-align:center; cursor:pointer;'> ". __('Fechados dos Abertos no Período','dashboard') ."</th>															
+						<th style='text-align:center; cursor:pointer;'> ". __('Fechados no Período') ."</th>															
 					</tr>
 				</thead>
 			<tbody>\n ";
@@ -348,7 +349,7 @@ echo "
 				"SELECT count( glpi_tickets.id ) AS total
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.date ".$datas2."
+				AND glpi_tickets.solvedate ".$datas2."
 				AND glpi_tickets.status = 5
 				AND glpi_tickets.itilcategories_id = ".$row['id']."
 				".$entidade." ";
@@ -369,7 +370,21 @@ echo "
 				
 				$result_fech = $DB->query($sql_fech);	
 				$data_fech = $DB->fetch_assoc($result_fech);
-				$fechados = $data_fech['total'];							
+				$fechados = $data_fech['total'];
+				
+				//chamados fechados
+				$sql_fech_period = 
+				"SELECT count( glpi_tickets.id ) AS total
+				FROM glpi_tickets
+				WHERE glpi_tickets.is_deleted = 0
+				AND glpi_tickets.solvedate ".$datas2."
+				AND glpi_tickets.status = 6
+				AND glpi_tickets.itilcategories_id = ".$row['id']."
+				".$entidade." ";
+				
+				$result_fech_period = $DB->query($sql_fech_period);	
+				$data_fech_period = $DB->fetch_assoc($result_fech_period);
+				$fechados_period = $data_fech_period['total'];
 				
 				echo "	
 				<tr>
@@ -378,6 +393,7 @@ echo "
 					<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $solucionados ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>				
+					<td style='vertical-align:middle; text-align:center;'> ". $fechados_period ." </td>				
 				</tr>";
 			}
 

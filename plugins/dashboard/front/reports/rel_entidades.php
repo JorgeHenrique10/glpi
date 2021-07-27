@@ -220,8 +220,8 @@ if(isset($_GET['con'])) {
 						<th style='text-align:center; cursor:pointer;'> ". __('Opened','dashboard') ."</th>
 						<th style='text-align:center; cursor:pointer;'> ". __('Late','dashboard') ."</th>
 						<th style='text-align:center; cursor:pointer;'> ". __('Solved','dashboard') ."</th>	
-						<th style='text-align:center; cursor:pointer;'> ". __('Closed','dashboard') ."</th>									
-						<th style='text-align:center; '> % ". __('Closed','dashboard') ."</th>
+						<th style='text-align:center; cursor:pointer;'> ". __('Fechados dos Abertos no Período','dashboard') ."</th>									
+						<th style='text-align:center; '> ". __('Fechados no Período','dashboard') ."</th>
 					";
 		
 						echo "</tr>
@@ -267,7 +267,7 @@ if(isset($_GET['con'])) {
 			AND glpi_entities.id = ".$id_ent['id']."
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.status = 5
-			AND glpi_tickets.date ".$datas2." ";
+			AND glpi_tickets.solvedate ".$datas2." ";
 			
 			$result_sol = $DB->query($sql_sol) or die ("erro_ab");
 			$data_sol = $DB->fetch_assoc($result_sol);
@@ -288,6 +288,21 @@ if(isset($_GET['con'])) {
 			$data_clo = $DB->fetch_assoc($result_clo);
 			
 			$fechados = $data_clo['total'];
+
+
+			//chamados fechados no periodo
+			$sql_clo_period = "SELECT count(glpi_tickets.id) AS total, glpi_entities.name AS name, glpi_entities.completename AS cname
+			FROM glpi_entities, glpi_tickets
+			WHERE glpi_tickets.entities_id = glpi_entities.id
+			AND glpi_entities.id = ".$id_ent['id']."
+			AND glpi_tickets.is_deleted = 0
+			AND glpi_tickets.status = 6
+			AND glpi_tickets.date ".$datas2." ";
+			
+			$result_clo_period = $DB->query($sql_clo_period) or die ("erro_ab");
+			$data_clo_period = $DB->fetch_assoc($result_clo_period);
+			
+			$fechados_period = $data_clo_period['total'];
 			
 			//chamados pendentes
 /*			$sql_pen = "SELECT count(glpi_tickets.id) AS total, glpi_entities.name AS name, glpi_entities.completename AS cname
@@ -412,14 +427,15 @@ if(isset($_GET['con'])) {
 					<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". ($exibir ? $atrasados_retorno_total['atraso'] : $atrasados) ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $solucionados ." </td>
-					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>			
-					<td style='vertical-align:middle; text-align:center;'> 
+					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>
+					<td style='vertical-align:middle; text-align:center;'> ". $fechados_period ." </td>				
+					<!-- <td style='vertical-align:middle; text-align:center;'> 
 						<div class='progress' style='margin-top: 5px; margin-bottom: 5px;'>
 							<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='width: ".$width."%;'>
 					 			".$barra." % 	
 					 		</div>		
 						</div>			
-				   </td>
+				   </td> -->
 			 ";			
 						
 			echo "</tr>";

@@ -698,28 +698,29 @@ $entidade
 
 
 	foreach ($result_cham_contratos as $chamado) {
-		$cont_dispensa++;
+
 		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
-	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
-		THEN NOW() 
-		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END),
-	(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END)
-) dias";
+		(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
+			THEN (NULL)
+			ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END),
+			(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (NULL) 
+				ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END)
+		) dias";
+
 
 		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END),
-	(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END)
-) dias";
+			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ") 
+				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END),
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN (NULL)
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END)
+			) dias";
 
 		$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 		$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
@@ -760,30 +761,32 @@ $entidade
 	$qtd_dias_dispensa_1 = 0;
 	$qtd_dias_dispensa_2 = 0;
 
+
 	foreach ($result_cham_dispensa_contratos as $chamado) {
 
+
 		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
-	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
-		THEN NOW() 
-		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END),
-	(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END)
-) dias";
-
+			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
+				THEN (NULL)
+				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END),
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (SELECT date FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ")
+				ELSE (SELECT min(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END)
+		) dias";
+		//print_r($query_dias_etapa1); print_r('<br>');
 		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END),
-	(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-		THEN NOW() 
-		ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
-	END)
-) dias";
-
+			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ")
+				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END),
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (NULL)
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			END)
+		) dias";
+		//print_r($query_dias_etapa2); print_r('<br>');
 		$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 		$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
 
@@ -822,21 +825,19 @@ $entidade
 	//$qtd_dias_aditivo_2 = 0;
 	//print_r($result_cham_aditivo_contratos);exit();
 	foreach ($result_cham_aditivo_contratos as $chamado) {
-
-		//print_r($chamado['content']);
-		$content = explode(' Insira Data de Inicio :', $chamado['content']);
-		$data_inicio_aditivo = date('Y-m-d H:i:s', strtotime(substr($content[1], 16, 10)));
-		$data_fim_aditivo = $chamado['solvedate'];
-
-		$datetime1 = new DateTime($data_inicio_aditivo);
-		$datetime2 = new DateTime($data_fim_aditivo);
+		
+		$data_fim_aditivo = date('Y-m-d', strtotime($chamado['solvedate']));
 
 		$matches;
 		$regex = "/[0-9]{2}\-[0-9]{2}\-[0-9]{4}/";
-		$title = 'svvkldjkljdsklvjkldvlksdjv> 10-01-2000 ssgdfdsgsdgdgsdg';
+
 		preg_match_all ($regex, $chamado['content'], $matches);
-		
-		$diferenca = get_total_days($matches[0][0], $data_fim_aditivo);
+		$data_inicio_aditivo = date('Y-m-d', strtotime($matches[0][0]));
+		$datetime1 = new DateTime($data_inicio_aditivo);
+		$datetime2 = new DateTime($data_fim_aditivo);
+		//$datetime2->modify('+1 day');
+
+		$diferenca = $datetime2->diff($datetime1)->days;
 
 		if ($data_inicio_aditivo >= $data_fim_aditivo) {
 			$entrouif++;
@@ -845,7 +846,7 @@ $entidade
 			$entrouelse++;
 			$qtd_dias_aditivo = $qtd_dias_aditivo - $diferenca;
 		}
-	}
+	}		
 
 	//________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -919,24 +920,18 @@ $entidade
 
 	$result_stat_lead_time = $DB->query($query_stat_lead_time);
 
-	// $query_entidades_contratos = "select id from glpi_entities where id = 17 OR entities_id = 17";
+	$query_contratos = "SELECT id, entities_id FROM glpi_entities WHERE id in (" . $sel_ent . ")";
 
-	// $result_entities_contratos = $DB->query($query_entidades_contratos)->fetch_all();
-					
-	// $ids_contract = [];
+	$result_contratos = $DB->query($query_contratos);
+	$sel_ent_contratos = $result_contratos->fetch_all();
 
-	// foreach ($result_entities_contratos as $id) {
-	// 	$ids_contract[] = $id[0];
-	// }
-
-	// $array_entidades = explode(',',$sel_ent);
-
-	// $mostrar = FALSE;
-
-	// if(sizeof(array_intersect_assoc($ids_contract, $array_entidades)) > 0 )
-	// {
-	// 	$mostrar = TRUE;
-	// }
+	$mostrar = false;
+	foreach ($sel_ent_contratos as $item) {
+		if ($item[0] == 17 || $item[1] == 17) {
+			$mostrar = true;
+		}
+	}
+	
 
 	$new_lead = number_format((($DB->result($result_stat_lead_time, 0, 'new') + 0) / ($DB->result($result_stat_lead_time, 0, 'new_count') + 0)), 2, ',', ' ');
 	$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, ',', ' ');
@@ -1164,7 +1159,7 @@ $entidade
 <td align='right'>" . time_hrs($avgtime) . "</td>
 </tr>			
 <tr>
-<td>" . ('% Contratos formalizados') . "</td>
+<td>" . ('Média de dias contratos formalizados') . "</td>
 <td align='right'>" . $aditivos_renovados . "</td>
 </tr>		
 <tr>
@@ -1194,7 +1189,7 @@ $entidade
 </tr>
 
 <tr>
-<td>" . __('Assigned') . "</td>
+<td>Processando (Atribuído) </td>
 <td align='center'>" . $assig . "</td>			
 <td align='center'>" . $assig_lead . "</td>			
 </tr>
