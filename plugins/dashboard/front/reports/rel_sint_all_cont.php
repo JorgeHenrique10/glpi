@@ -590,24 +590,26 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								THEN (NULL)
 								ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
 								END),
-								(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 									THEN (NULL) 
-									ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
+									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
 								END)
 							) dias";
 
 
 							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
-								(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 									THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ") 
-									ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
 										END),
 										(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 											THEN (NULL)
 											ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
 										END)
 								) dias";
-
+							print_r($query_dias_etapa1);print_r('<br>');
+							print_r($query_dias_etapa2);print_r('<br>');
+							
 
 							$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 							$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
