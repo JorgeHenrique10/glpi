@@ -1,4 +1,10 @@
 <?php
+
+
+//include ("includes.php");
+// include ("config.php");
+// include "functions.php";
+
 /**
  * ---------------------------------------------------------------------
  * GLPI - Gestionnaire Libre de Parc Informatique
@@ -40,6 +46,9 @@ if (!defined('GLPI_ROOT')) {
  * Html Class
  * Inpired from Html/FormHelper for several functions
 **/
+
+
+
 class Html {
 
 
@@ -1967,7 +1976,7 @@ class Html {
       echo "<div id='show_all_menu' class='invisible'>";
       $items_per_columns = 15;
       $i                 = -1;
-
+     
       foreach ($menu as $part => $data) {
          if (isset($data['content']) && count($data['content'])) {
             echo "<dl>";
@@ -2031,6 +2040,40 @@ class Html {
       echo "</a>";
 
       echo "</div>";
+   }
+
+   static function consultaEntidadeContratos(){
+      $DB = new DB();
+
+      $query = "SELECT * FROM glpi_entities WHERE entities_id = 17";
+   
+         $result = $DB->query($query);
+
+    
+      
+      $entidades = [];
+
+      while ($row_result = $DB->fetch_assoc($result) ){
+         $entidades[] = $row_result['id'];
+      }
+
+      $permissao_contrato = false;
+
+      foreach ($_SESSION['glpiactiveentities'] as $enti) {
+
+         if(in_array($enti, $entidades ))
+         {
+            $permissao_contrato = true;
+            break;            
+         }
+
+      }
+
+      if($_SESSION['glpiactiveentities'][17] == 17 ){
+         $permissao_contrato = true;
+      }
+
+      return $permissao_contrato;
    }
 
 
@@ -6439,7 +6482,7 @@ class Html {
             $i++;
          }
       }
-
+     
       if ($full === false) {
          // Plugins
          $menu['plugins'] = [
@@ -6467,7 +6510,7 @@ class Html {
                }
             }
          }
-
+     
          // Display plugins
          if (isset($menu['plugins']['content']) && count($menu['plugins']['content']) > 0) {
             asort($menu['plugins']['content']);
@@ -6475,8 +6518,9 @@ class Html {
             echo "<a href='#' title=\"".
                   _sn('Plugin', 'Plugins', Session::getPluralNumber())."\" class='itemP'>".
                   __('Plugins')."</a>"; // default none
+                  echo ' <li>Teste</li>';
             echo "<ul class='ssmenu'>";
-
+ 
             // list menu item
             foreach ($menu['plugins']['content'] as $key => $val) {
                echo "<li><a href='".$CFG_GLPI["root_doc"]."/plugins/".$key.$val['page']."'>".
@@ -6485,8 +6529,27 @@ class Html {
             echo "</ul></li>";
          }
       }
+      
+      if(self::consultaEntidadeContratos()){
+         
+         echo "<li'>
+         <a 
+         href='". $CFG_GLPI["root_doc"] . "/plugins/dashboardContrato/front/index1.php'
+         style='
+         color: #fff;
+         font-weight: bold;
+         font-size: 13px;
+         display: inline-block;
+         min-width: 135px;
+         height: 20px;
+         cursor: pointer;'>
+            Relatórios Contratos</a>
+         </li>";
+      }
 
+      
       echo "</ul>"; // #menu
+
 
       // Display MENU ALL
       self::displayMenuAll($menu);

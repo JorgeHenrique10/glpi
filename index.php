@@ -140,6 +140,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
    echo Html::script('lib/jqueryplugins/select2/js/select2.full.js');
    echo Html::css('lib/jqueryplugins/select2/css/select2.css');
 	echo Html::css('lib/font-awesome/css/all.css');	   
+	
 	?>
 
 </head>
