@@ -61,167 +61,157 @@ array_push($quant2,$more8);
 
 $conta_q = count($quant2)-1;
 
-$query_new = "
-Select count(IF( days < 20, chamados, null )  ) AS menor20, count(IF( days >= 20 && days < 41, chamados, null )  ) AS maiorigual20 , count(IF( days >= 41, chamados, null )  ) AS maiorigual41,categoria
-from 
-(SELECT count( glpi_tickets.id ) AS chamados , DATEDIFF( solvedate, date ) AS days, itilcategories_id as categoria
-FROM glpi_tickets, glpi_tickets_users
-WHERE solvedate IS NOT NULL AND is_deleted = 0
-AND glpi_tickets_users.type = 2
-AND glpi_tickets_users.users_id = ".$id_tec."
-AND glpi_tickets.itilcategories_id IN (189,190,191,197) 
-AND glpi_tickets.date ".$datas."  
-".$entidade_age."
-GROUP BY days, itilcategories_id) as tabela
-group by categoria";
 
-//print_r($query_new);exit;
+echo "
+<script type='text/javascript'>
 
-$result_new = $DB->query($query_new) or die('erro');
-$array_days = [];
+$(function () {		
+    	   		
+		// Build the chart
+        $('#graf_time1').highcharts({
+            chart: {
+            type: 'column',
+            plotBorderColor: '#ffffff',
+            plotBorderWidth: 0
+            },              
+            title: {
+                text: 'Tempo de Solução dos Chamados'
+            },
 
-while ($row_result_new = $DB->fetch_assoc($result_new)) 
-{
-    $array_days[$row_result_new['categoria']]['menor20'] = $row_result_new['menor20'];
-    $array_days[$row_result_new['categoria']]['maiorigual20'] = $row_result_new['maiorigual20'];
-    $array_days[$row_result_new['categoria']]['maiorigual41'] = $row_result_new['maiorigual41'];
-}
+            tooltip: {
+        	    pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            plotOptions: {
+             
+                showInLegend: true,
+                series: {
+                    groupPadding: 0.1
+                    }
+            },
 
-echo "<script type='text/javascript'>
+            credits: {
+                enabled: false
+            },
+            xAxis:{
+                min:1,
+                categories:['','']
 
-        $(function () {
-                $('#graf_time1').highcharts({
-                    chart: {
-                        type: 'column',
-                            height: 450,
-                        plotBorderColor: '#ffffff',
-                        plotBorderWidth: 0
-                    },
-                    title: {
-                        text: '" .__('Open Tickets Age','dashboard')."'
-                        //text: ''
-                    },
-
-                    xAxis: {
-                        categories: [ '0-20', '21-40', '> 41' ],
-                        labels: {
-                            text: '',
-                            align: 'center',
-                            style: {
-                                //fontSize: '11px',
-                                //fontFamily: 'Verdana, sans-serif'
-                                
-                            },
-                            overflow: 'justify'
-                            },
-        //                     crosshair:true,
-                            title: {
-                                    text: '" .__('days','dashboard')."',
-                                align: 'middle'
-                                    }
-                            },
-                    yAxis: {
-                        min: 0,
-                        title: {
-                                text: '',
-                            align: 'middle'
-                        },
-                        labels: {
-                            overflow: 'justify'
-                        },
-                        stackLabels: {
+            },
+            labels: {
+                overflow: 'justify'
+            },
+            stackLabels: {
+            enabled: true,
+            y:0,
+            },
+            yAxis:{
+                title:{
+                    text:''
+                }             
+            },
+            series: [                
+                {     
+                    name: '< 1 Dia',
+                    data: ['< 1 " .__('day','dashboard')."',  ".$quant2[0]."],
+                    dataLabels: {
                         enabled: true,
-                        y:-15,
                         style: {
-                            //fontWeight: 'bold',
-                            //color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
                         }
-                    }
-                    },
-
-                tooltip: {
-                    formatter: function () {
-                        return '<b>' + this.x + '</b><br/>' +
-                            this.series.name + ': ' + this.y + '<br/>' +
-                            'Total: ' + this.point.stackTotal;
                     }
                 },
-                    legend: {
-                        layout: 'horizontal',
-                        align: 'left',
-                        x: 20,
-                        y: 30,
-                        verticalAlign: 'top',
-                        floating: true,
-                    adjustChartSize: true,
-                        borderWidth: 0	
-                },
-                credits: {
-                    enabled: false
-                    },
-                plotOptions: {
-                    column: {
-                        stacking: 'normal',
-                        dataLabels: {
-                            enabled: true,
-                            color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-                            style: {
-                                textShadow: '0 0 3px black'
-                            }
-                        },
-                        borderWidth: 2,
-                            borderColor: '#fff',
-                            shadow:true,
-                            showInLegend: true,
-                    },
-                    series: {
-                    cursor: '',
-                        colorByPoint: false, 
-                    point: {
-                            events: {
-                          
-                            }
+                {
+                    name: '1 Dia',
+                    data: ['1 " .__('days','dashboard')."',  ".$quant2[1]." ],
+                    color: 'cyan',
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
                         }
                     }
-                
-                    },
-                    series: [
-                        {
-                        name: 'Aditivo',
-                        data: [
-                        {y:" . $array_days[189]["menor20"] ."},
-                        {y:" . $array_days[189]["maiorigual20"] ."},
-                        {y:" . $array_days[189]["maiorigual41"] ."}]},
-                        {
-                        name: 'Cotação',
-                        data: [
-                        {y:" . $array_days[190]["menor20"] ."},
-                        {y:" . $array_days[190]["maiorigual20"] ."},
-                        {y:" . $array_days[190]["maiorigual41"] ."}]},
-                        {
-                        name: 'Dispensa',
-                        data: [
-                        {y:" . $array_days[191]["menor20"] ."},
-                        {y:" . $array_days[191]["maiorigual20"] ."},
-                        {y:" . $array_days[191]["maiorigual41"] ."}]},
-                        {                
-                        name: 'Distrato',
-                        data: [
-                        {y:" . $array_days[197]["menor20"] ."},
-                        {y:" . $array_days[197]["maiorigual20"] ."},
-                        {y:" . $array_days[197]["maiorigual41"] ."}],
-                        dataLabels: {
-                            enabled: false,
-                            style: {
-                                fontSize: '11px',
-                                fontFamily: 'Verdana, sans-serif'
-                            }
+                },
+                {
+                    name: '2 Dias',
+                    data: ['2 " .__('days','dashboard')."', ".$quant2[2]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
                         }
-
-                    }]
-                });
-            });
-
-	</script>";
-
-		?>
+                    }
+                },
+                {
+                    name: '3 Dias',
+                    data: ['3 " .__('days','dashboard')."', ".$quant2[3]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '4 Dias',
+                    data: ['4 " .__('days','dashboard')."', ".$quant2[4]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '5 Dias',
+                    data: ['5 " .__('days','dashboard')."', ".$quant2[5]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '6 Dias',
+                    data: ['6 " .__('days','dashboard')."', ".$quant2[6]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '7 Dias',
+                    data: ['7 " .__('days','dashboard')."', ".$quant2[7]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                },
+                {
+                    name: '8 Dias',
+                    data: ['8+" .__('days','dashboard')."', ".$quant2[$conta_q]." ],
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontFamily: 'Roboto, sans-serif'
+                        }
+                    }
+                }
+            ]
+        });
+    });
+		</script>"; 
+    //<1 = [0] - 1 [1]

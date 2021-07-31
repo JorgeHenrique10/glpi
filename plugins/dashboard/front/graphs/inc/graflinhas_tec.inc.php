@@ -351,7 +351,16 @@ $(function ()
 
                 {
                 name: '".__('Closed','dashboard')." (".array_sum($quant_c).")',
-                data: [$quant_c2] }]
+                data: [$quant_c2] },
+                
+                {
+                name: '".__('Backlog','dashboard')." (".end($arr_bk).")',
+                type: 'spline',
+                dataLabels: { enabled: false },
+                color: '#db5e5e',
+                data: [$back]
+           
+            }]
         });
     });
   </script>

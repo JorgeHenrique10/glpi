@@ -296,9 +296,8 @@ if($con == "1") {
 	$sql_cham =
 	"SELECT glpi_tickets.id AS id, glpi_tickets.name AS name, glpi_tickets.date AS date, glpi_tickets.closedate as closedate,
 	glpi_tickets.type, glpi_tickets.status, FROM_UNIXTIME( UNIX_TIMESTAMP( `glpi_tickets`.`closedate` ) , '%Y-%m' ) AS date_unix, AVG( glpi_tickets.solve_delay_stat ) AS time,
-	glpi_tickets.solve_delay_stat AS time_sec, glpi_itilcategories.name AS categoria
+	glpi_tickets.solve_delay_stat AS time_sec
 	FROM `glpi_tickets_users`, glpi_tickets
-	INNER JOIN glpi_itilcategories on glpi_itilcategories.id = glpi_tickets.itilcategories_id
 	WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 	AND glpi_tickets_users.type =2
 	AND glpi_tickets_users.users_id = ". $id_tec ."

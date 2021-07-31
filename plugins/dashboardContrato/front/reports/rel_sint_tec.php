@@ -552,7 +552,6 @@ LIMIT 5 ";
 	FROM glpi_tickets, glpi_tickets_users, glpi_itilcategories
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_itilcategories.id = glpi_tickets.itilcategories_id
-	AND glpi_tickets.solvedate is null
 	AND glpi_tickets.date ".$sel_date."
 	AND glpi_tickets_users.type = 2
 	AND glpi_tickets_users.tickets_id = glpi_tickets.id
@@ -680,7 +679,7 @@ $entidade
 
 	foreach ($result_cham_contratos as $chamado) {
 		$cont_dispensa++;
-		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+		$query_dias_etapa1 = "SELECT DATEDIFF(
 	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 		THEN NOW() 
 		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -691,7 +690,7 @@ $entidade
 	END)
 ) dias";
 
-		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+		$query_dias_etapa2 = "SELECT DATEDIFF(
 	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 		THEN NOW() 
 		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -743,7 +742,7 @@ $entidade
 
 	foreach ($result_cham_dispensa_contratos as $chamado) {
 
-		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+		$query_dias_etapa1 = "SELECT DATEDIFF(
 	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 		THEN NOW() 
 		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -754,7 +753,7 @@ $entidade
 	END)
 ) dias";
 
-		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+		$query_dias_etapa2 = "SELECT DATEDIFF(
 	(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 		THEN NOW() 
 		ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -1220,7 +1219,7 @@ $status_contratos
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Incidentes </th>										
+							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
 							</tr>
 						</thead>
 						<tbody> 

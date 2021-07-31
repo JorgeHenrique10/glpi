@@ -490,6 +490,38 @@ if($conta_cons > 0) {
 
 else { $barra = 0;}
 
+
+//chamados atrasados contratos
+// $query_atraso_contrato =
+// "Select COUNT(IF(diffs > time, id, NULL)) AS atraso FROM 
+// (SELECT glpi_tickets.id, glpi_status_time.time, 
+// glpi_tickets.status, max(glpi_tickets_status.data_inicio) as data_inicio, data_cons,
+// TOtal_WEEKdays(NOW(), max(glpi_tickets_status.data_inicio)) as diffs
+// FROM glpi_tickets
+// inner join glpi_status_time on glpi_status_time.cod_status = glpi_tickets.status
+// inner join glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id
+// inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
+// WHERE glpi_tickets.status NOT IN (5,6) 
+// AND data_cons is null
+// AND glpi_tickets.is_deleted = 0
+// AND glpi_status_time.time != 0
+// AND glpi_tickets_users.users_id = ".$id_tec['id']." 
+// ". $entidade ."
+// ". $grupo_tic ."
+// ". $grupo_tic1 ."
+// group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
+// order by id) as Tabela";
+
+// $atrasados_contratos_retorno = $DB->query($query_atraso_contrato);
+// $atrasados_retorno_total = $DB->fetch_assoc($atrasados_contratos_retorno);
+
+// //print_r($entidade);
+// $exibir = false;
+// if( mb_strpos($id_ent['cname'], 'CONTRATOS') ) 
+// {
+// 	$exibir = true;
+// }
+
 //chamados atrasados
 $sql_due = "
 SELECT count( glpi_tickets.id ) AS total, glpi_tickets.id as ID
@@ -576,7 +608,7 @@ else { $barra_due = 0;}
 		<tr>
 			<td style='vertical-align:middle; text-align:left;'><i class='del fa fa-times' style='cursor:pointer;' title='". __('Hide') ."'>&nbsp;&nbsp;&nbsp; </i>
 				<img class='avatar2' width='40px' height='43px' src='".User::getURLForPicture($id_tec['picture'])."'></img>&nbsp;&nbsp;
-				<a href='rel_tecnico.php?con=1&sel_tec=". $id_tec['id'] ."&date1=".$data_ini."&date2=".$data_fin."' target='_blank' >" . $id_tec['fname'].' '.$id_tec['rname']. ' ('.$id_tec['id'].")</a>
+				<a href='rel_tecnico_cont.php?con=1&sel_tec=". $id_tec['id'] ."&date1=".$data_ini."&date2=".$data_fin."' target='_blank' >" . $id_tec['fname'].' '.$id_tec['rname']. ' ('.$id_tec['id'].")</a>
 			</td>
 			<td style='vertical-align:middle; text-align:center;'> ". $total ." </td>
 			<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>

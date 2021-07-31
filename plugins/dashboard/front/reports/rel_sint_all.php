@@ -288,7 +288,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			AND glpi_tickets_users.type = 2
 			" . $entidade . " 
 			GROUP BY name
-			ORDER BY conta DESC";
+			ORDER BY conta DESC ";
 
 						$result_tec = $DB->query($sql_tec);
 
@@ -303,26 +303,26 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			AND glpi_tickets.is_deleted = 0
 			" . $entidade . "
 			GROUP BY `users_id`
-			ORDER BY conta DESC";
+			ORDER BY conta DESC ";
 
 						$result_req = $DB->query($sql_req);
 
 						//avg time
-			$sql_time =
-				"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
+						$sql_time =
+							"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
 			FROM glpi_tickets
 			WHERE date " . $sel_date . "			
 			AND glpi_tickets.is_deleted = 0			
 			" . $entidade . " ";
 
-			$result_time = $DB->query($sql_time);
-			$time_cham = $DB->fetch_assoc($result_time);
+						$result_time = $DB->query($sql_time);
+						$time_cham = $DB->fetch_assoc($result_time);
 
-			$avgtime = $time_cham['avgtime'];
+						$avgtime = $time_cham['avgtime'];
 
-			//AND glpi_tickets.solvedate IS NOT NULL
-			//count by status
-			$query_stat = "
+						//AND glpi_tickets.solvedate IS NOT NULL
+						//count by status
+						$query_stat = "
 			SELECT
 			SUM(case when glpi_tickets.status = 1 then 1 else 0 end) AS new,
 			SUM(case when glpi_tickets.status = 2 then 1 else 0 end) AS assig,
@@ -443,7 +443,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.solvedate is not null
-			AND glpi_tickets.solvedate ".$sel_date."
+			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
 
 			$result_sla_contrato = $DB->query($sql_sla_contratos);		
@@ -463,6 +463,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
 
@@ -480,7 +481,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 197
-					AND glpi_tickets.solvedate ".$sel_date."
+					AND glpi_tickets.date ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_dispensa = "
@@ -488,7 +489,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 191
-					AND glpi_tickets.solvedate ".$sel_date."
+					AND glpi_tickets.date ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_cotacao = "
@@ -496,7 +497,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 190
-					AND glpi_tickets.solvedate ".$sel_date."
+					AND glpi_tickets.date ".$sel_date."
 					".$entidade;
 
 				$sql_sla_contratos_dias_aditivo = "
@@ -504,7 +505,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					FROM glpi_tickets
 					WHERE glpi_tickets.is_deleted = 0
 					AND glpi_tickets.itilcategories_id = 189
-					AND glpi_tickets.solvedate ".$sel_date."
+					AND glpi_tickets.date ".$sel_date."
 					".$entidade;
 
 				$result_dias_distrato = $DB->query($sql_sla_contratos_dias_distrato);
@@ -516,7 +517,8 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				$dias_dispensa = (int) $DB->result($result_dias_dispensa, 0, 'dias');
 				$dias_cotacao = (int) $DB->result($result_dias_cotacao, 0, 'dias');
 				$dias_aditivo = (int) $DB->result($result_dias_aditivo, 0, 'dias');
-			    $result_grp = $DB->query($sql_grp);
+
+						$result_grp = $DB->query($sql_grp);
 
 						//logo						
 						if (file_exists('../../../../pics/logoverde.svg')) {
@@ -563,7 +565,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						foreach ($result_cham_contratos as $chamado) {
 
-							$query_dias_etapa1 = "SELECT DATEDIFF(
+							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -574,7 +576,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					END)
 				) dias";
 
-							$query_dias_etapa2 = "SELECT DATEDIFF(
+							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -594,23 +596,23 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						//Calculo para dispensa
 						$query_chamados_dispensa = "
-									SELECT * 
-									FROM glpi_tickets_status 
-									INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-									WHERE glpi_tickets.solvedate $sel_date
-									AND glpi_tickets.is_deleted = 0
-									AND glpi_tickets.itilcategories_id = 191
-									$entidade
-								";
+		SELECT * 
+		FROM glpi_tickets_status 
+		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 191
+		$entidade
+	";
 
-													$query_cont_dispensa = "
-									SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
-									INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-									WHERE glpi_tickets.solvedate $sel_date
-									AND glpi_tickets.is_deleted = 0
-									AND glpi_tickets.itilcategories_id = 191
-									$entidade
-								";
+						$query_cont_dispensa = "
+		SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
+		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 191
+		$entidade
+	";
 						$result_cham_dispensa_cont = $DB->query($query_cont_dispensa)->fetch_assoc();
 						$result_cham_dispensa_contratos = $DB->query($query_chamados_dispensa);
 
@@ -619,7 +621,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						foreach ($result_cham_dispensa_contratos as $chamado) {
 
-							$query_dias_etapa1 = "SELECT DATEDIFF(
+							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -630,7 +632,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					END)
 				) dias";
 
-							$query_dias_etapa2 = "SELECT DATEDIFF(
+							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -650,24 +652,24 @@ if ($sel_ent == '' || $sel_ent == -1) {
 
 						//Calculo para aditivo contrato
 						$query_chamados_aditivo = "
-							SELECT * 
-							FROM glpi_tickets 
-							WHERE glpi_tickets.date $sel_date
-							AND glpi_tickets.is_deleted = 0
-							AND glpi_tickets.itilcategories_id = 189
-							AND glpi_tickets.solvedate is not null
-							$entidade
-						";
+		SELECT * 
+		FROM glpi_tickets 
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.solvedate is not null
+		$entidade
+	";
 
-											$query_cont_aditivo = "
-							SELECT count(DISTINCT glpi_tickets.id) as total 
-							from glpi_tickets
-							WHERE glpi_tickets.date $sel_date
-							AND glpi_tickets.is_deleted = 0
-							AND glpi_tickets.itilcategories_id = 189
-							AND glpi_tickets.solvedate is not null
-							$entidade
-						";
+						$query_cont_aditivo = "
+		SELECT count(DISTINCT glpi_tickets.id) as total 
+		from glpi_tickets
+		WHERE glpi_tickets.date $sel_date
+		AND glpi_tickets.is_deleted = 0
+		AND glpi_tickets.itilcategories_id = 189
+		AND glpi_tickets.solvedate is not null
+		$entidade
+	";
 
 						$result_cham_aditivo_cont = $DB->query($query_cont_aditivo)->fetch_assoc();
 						$result_cham_aditivo_contratos = $DB->query($query_chamados_aditivo);
@@ -761,7 +763,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets_status.data_fim is not null
-		AND glpi_tickets.solvedate " . $sel_date . "			
+		AND glpi_tickets.date " . $sel_date . "			
 		" . $entidade . "";
 		
 		$result_stat_lead_time = $DB->query($query_stat_lead_time);
@@ -1056,7 +1058,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
+							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Incidentes </th>										
 							</tr>
 						</thead>
 						<tbody> 

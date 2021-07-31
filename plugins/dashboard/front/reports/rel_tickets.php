@@ -489,8 +489,7 @@ if($con == "1") {
 
 		if(in_array(0,$user_ents)) {
 			$id_ent = 0 ;
-			//print_r($ents);exit;
-			$entidade = "AND glpi_tickets.entities_id IN (".$ents.")";
+			$entidade = '';
 		}
 		else {			
 			$id_ent = implode(',',$_SESSION['glpiactiveentities']); 
@@ -520,7 +519,7 @@ if($con == "1") {
 	}
 	
 	elseif($id_sta1 == 6) {
-		$period = "AND glpi_tickets.solvedate ".$datas2." ";	
+		$period = "AND glpi_tickets.closedate ".$datas2." ";	
 	}	
 	
 	else {
@@ -530,7 +529,7 @@ if($con == "1") {
 	
 	$id_ident =  $_REQUEST['status'];
 	// Chamados
-	if($id_ident == 99)
+	if($id_ident =99)
 	{
 		$sql_cham =
 		"Select id, entities_id, name, date, closedate, solvedate, status, users_id_recipient, requesttypes_id, priority, itilcategories_id, type, time_to_resolve
@@ -740,7 +739,7 @@ if($consulta > 0) {
 					<tr>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('ID')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Status')." </th>
-						<!-- <th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th> -->
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Source')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Priority')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Category')." </th>
@@ -852,7 +851,7 @@ if($consulta > 0) {
 		<tr style='font-weight:normal;'>
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])."</td>
-			<!-- <td style='vertical-align:middle;'> ". $type ." </td> -->
+			<td style='vertical-align:middle;'> ". $type ." </td>
 			<td style='vertical-align:middle;'> ". $row_req['name'] ." </td>
 			<td style='vertical-align:middle;text-align:center;'> ". $pri ." </td>
 			<td style='vertical-align:middle; max-width:150px;'> ". $row_cat['name'] ." </td>		

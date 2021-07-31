@@ -475,6 +475,7 @@ $result_ent = $DB->query($sql_ent);
 		COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = 0
+	AND glpi_tickets.solvedate is null
 	AND glpi_tickets.date ".$sel_date."
 	".$entidade;
 
@@ -576,7 +577,7 @@ $result_ent = $DB->query($sql_ent);
 
 						foreach ($result_cham_contratos as $chamado) {
 
-							$query_dias_etapa1 = "SELECT DATEDIFF(
+							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -587,7 +588,7 @@ $result_ent = $DB->query($sql_ent);
 					END)
 				) dias";
 
-							$query_dias_etapa2 = "SELECT DATEDIFF(
+							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -632,7 +633,7 @@ $result_ent = $DB->query($sql_ent);
 
 						foreach ($result_cham_dispensa_contratos as $chamado) {
 
-							$query_dias_etapa1 = "SELECT DATEDIFF(
+							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -643,7 +644,7 @@ $result_ent = $DB->query($sql_ent);
 					END)
 				) dias";
 
-							$query_dias_etapa2 = "SELECT DATEDIFF(
+							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN NOW() 
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -1067,7 +1068,7 @@ $result_ent = $DB->query($sql_ent);
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
+							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Incidentes </th>										
 							</tr>
 						</thead>
 						<tbody> 

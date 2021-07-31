@@ -263,9 +263,6 @@ else {
 		    	$status = $status_all;
 		    }
 
-
-
-
 		// Chamados
 		$sql_cham =
 		"SELECT id, name AS descr, date, closedate, solvedate, status , actiontime AS act, itilcategories_id AS cat, TYPE, FROM_UNIXTIME( UNIX_TIMESTAMP( `glpi_tickets`.`solvedate` ) , '%Y-%m' ) AS date_unix, glpi_tickets.solve_delay_stat AS time_sec
@@ -429,7 +426,13 @@ else {
 				<td colspan='3' style='font-size: 16px; vertical-align:middle; width:200px;'><span style='color:#000;'>
 				".__('Period', 'dashboard') .": </span> " . conv_data($data_ini2) ." a ". conv_data($data_fin2)."
 				</td>
-				
+				<td style='vertical-align:middle; width: 190px;'>
+					<div class='progress' style='margin-top: 19px;'>
+						<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='width: ".$barra."%;'>
+		    				".$barra." % ".__('Closed', 'dashboard') ."
+		    			</div>
+					</div>
+				</td>
 			</tr>
 		</table>
 
@@ -446,7 +449,7 @@ else {
 		<table style='font-size: 16px; width: 100%;' border=0>
 			<tr>
 				<td style='font-weight:bold;'><span style='color: #000;'>". _x('status','New').": </span>".$new." </td>
-				<td style='font-weight:bold;'><span style='color: #000;'>". __('Processando (Atribuído)'). ": </span>". ($assig + $plan) ."</td>
+				<td style='font-weight:bold;'><span style='color: #000;'>". __('Assigned'). ": </span>". ($assig + $plan) ."</td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Pending').": </span>".$pend." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Solved','dashboard').": </span>".$solve." </td>
 				<td style='font-weight:bold;'><span style='color: #000;'>". __('Closed').": </span>".$close." </td>
@@ -494,7 +497,7 @@ else {
 				<tr>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Tickets', 'dashboard')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Status')." </th>
-					<!-- <th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Type')." </th> -->
+					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Type')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Title')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; max-width:120px;'> ".__('Requester')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Technician')." </th>
@@ -605,7 +608,7 @@ else {
 		<tr>
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle; font-size:10px;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])." </td>
-			<!-- <td style='vertical-align:middle;'> ". Ticket::getTicketTypeName($row['TYPE']) ." </td> -->
+			<td style='vertical-align:middle;'> ". Ticket::getTicketTypeName($row['TYPE']) ." </td>
 			<td style='vertical-align:middle;'> ". substr($row['descr'],0,55) ." </td>
 			<td style='vertical-align:middle;'> ". $row_user['name'] ." ". $row_user['sname'] ." </td>
 			<td style='vertical-align:middle;'> ". $row_tec['name'] ." ". $row_tec['sname'] ." </td>

@@ -731,10 +731,13 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 							<?php include("./inc/graflinhas_tec.inc.php"); ?>
 						</div>
 
-						<div id="graf2" class="col-md-12 col-sm-12">
+						<div id="graf2" class="col-md-6 col-sm-6">
 							<?php include("./inc/grafpie_stat_tec.inc.php");  ?>
 						</div>
 
+						<div id="graf_tipo" class="col-md-6 col-sm-6">
+							<?php include("./inc/grafpie_tipo_tec.inc.php");  ?>
+						</div>
 
 						<div id="graf4" class="col-md-12 col-sm-12" style="height: 450px; ">
 							<?php include("./inc/grafcat_tec.inc.php"); ?>
@@ -744,7 +747,9 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 							<?php include("./inc/grafbar_age_tecnico.inc.php");  ?>
 						</div>
 
-			
+						<div id="graf_prio" class="col-md-6 col-sm-6">
+							<?php include("./inc/grafpie_prio_tecnico.inc.php");  ?>
+						</div>
 
 						<div id="graf_time1" class="col-md-6 col-sm-6" style="height: 450px; margin-top:30px; margin-bottom:0px; margin-left: 0px;">
 							<?php include("./inc/grafpie_time_tecnico.inc.php"); ?>

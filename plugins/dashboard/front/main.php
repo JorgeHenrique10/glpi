@@ -376,8 +376,7 @@ $query_atraso_contrato =
 	inner join glpi_tickets_status on glpi_tickets_status.status_cod = glpi_tickets.status
 	WHERE glpi_tickets.status NOT IN (5,6) 
 	AND data_cons is null
-	AND glpi_tickets.is_deleted = 0
-	AND glpi_status_time.time != 0 
+	AND glpi_tickets.is_deleted = 0 
 	$entidade
 	group by glpi_tickets.id, glpi_status_time.time, glpi_tickets.status
 	order by id) as Tabela";
@@ -677,7 +676,7 @@ foreach ($sel_ent_contratos as $item) {
 				<div class="col-sm-6 col-md-6">
 					<div id="tickets_age" class="widget widget-table action-table striped card1">
 						<div class="widget-header wpurple">
-							<h3><i class="fa fa-pie-chart" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Idade dos Chamados Abertos', 'dashboard'); ?></h3>
+							<h3><i class="fa fa-pie-chart" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Ticket Solving Period', 'dashboard'); ?></h3>
 							<span class="fa fa-times hide-widget"></span>
 						</div>
 						<!-- /widget-header -->
@@ -692,7 +691,7 @@ foreach ($sel_ent_contratos as $item) {
 				<div class="col-sm-6 col-md-6">
 					<div id="tickets_time" class="widget widget-table action-table striped card1">
 						<div class="widget-header wpurple">
-							<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Tempo de Solução dos Chamados', 'dashboard'); ?></h3>
+							<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Open Tickets Age', 'dashboard'); ?></h3>
 							<span class="fa fa-times hide-widget"></span>
 						</div>
 						<!-- /widget-header -->

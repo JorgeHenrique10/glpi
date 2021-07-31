@@ -352,7 +352,7 @@ $month2iz = $month2iz ? $month2iz : 0;
 echo "<script type='text/javascript'>
 
 $(function () {
-        $('#graf9').highcharts({
+        $('#graf8').highcharts({
             chart: {
                 type: 'column',
 					 height: 330,
@@ -451,8 +451,7 @@ $(function () {
             series: [
             	{
                 name: 'Aditivo',
-                data: [
-                {y:$week, url:'reports/rel_data.php?con=1&stat=open&date1=".$dataf_s."&date2=".$datai_s."' }, 
+                data: [{ y:$week, url:'reports/rel_data.php?con=1&stat=open&date1=".$dataf_s."&date2=".$datai_s."' }, 
                 {y:$quinz, url:'reports/rel_data.php?con=1&stat=open&date1=".$dataf_q."&date2=".$datai_q."'}, 
                 {y:$month, url:'reports/rel_data.php?con=1&stat=open&date1=".$dataf_m."&date2=".$datai_m."'},
                 {y:$month1, url:'reports/rel_data.php?con=1&stat=open&date1=".$dataf_m1."&date2=".$datai_m1."'}, 

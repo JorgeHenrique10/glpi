@@ -352,7 +352,7 @@ else {
                         <li><a href="./reports/rel_tickets.php" target="iframe1" > <?php echo _sn('Ticket','Tickets',2); ?> </a></li>                                                						                                                                                                                       
                         <li><a href="./reports/rel_entidades.php?con=1" target="iframe1" > <?php echo _sn('Entity','Entities',2); ?> </a></li>                   
                         <li><a href="./reports/rel_satisfacao.php" target="iframe1" > <?php echo __('Satisfaction'); ?> </a></li>
-                        <li><a href="./reports/rel_tecnicos.php?con=1" target="iframe1" > <?php echo _sn('Technician','Technicians',2,'dashboard'); ?> </a></li>						
+                        <li><a href="./reports/rel_tecnicos_cont.php?con=1" target="iframe1" > <?php echo _sn('Technician','Technicians',2,'dashboard'); ?> </a></li>						
                        
 								<li class="dropdown-submenu">
 							   <a tabindex="-1" href="#"><?php echo __('Summary','dashboard'); ?></a>
@@ -389,7 +389,7 @@ else {
                         <li><a href="./reports/rel_data.php" target="iframe1" > <?php echo __('by Date','dashboard'); ?> </a></li> 
                         <li><a href="./reports/rel_entidade.php" target="iframe1" > <?php echo __('by Entity','dashboard'); ?> </a></li>
                         <li><a href="./reports/rel_usuario.php" target="iframe1" > <?php echo __('by Requester','dashboard'); ?> </a></li>
-                        <li><a href="./reports/rel_tecnico.php" target="iframe1" > <?php echo __('by Technician','dashboard'); ?> </a></li>                
+                        <li><a href="./reports/rel_tecnico_cont.php" target="iframe1" > <?php echo __('by Technician','dashboard'); ?> </a></li>                
                         </li>
 						       							
                       </ul>
