@@ -348,7 +348,7 @@ else {
                           <!-- <p><strong>Links Title</strong></p> -->
                         </li>
 
-                        <li><a href="./reports/rel_categorias.php?con=1" target="iframe1" > <?php echo __('Category'); ?> </a></li>
+                        <li><a href="./reports/rel_categorias_cont.php?con=1" target="iframe1" > <?php echo __('Category'); ?> </a></li>
                         <li><a href="./reports/rel_tickets.php" target="iframe1" > <?php echo _sn('Ticket','Tickets',2); ?> </a></li>                                                						                                                                                                                       
                         <li><a href="./reports/rel_entidades.php?con=1" target="iframe1" > <?php echo _sn('Entity','Entities',2); ?> </a></li>                   
                         <li><a href="./reports/rel_satisfacao.php" target="iframe1" > <?php echo __('Satisfaction'); ?> </a></li>

@@ -312,6 +312,7 @@ $sql_ano_ab =	"SELECT COUNT(glpi_tickets.id) as total
       LEFT JOIN glpi_entities ON glpi_tickets.entities_id = glpi_entities.id
       WHERE glpi_tickets.is_deleted = '0' 
       AND glpi_tickets.status <> 6
+	  AND glpi_tickets.status <> 5 
       AND DATE_FORMAT( glpi_tickets.date, '%Y' ) IN (" . $years . ") 
       " . $entidade . " ";
 

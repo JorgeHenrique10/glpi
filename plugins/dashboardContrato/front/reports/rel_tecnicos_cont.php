@@ -404,7 +404,7 @@ $abertos = $data_ab['total'];
 $sql_sol = "SELECT count( glpi_tickets.id ) AS total, glpi_tickets_users.users_id AS id
 FROM glpi_tickets_users, glpi_tickets, glpi_users". $glpi_groups ."
 WHERE glpi_tickets.id = glpi_tickets_users.tickets_id
-AND glpi_tickets.solvedate ".$datas2."
+AND glpi_tickets.date ".$datas2."
 AND glpi_tickets_users.users_id = ".$id_tec['id']."
 AND glpi_tickets.status = 5
 AND glpi_tickets_users.users_id = glpi_users.id
@@ -424,7 +424,7 @@ $solucionados = $data_sol['total'];
 $sql_clo = "SELECT count( glpi_tickets.id ) AS total, glpi_tickets_users.users_id AS id
 FROM glpi_tickets_users, glpi_tickets, glpi_users". $glpi_groups ."
 WHERE glpi_tickets.id = glpi_tickets_users.tickets_id
-AND glpi_tickets.closedate ".$datas2."
+AND glpi_tickets.solvedate ".$datas2."
 AND glpi_tickets_users.users_id = ".$id_tec['id']."
 AND glpi_tickets.status = 6
 AND glpi_tickets_users.users_id = glpi_users.id
@@ -443,6 +443,7 @@ $fechados = $data_clo['total'];
 $sql_clo_period = "SELECT count( glpi_tickets.id ) AS total, glpi_tickets_users.users_id AS id
 FROM glpi_tickets_users, glpi_tickets, glpi_users". $glpi_groups ."
 WHERE glpi_tickets.id = glpi_tickets_users.tickets_id
+AND glpi_tickets.solvedate ".$datas2."
 AND glpi_tickets.date ".$datas2."
 AND glpi_tickets_users.users_id = ".$id_tec['id']."
 AND glpi_tickets.status = 6

@@ -349,7 +349,7 @@ echo "
 				"SELECT count( glpi_tickets.id ) AS total
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate ".$datas2."
+				AND glpi_tickets.date ".$datas2."
 				AND glpi_tickets.status = 5
 				AND glpi_tickets.itilcategories_id = ".$row['id']."
 				".$entidade." ";
@@ -364,6 +364,7 @@ echo "
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
 				AND glpi_tickets.date ".$datas2."
+				AND glpi_tickets.solvedate ".$datas2."
 				AND glpi_tickets.status = 6
 				AND glpi_tickets.itilcategories_id = ".$row['id']."
 				".$entidade." ";
@@ -372,12 +373,12 @@ echo "
 				$data_fech = $DB->fetch_assoc($result_fech);
 				$fechados = $data_fech['total'];
 				
-				//chamados fechados
+				//chamados no periodo
 				$sql_fech_period = 
 				"SELECT count( glpi_tickets.id ) AS total
 				FROM glpi_tickets
 				WHERE glpi_tickets.is_deleted = 0
-				AND glpi_tickets.solvedate ".$datas2."
+				AND glpi_tickets.solvedate ".$datas2."				
 				AND glpi_tickets.status = 6
 				AND glpi_tickets.itilcategories_id = ".$row['id']."
 				".$entidade." ";

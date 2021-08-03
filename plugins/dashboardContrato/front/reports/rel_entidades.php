@@ -267,7 +267,7 @@ if(isset($_GET['con'])) {
 			AND glpi_entities.id = ".$id_ent['id']."
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.status = 5
-			AND glpi_tickets.solvedate ".$datas2." ";
+			AND glpi_tickets.date ".$datas2." ";
 			
 			$result_sol = $DB->query($sql_sol) or die ("erro_ab");
 			$data_sol = $DB->fetch_assoc($result_sol);
@@ -282,7 +282,7 @@ if(isset($_GET['con'])) {
 			AND glpi_entities.id = ".$id_ent['id']."
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.status = 6
-			AND glpi_tickets.closedate ".$datas2." ";
+			AND glpi_tickets.solvedate ".$datas2." ";
 			
 			$result_clo = $DB->query($sql_clo) or die ("erro_ab");
 			$data_clo = $DB->fetch_assoc($result_clo);
