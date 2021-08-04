@@ -293,12 +293,13 @@ else {
 			$sql_cham =
 			"SELECT glpi_tickets.id AS id, glpi_tickets.name AS name, glpi_tickets.date AS date, glpi_tickets.closedate as closedate,
 			glpi_tickets.type, glpi_tickets.status, FROM_UNIXTIME( UNIX_TIMESTAMP( `glpi_tickets`.`closedate` ) , '%Y-%m' ) AS date_unix, AVG( glpi_tickets.solve_delay_stat ) AS time,
-			glpi_tickets.solve_delay_stat AS time_sec
-			FROM glpi_tickets
+			glpi_tickets.solve_delay_stat AS time_sec, glpi_entities.name AS unidade
+			FROM glpi_tickets, glpi_entities
 			WHERE glpi_tickets.itilcategories_id IN (".$id_cat.")
 			AND glpi_tickets.is_deleted = 0
 			AND glpi_tickets.date ".$datas2."
 			AND glpi_tickets.status IN ".$status."
+			AND glpi_tickets.entities_id = glpi_entities.id
 			".$entidade."
 			GROUP BY id
 			ORDER BY id DESC ";
@@ -513,7 +514,8 @@ else {
 					<tr>
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Tickets', 'dashboard')." </th>
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Status')." </th>
-						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Title')." </th>
+						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Unidade')." </th>
+						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Objeto')." </th>
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Requester')." </th>
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Technician')." </th>
 						<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; vertical-align:middle;'> ".__('Opened','dashboard')."</th>
@@ -558,11 +560,16 @@ else {
 			$result_tec = $DB->query($sql_tec);
 			$row_tec = $DB->fetch_assoc($result_tec);
 
+			$array = ['SETOR CONTRATOS CONTRATOS > DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS > ADITIVO', 'SETOR CONTRATOS CONTRATOS > DISTRATOS','SETOR CONTRATOS CONTRATOS > COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; ADITIVO', 'SETOR CONTRATOS CONTRATOS &gt; DISTRATOS','SETOR CONTRATOS CONTRATOS &gt; COTAÇÃO'];
+
+			$objeto = str_replace($array, "", $row['name']);
+
 			echo "
 			<tr style='font-size:11px;'>
 				<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 				<td style='vertical-align:middle;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])."  </td>
-				<td style='vertical-align:middle;'> ". substr($row['name'],0,55) ." </td>
+				<td style='vertical-align:middle;'> ". $row['unidade'] ." </td>
+				<td style='vertical-align:middle;'> ". $objeto ." </td>
 				<td style='vertical-align:middle;'> ". $row_user['name'] ." ".$row_user['sname'] ." </td>
 				<td style='vertical-align:middle;'> ". $row_tec['name'] ." ".$row_tec['sname'] ." </td>
 				<td style='vertical-align:middle; text-align:center;'> ". conv_data_hora($row['date']) ." </td>

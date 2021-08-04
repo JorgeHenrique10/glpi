@@ -495,7 +495,8 @@ else {
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Tickets', 'dashboard')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Status')." </th>
 					<!-- <th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Type')." </th> -->
-					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Title')." </th>
+					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Unidade')." </th>
+					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Objeto')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; max-width:120px;'> ".__('Requester')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Technician')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer; max-width:120px;'> ".__('Category')." </th>
@@ -535,11 +536,12 @@ else {
 		    if($status1 == "23" ) { $status1 = "atribuido";}
 
 		//requerente
-		      $sql_user = "SELECT glpi_tickets.id AS id, glpi_users.firstname AS name, glpi_users.realname AS sname
-				FROM `glpi_tickets_users` , glpi_tickets, glpi_users
+		      $sql_user = "SELECT glpi_tickets.id AS id, glpi_users.firstname AS name, glpi_users.realname AS sname, glpi_entities.name AS unidade
+				FROM `glpi_tickets_users` , glpi_tickets, glpi_users, glpi_entities
 				WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 				AND glpi_tickets.id = ". $row['id'] ."
 				AND glpi_tickets_users.`users_id` = glpi_users.id
+				AND glpi_tickets.entities_id = glpi_entities.id
 				AND glpi_tickets_users.type = 1 ";
 
 				$result_user = $DB->query($sql_user);
@@ -601,12 +603,17 @@ else {
 			$row_item = $DB->fetch_assoc($result_ass);
 		}
 
+		$array = ['SETOR CONTRATOS CONTRATOS > DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS > ADITIVO', 'SETOR CONTRATOS CONTRATOS > DISTRATOS','SETOR CONTRATOS CONTRATOS > COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; ADITIVO', 'SETOR CONTRATOS CONTRATOS &gt; DISTRATOS','SETOR CONTRATOS CONTRATOS &gt; COTAÇÃO'];
+
+		$objeto = str_replace($array, "", $row['descr']);
+
 		echo "
 		<tr>
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle; font-size:10px;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])." </td>
 			<!-- <td style='vertical-align:middle;'> ". Ticket::getTicketTypeName($row['TYPE']) ." </td> -->
-			<td style='vertical-align:middle;'> ". substr($row['descr'],0,55) ." </td>
+			<td style='vertical-align:middle;'> ". $row_user['unidade'] ." </td>
+			<td style='vertical-align:middle;'> ". $objeto ." </td>
 			<td style='vertical-align:middle;'> ". $row_user['name'] ." ". $row_user['sname'] ." </td>
 			<td style='vertical-align:middle;'> ". $row_tec['name'] ." ". $row_tec['sname'] ." </td>
 			<td style='vertical-align:middle;'> ". $row_cat['completename'] ." </td>

@@ -743,8 +743,9 @@ if($consulta > 0) {
 						<!-- <th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Type')." </th> -->
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Source')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Priority')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Unidade')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Category')." </th>
-						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Title')." </th>
+						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Objeto')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Content')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Requester')." </th>
 						<th style='font-size: 12px; text-align: center; cursor:pointer;'> ".__('Technician')." </th>			
@@ -796,17 +797,24 @@ if($consulta > 0) {
 		if($prio == "6" ) { $pri = _x('priority', 'Major');} 
 		
 		//requerente	
-		$sql_user = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS title, glpi_tickets.content AS content, glpi_users.firstname AS name, glpi_users.realname AS sname
-		FROM `glpi_tickets_users` , glpi_tickets, glpi_users
+		$sql_user = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS title, glpi_tickets.content AS content, glpi_users.firstname AS name, glpi_users.realname AS sname, glpi_entities.name AS unidade
+		FROM `glpi_tickets_users` , glpi_tickets, glpi_users, glpi_entities
 		WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 		AND glpi_tickets.id = ". $row['id'] ."
 		AND glpi_tickets_users.`users_id` = glpi_users.id
-		AND glpi_tickets_users.type = 1 ";
-	
+		AND glpi_tickets_users.type = 1 
+		AND glpi_tickets.entities_id = glpi_entities.id
+		";
+		
 		$result_user = $DB->query($sql_user);
 				
 		$row_user = $DB->fetch_assoc($result_user);
-					
+		
+		$array = ['SETOR CONTRATOS CONTRATOS > DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS > ADITIVO', 'SETOR CONTRATOS CONTRATOS > DISTRATOS','SETOR CONTRATOS CONTRATOS > COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; ADITIVO', 'SETOR CONTRATOS CONTRATOS &gt; DISTRATOS','SETOR CONTRATOS CONTRATOS &gt; COTAÇÃO'];
+
+		$objeto = str_replace($array, "", $row_user['title']);
+
+
 		//tecnico	
 		$sql_tec = "SELECT glpi_tickets.id AS id, glpi_users.firstname AS name, glpi_users.realname AS sname
 		FROM `glpi_tickets_users` , glpi_tickets, glpi_users
@@ -846,7 +854,7 @@ if($consulta > 0) {
 				
 		$result_due = $DB->query($sql_due);
 		$row_due = $DB->fetch_assoc($result_due);
-	
+		
 			
 	echo "	
 		<tr style='font-weight:normal;'>
@@ -855,8 +863,9 @@ if($consulta > 0) {
 			<!-- <td style='vertical-align:middle;'> ". $type ." </td> -->
 			<td style='vertical-align:middle;'> ". $row_req['name'] ." </td>
 			<td style='vertical-align:middle;text-align:center;'> ". $pri ." </td>
+			<td style='vertical-align:middle;'> ". $row_user['unidade'] ." </td>
 			<td style='vertical-align:middle; max-width:150px;'> ". $row_cat['name'] ." </td>		
-			<td style='vertical-align:middle;'> ". substr($row_user['title'],0,55) ." </td>
+			<td style='vertical-align:middle;'> ". $objeto ." </td>
 			<td style='vertical-align:middle; max-width:550px;'> ". html_entity_decode($row_user['content']) ." </td>
 			<td style='vertical-align:middle;'> ". $row_user['name'] ." ".$row_user['sname'] ." </td>
 			<td style='vertical-align:middle;'> ". $row_tec['name'] ." ".$row_tec['sname'] ." </td>

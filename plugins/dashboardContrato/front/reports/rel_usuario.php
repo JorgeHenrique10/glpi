@@ -580,7 +580,7 @@ if($con == "1") {
 				<th style='text-align:center; cursor:pointer;'> ". __('Tickets','dashboard') ." </th>
 				<th style='text-align:center; cursor:pointer;'> ".__('Status')." </th>
 				<th style='text-align:center; cursor:pointer;'> ". __('Type') ."</th>
-				<th style='text-align:center; cursor:pointer;'> ". __('Title') ."</th>
+				<th style='text-align:center; cursor:pointer;'> ". __('Objeto') ."</th>
 				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Requester') ."</th>
 				<th style='text-align:center; cursor:pointer;'> ". __('Opened','dashboard') ."</th>
 				<th style='text-align:center; cursor:pointer;'> ". __('Closed','dashboard') ."</th>
@@ -657,7 +657,7 @@ if($con == "1") {
 				<th style='text-align:center; cursor:pointer; vertical-align:middle; font-weight:bold;'> ". __('Tickets','dashboard') ." </th>
 				<th style='text-align:center; cursor:pointer; font-size: 12px; vertical-align:middle;'> ".__('Status')." </th>
 				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Type') ."</th>
-				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Title') ."</th>
+				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Objeto') ."</th>
 				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Requester') ."</th>
 				<th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Opened' ,'dashboard') ."</th>
 			   <th style='text-align:center; cursor:pointer; vertical-align:middle;'> ". __('Closed','dashboard') ."</th>
@@ -685,8 +685,8 @@ while($row = $DB->fetch_assoc($result_cham)){
 	$type = ($row['categoria']);
 	
 	//requerente	
-	$sql_user = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_users.firstname AS name, glpi_users.realname AS sname
-	FROM `glpi_tickets_users` , glpi_tickets, glpi_users
+	$sql_user = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_users.firstname AS name, glpi_users.realname AS sname, glpi_entities.name AS unidade
+	FROM `glpi_tickets_users` , glpi_tickets, glpi_users, glpi_entities
 	WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 	AND glpi_tickets.id = ". $row['id'] ."
 	AND glpi_tickets_users.`users_id` = glpi_users.id
@@ -694,6 +694,10 @@ while($row = $DB->fetch_assoc($result_cham)){
 	
 	$result_user = $DB->query($sql_user);			
 	$row_user = $DB->fetch_assoc($result_user);
+
+	$array = ['SETOR CONTRATOS CONTRATOS > DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS > ADITIVO', 'SETOR CONTRATOS CONTRATOS > DISTRATOS','SETOR CONTRATOS CONTRATOS > COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; ADITIVO', 'SETOR CONTRATOS CONTRATOS &gt; DISTRATOS','SETOR CONTRATOS CONTRATOS &gt; COTAÇÃO'];
+
+	$objeto = str_replace($array, "", $row['name']);
 	
 
 	if($satisfacao != '' || $satisfacao > 0) {
@@ -713,7 +717,7 @@ while($row = $DB->fetch_assoc($result_cham)){
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle; font-weight:normal;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])." </td>
 			<td style='vertical-align:middle; font-weight:normal;'> ". $type ." </td>
-			<td style='vertical-align:middle; font-weight:normal;'> ". substr($row['name'],0,70) ." </td>
+			<td style='vertical-align:middle; font-weight:normal;'> ". $objeto ." </td>
 			<td style='vertical-align:middle; font-weight:normal;'> ". $row_user['name'] ." ".$row_user['sname'] ." </td>
 			<td style='vertical-align:middle; font-weight:normal; text-align:center;'> ". conv_data_hora($row['date']) ." </td>
 			<td style='vertical-align:middle; font-weight:normal; text-align:center;'> ". conv_data_hora($row['closedate']) ." </td>
@@ -732,7 +736,7 @@ while($row = $DB->fetch_assoc($result_cham)){
 			<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 			<td style='vertical-align:middle; font-weight:normal;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])." </td>
 			<td style='vertical-align:middle; font-weight:normal;'> ". $type ." </td>
-			<td style='vertical-align:middle; font-weight:normal;'> ". substr($row['name'],0,70) ." </td>
+			<td style='vertical-align:middle; font-weight:normal;'> ". $objeto ." </td>
 			<td style='vertical-align:middle; font-weight:normal;'> ". $row_user['name'] ." ".$row_user['sname'] ." </td>
 			<td style='vertical-align:middle; font-weight:normal; text-align:center;'> ". conv_data_hora($row['date']) ." </td>
 			<td style='vertical-align:middle; font-weight:normal; text-align:center;'> ". conv_data_hora($row['closedate']) ." </td>

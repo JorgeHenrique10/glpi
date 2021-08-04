@@ -291,11 +291,12 @@ else {
 
 
 		// Chamados
-		$sql_cham = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_tickets.date AS date, glpi_tickets.solvedate AS solvedate, glpi_tickets.status AS status
-		FROM glpi_tickets
+		$sql_cham = "SELECT glpi_tickets.id AS id, glpi_tickets.name AS descr, glpi_tickets.date AS date, glpi_tickets.solvedate AS solvedate, glpi_tickets.status AS status, glpi_entities.name AS unidade
+		FROM glpi_tickets, glpi_entities
 		WHERE glpi_tickets.date ".$sel_date."
 		AND glpi_tickets.is_deleted = 0
 		AND glpi_tickets.status IN ".$status_all_not_close."
+		AND glpi_tickets.entities_id = glpi_entities.id
 		".$entidade."
 		ORDER BY id DESC ";
 
@@ -475,7 +476,8 @@ $total_cham2=$total_cham-$close;
 				<tr>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Tickets','dashboard')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Status')." </th>
-					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Title')." </th>
+					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Unidade')." </th>
+					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Objeto')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Requester')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Technician')." </th>
 					<th style='font-size: 12px; font-weight:bold; text-align: center; cursor:pointer;'> ".__('Opened','dashboard')."</th>
@@ -538,11 +540,16 @@ $total_cham2=$total_cham-$close;
 			$result_tec = $DB->query($sql_tec);
 			$row_tec = $DB->fetch_assoc($result_tec);
 
+			$array = ['SETOR CONTRATOS CONTRATOS > DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS > ADITIVO', 'SETOR CONTRATOS CONTRATOS > DISTRATOS','SETOR CONTRATOS CONTRATOS > COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; DISPENSA DE COTAÇÃO','SETOR CONTRATOS CONTRATOS &gt; ADITIVO', 'SETOR CONTRATOS CONTRATOS &gt; DISTRATOS','SETOR CONTRATOS CONTRATOS &gt; COTAÇÃO'];
+
+			$objeto = str_replace($array, "", $row['descr']);
+
 			echo "
 			<tr style='font-weight:normal;'>
 				<td style='vertical-align:middle; text-align:center; font-weight:bold;'><a href=".$CFG_GLPI['url_base']."/front/ticket.form.php?id=". $row['id'] ." target=_blank >" . $row['id'] . "</a></td>
 				<td style='vertical-align:middle;'><img src=".$CFG_GLPI['url_base']."/pics/".$status1.".png title='".Ticket::getStatus($row['status'])."' style=' cursor: pointer; cursor: hand;'/>&nbsp; ".Ticket::getStatus($row['status'])."  </td>
-				<td style='vertical-align:middle;'> ". substr($row['descr'],0,55) ." </td>
+				<td style='vertical-align:middle;'> ". $row['unidade'] ." </td>
+				<td style='vertical-align:middle;'> ". $objeto ." </td>
 				<td style='vertical-align:middle;'> ". $row_user['name'] ." ".$row_user['sname'] ." </td>
 				<td style='vertical-align:middle;'> ". $row_tec['name'] ." ".$row_tec['sname'] ." </td>
 				<td style='vertical-align:middle; text-align:center;'> ". conv_data_hora($row['date']) ." </td>
