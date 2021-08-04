@@ -1,231 +1,170 @@
-
 <?php
 
-//chamados mensais
+$status = "(5,6)";
 
-$querym = "
-SELECT DISTINCT   DATE_FORMAT(date, '%b-%y') as month_l,  COUNT(id) as nb, DATE_FORMAT(date, '%y-%m') as month
+$query1 = "
+SELECT COUNT(glpi_tickets.id) as tick
 FROM glpi_tickets
-WHERE glpi_tickets.is_deleted = '0'
-".$entidade."
-GROUP BY month
-ORDER BY month
- ";
-
-$resultm = $DB->query($querym) or die('erro');
-
-$arr_grfm = array();
-while ($row_result = $DB->fetch_assoc($resultm))
-	{
-		$v_row_result = $row_result['month_l'];
-		$arr_grfm[$v_row_result] = $row_result['nb'];
-	}
-
-$grfm = array_keys($arr_grfm) ;
-$quantm = array_values($arr_grfm) ;
-
-$grfm3 = json_encode($grfm);
-$quantm2 = implode(',',$quantm);
-
-$opened = array_sum($quantm);
-
-//array to compare months
-$DB->data_seek($resultm, 0);
-
-$arr_month = array();
-while ($row_result = $DB->fetch_assoc($resultm))
-	{
-		$v_row_result = $row_result['month_l'];
-		$arr_month[$v_row_result] = 0;
-	}
+WHERE glpi_tickets.is_deleted = 0 
+AND glpi_tickets.itilcategories_id = 189
+" . $entidade . "";
 
 
-// incidents
-$arr_grfa = array();
+$result1 = $DB->query($query1) or die('erro');
+$aditivo = $DB->fetch_assoc($result1);
 
-$DB->data_seek($resultm, 0);
-while ($row_result = $DB->fetch_assoc($resultm))
-{
-
-	$querya2 = "
-	SELECT DISTINCT DATE_FORMAT( date, '%b-%y' ) AS month_l, DATE_FORMAT( date, '%y-%m' ) AS month, count(id) AS nb
-	FROM glpi_tickets
-	WHERE is_deleted = 0
-	AND type = 1
-	AND DATE_FORMAT( date, '%b-%y' ) = '".$row_result['month_l']."'
-	".$entidade."
-	GROUP BY month
-	ORDER BY month";
-
-	$resulta2 = $DB->query($querya2) or die('erronb');
-	$row_result2 = $DB->fetch_assoc($resulta2);
-
-		$v_row_result = $row_result['month_l'];
-		if($row_result2['nb'] != '') {
-			$arr_grfa[$v_row_result] = $row_result2['nb'];
-		}
-		else {
-			$arr_grfa[$v_row_result] = 0;
-		}
-
-}
-
-$arr_open = array_merge($arr_month, $arr_grfa);
-
-$grfa = array_keys($arr_open) ;
-$quanta = array_values($arr_open) ;
-
-$grfa3 = json_encode($grfa);
-$quanta2 = implode(',',$quanta);
+$query2 = "
+SELECT COUNT(glpi_tickets.id) as tick
+FROM glpi_tickets
+WHERE glpi_tickets.is_deleted = 0 
+AND glpi_tickets.itilcategories_id = 190
+" . $entidade . "";
 
 
-// requests
-$arr_grfs = array();
 
-$DB->data_seek($resultm, 0);
-while ($row_result = $DB->fetch_assoc($resultm))
-{
-
-	$querys2 = "
-	SELECT DISTINCT DATE_FORMAT( date, '%b-%y' ) AS month_l, DATE_FORMAT( date, '%y-%m' ) AS month, count(id) AS nb
-	FROM glpi_tickets
-	WHERE is_deleted = 0
-	AND type = 2
-	AND DATE_FORMAT( date, '%b-%y' ) = '".$row_result['month_l']."'
-	".$entidade."
-	GROUP BY month
-	ORDER BY month";
-
-	$results2 = $DB->query($querys2) or die('erronb');
-	$row_result2 = $DB->fetch_assoc($results2);
-
-		$v_row_result = $row_result['month_l'];
-		if($row_result2['nb'] != '') {
-			$arr_grfs[$v_row_result] = $row_result2['nb'];
-		}
-		else {
-			$arr_grfs[$v_row_result] = 0;
-		}
-}
-
-$grfs = array_keys($arr_grfs) ;
-$quants = array_values($arr_grfs) ;
-
-$grfs3 = json_encode($grfs);
-$quants2 = implode(',',$quants);
+$result2 = $DB->query($query2) or die('erro');
+$cotacao = $DB->fetch_assoc($result2);
 
 
-// problems
-$arr_grfp = array();
+$query3 = "
+SELECT COUNT(glpi_tickets.id) as tick
+FROM glpi_tickets
+WHERE glpi_tickets.is_deleted = 0 
+AND glpi_tickets.itilcategories_id = 191
+" . $entidade . "";
 
-$DB->data_seek($resultm, 0);
-while ($row_result = $DB->fetch_assoc($resultm))
-{
 
-	$queryp = "
-	SELECT DISTINCT DATE_FORMAT(date, '%b-%y') as month_l, DATE_FORMAT(date, '%y-%m') as month, COUNT(id) as nb
-	FROM glpi_problems
-	WHERE glpi_problems.is_deleted = '0'
-	AND DATE_FORMAT( date, '%b-%y' ) = '".$row_result['month_l']."'
-	".$problem."
-	GROUP BY month
-	ORDER BY month ";
 
-	$resultp = $DB->query($queryp) or die('errof');
+$result3 = $DB->query($query3) or die('erro');
+$dispensa = $DB->fetch_assoc($result3);
 
-	$row_resultp = $DB->fetch_assoc($resultp);
 
-	$v_row_result = $row_result['month_l'];
-	if($row_resultp['nb'] != '') {
-		$arr_grfp[$v_row_result] = $row_resultp['nb'];
-	}
-	else {
-		$arr_grfp[$v_row_result] = 0;
-	}
-}
+$query4 = "
+SELECT COUNT(glpi_tickets.id) as tick
+FROM glpi_tickets
+WHERE glpi_tickets.is_deleted = 0 
+AND glpi_tickets.itilcategories_id = 197
+" . $entidade . "";
 
-$grfp = array_keys($arr_grfp) ;
-$quantp = array_values($arr_grfp) ;
 
-$grfp3 = json_encode($grfp);
-$quantp2 = implode(',',$quantp);
+
+$result4 = $DB->query($query4) or die('erro');
+$distrato = $DB->fetch_assoc($result4);
+
+
+
+//echo "teste <br>";
+
 
 echo "
 <script type='text/javascript'>
-$(function () {
+
+$(function () {     
+                
+        // Build the chart
         $('#graf_tipo').highcharts({
             chart: {
-                type: 'column'
+                type: 'column',
+                height: 450,
+                plotBorderColor: '#ffffff',
+                plotBorderWidth: 0
             },
-            title: {
-                text: '".__('Tickets','dashboard')." ".__('by Type','dashboard')."'
+            title: {                
+                text: 'Chamados por Status'                
             },
-            xAxis: {
-                categories: $grfp3
+             legend: {     
+                   layout: 'horizontal',
+                align: 'left',
+                x: 5555555555555555,
+                y: -15,
+                verticalAlign: 'top',
+                floating: true,
+               adjustChartSize: true,
+                borderWidth: 0             
             },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: '".__('Tickets','dashboard')."'
-                },
-                stackLabels: {
-                    enabled: true,
-                    style: {
-                        //fontWeight: 'bold',
-                        //color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                    }
-                }
+            xAxis :{
+            categories: ['Aditivo', 'Cotação', 'Dispensa', 'Distrato'],
             },
-     			legend: {
-                layout: 'horizontal',
-                align: 'center',
-                verticalAlign: 'bottom',
-                x: 0,
-                y: 0,
-                //floating: true,
-                borderWidth: 0,
-                //backgroundColor: '#FFFFFF',
-                adjustChartSize: true
+            credits: {
+                enabled: false
             },
-        /*    tooltip: {
-                formatter: function() {
-                    return '<b>'+ this.x +'</b><br/>'+
-                        this.series.name +': '+ this.y +'<br/>'+
-                        'Total: '+ this.point.stackTotal;
-                }
-            },*/
             tooltip: {
-                pointFormat: '<span style=\"color:{series.color}\">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
-                shared: true
+                pointFormat: '{series.name}: <b>{point.y} </b>'
             },
+            yAxis:{
+            min: 0,
+            title:{
+                text: '', 
+                align: 'middle'
+            },
+            labels: {
+                overflow: 'justify'
+            },
+            stackLabels: {
+            enabled: true,
+            y:-15,
+            }
+                    },
             plotOptions: {
-                column: {
-                    stacking: 'normal',
-                    dataLabels: {
-                        enabled: false,
-                        x:0,
-                        y:0,
-                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-                        style: {
-                            textShadow: '0 0 3px black, 0 0 3px black'
-                        }
-                    }
-                }
+                series: {
+                    cursor: '',
+                        colorByPoint: true, 
+                    point: {
+                           events: {
+                               click: function () {
+                                   window.open(this.options.url);
+                                   //location.href = this.options.url;
+                               }
+                           }
+                       }
+                   }
+                  
             },
             series: [{
-                name: '".__('Incident')."',
-                data: [$quanta2]
-            }, {
-                name: '".__('Request')."',
-                data: [$quants2]
-            }, {
-                name: '".__('Problem')."',
-                data: [$quantp2]
+                            name: '" . __('Tickets', 'dashboard') . "',
+                data: [
+                    {
+                        name: 'Aditivo',
+                        y: " . $aditivo['tick'] . ",   
+                        selected: false,
+                        
+                    },
+                    {
+                        name: 'Cotação',
+                        y: " . $cotacao['tick'] . ",   
+                        selected: false,
+                        
+                    },
+                    {
+                        name: 'Dispensa',
+                        y: " . $dispensa['tick'] . ",   
+                        selected: false,
+                        
+                    },
+                    {
+                        name: 'Distrato',
+                        y: " . $distrato['tick'] . ",   
+                        selected: false,
+                        
+                    }
+
+                    ";
+
+echo " ],
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        fontSize: '10px',
+                        fontFamily: 'Roboto, sans-serif'
+                    }
+                }
+            
+            
             }]
         });
     });
 
-  </script>
-";
+        </script>";
 
-		?>
+	
+?>

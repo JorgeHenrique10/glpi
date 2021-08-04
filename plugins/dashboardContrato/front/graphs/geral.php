@@ -107,11 +107,11 @@ $total_mes = $DB->fetch_assoc($result);
 				<?php include ("./inc/graflinhas_sat_geral.inc.php"); ?>
 			</div>
 			
-			<div id="graf2" class="col-md-6 col-sm-6" style="margin-top:45px;" >
+			<div id="graf2" class="col-md-12 col-sm-12" style="margin-top:45px;" >
 			 <?php include ("./inc/grafpie_stat_geral.inc.php"); ?>
 			</div>
 			
-			<div id="graf4" class="col-md-6 col-sm-6" style="margin-top:45px;">
+			<div id="graf999" class="col-md-6 col-sm-6" style="margin-top:45px;">
 			 <?php include ("./inc/grafpie_origem.inc.php");  ?>
 			</div>
 			

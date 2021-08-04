@@ -667,8 +667,6 @@ foreach ($sel_ent_contratos as $item) {
 						<!-- /widget-header -->
 						<div id="graf7">
 							<?php
-							echo "teste";
-
 							include("graphs/inc/index/grafcol_setedias.inc.php");
 							?>
 						</div>

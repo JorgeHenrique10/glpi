@@ -62,12 +62,12 @@ array_push($quant2,$more8);
 $conta_q = count($quant2)-1;
 
 $query_new = "
-Select count(IF( days < 20, chamados, null )  ) AS menor20, count(IF( days >= 20 && days < 41, chamados, null )  ) AS maiorigual20 , count(IF( days >= 41, chamados, null )  ) AS maiorigual41,categoria
+Select sum(IF( days < 20, chamados, 0 )  ) AS menor20, sum(IF( days >= 20 && days < 41, chamados, 0 )  ) AS maiorigual20 , sum(IF( days >= 41, chamados, 0 )  ) AS maiorigual41,categoria
 from 
 (SELECT count( glpi_tickets.id ) AS chamados , DATEDIFF( solvedate, date ) AS days, itilcategories_id as categoria
-FROM glpi_tickets, glpi_tickets_users
+FROM glpi_tickets
+inner join glpi_tickets_users on glpi_tickets_users.tickets_id = glpi_tickets.id AND glpi_tickets_users.type = 2 
 WHERE solvedate IS NOT NULL AND is_deleted = 0
-AND glpi_tickets_users.type = 2
 AND glpi_tickets_users.users_id = ".$id_tec."
 AND glpi_tickets.itilcategories_id IN (189,190,191,197) 
 AND glpi_tickets.date ".$datas."  
@@ -79,6 +79,18 @@ group by categoria";
 
 $result_new = $DB->query($query_new) or die('erro');
 $array_days = [];
+$array_days[189]['menor20'] = 0;
+$array_days[189]['maiorigual20'] = 0;
+$array_days[189]['maiorigual41'] = 0;
+$array_days[190]['menor20'] = 0;
+$array_days[190]['maiorigual20'] = 0;
+$array_days[190]['maiorigual41'] = 0;
+$array_days[191]['menor20'] = 0;
+$array_days[191]['maiorigual20'] = 0;
+$array_days[191]['maiorigual41'] = 0;
+$array_days[197]['menor20'] = 0;
+$array_days[197]['maiorigual20'] = 0;
+$array_days[197]['maiorigual41'] = 0;
 
 while ($row_result_new = $DB->fetch_assoc($result_new)) 
 {

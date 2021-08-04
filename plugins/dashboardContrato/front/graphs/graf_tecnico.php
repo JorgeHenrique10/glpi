@@ -704,7 +704,6 @@ AND glpi_tickets_users.tickets_id = glpi_tickets.id ";
 								odometer3.innerHTML = <?php echo $solve; ?>;
 								odometer4.innerHTML = <?php echo $close; ?>;
 								if (<?php echo ($exibir ? 1 : 0) ?>) {
-									console.log("entrou")
 									odometer5.innerHTML = <?php echo $validacao_tr; ?>;
 									odometer6.innerHTML = <?php echo $publicacao; ?>;
 									odometer7.innerHTML = <?php echo $parecer_habilitacao; ?>;

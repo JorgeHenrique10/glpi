@@ -1,136 +1,234 @@
-
 <?php
 
-if($data_ini == $data_fin) {
-	$datas = "LIKE '".$data_ini."%'";	
-}	
+$querydays = "
+SELECT count(glpi_tickets.id) AS chamados , DATEDIFF( glpi_tickets.solvedate, glpi_tickets.date ) AS days
+FROM glpi_tickets, glpi_tickets_users
+WHERE glpi_tickets.solvedate IS NOT NULL
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.id = glpi_tickets_users.tickets_id
+GROUP BY days ";
+		
+$resultdays = $DB->query($querydays) or die('erro');
 
-else {
-	$datas = "BETWEEN '".$data_ini." 00:00:00' AND '".$data_fin." 23:59:59'";	
+$arr_keys = array();
+$arr_days = array();
+
+while ($row_result = $DB->fetch_assoc($resultdays)) { 
+	$v_row_result = $row_result['days'];
+	$arr_days[$v_row_result] = 0;						
 }
 
-//problems
-$query_p = "
-SELECT COUNT(id) AS total
-FROM glpi_problems
-WHERE glpi_problems.is_deleted = 0     
-AND glpi_problems.date ".$datas."
-AND glpi_problems.entities_id = ".$id_ent." 
- ";		
- 
-$result_p = $DB->query($query_p) or die('erro');
-$problems = $DB->fetch_assoc($result_p);
+$conta = count($arr_days);
 
-//tickets by type
+if( $conta < 9) {
+	for($i=$conta; $i < 9; $i++) {		
+		$arr_days[$i] = 0;			
+	}	
+}	
+
+
 $query2 = "
-SELECT COUNT(glpi_tickets.id) as tick, glpi_tickets.type AS tipo
-FROM glpi_tickets
-WHERE glpi_tickets.is_deleted = 0     
+SELECT count(glpi_tickets.id) AS chamados , DATEDIFF( glpi_tickets.solvedate, glpi_tickets.date ) AS days
+FROM glpi_tickets, glpi_tickets_users
+WHERE glpi_tickets.solvedate IS NOT NULL
+AND glpi_tickets.is_deleted = 0
+AND glpi_tickets.id = glpi_tickets_users.tickets_id
 AND glpi_tickets.date ".$datas."
-AND glpi_tickets.entities_id = ".$id_ent." 
-GROUP BY glpi_tickets.type
-ORDER BY type  ASC ";
+AND glpi_tickets.entities_id = ".$id_ent."
+GROUP BY days ";
 		
 $result2 = $DB->query($query2) or die('erro');
 
-$arr_grft2 = array();
-while ($row_result = $DB->fetch_assoc($result2))		
-{ 
-	$v_row_result = $row_result['tipo'];
-	$arr_grft2[$v_row_result] = $row_result['tick'];			
-} 
-	
-$grft2 = array_keys($arr_grft2);
-$quantt2 = array_values($arr_grft2);
-$conta = count($arr_grft2);
-
-if($conta == 1) {
-
-	if($grft2[0] == 1) {		
-		$grft2[0] = __('Incident'); 
-	}
-		
-	if($grft2[0] == 2) {		
-		$grft2[0] = __('Request'); 
-	}	
-	if($problems['total'] != 0) {	
-		$grft2[1] = __('Problem'); 
-		$quantt2[1] = $problems['total'];
-	}	
+while ($row_result = $DB->fetch_assoc($result2)){ 	
+	$v_row_result = $row_result['days'];
+	$arr_keys[$v_row_result] = $row_result['chamados'];			
 }
 
-
-if($conta > 1) {
-	$grft2[0] = __('Incident'); 
-	$grft2[1] = __('Request');
+$arr_tick = array_merge($arr_keys,$arr_days);
 	
-//	if($problems['total'] != 0) {	
-		$grft2[2] = __('Problem'); 
-		$quantt2[2] = $problems['total']; 		
-//	}	
+$days = array_keys($arr_tick);
+$keys = array_keys($arr_tick);
+
+$arr_more8 = array_slice($arr_keys,8);
+$more8 = array_sum($arr_more8);
+
+$quant2 = array_values($arr_tick);
+
+array_push($quant2,$more8);
+
+$conta_q = count($quant2)-1;
+
+$query_new = "
+Select sum(IF( days < 20, chamados, 0 )  ) AS menor20, sum(IF( days >= 20 && days < 41, chamados, 0 )  ) AS maiorigual20 , sum(IF( days >= 41, chamados, 0 )  ) AS maiorigual41,categoria
+from 
+(SELECT count( glpi_tickets.id ) AS chamados , DATEDIFF( solvedate, date ) AS days, itilcategories_id as categoria
+FROM glpi_tickets
+WHERE solvedate IS NOT NULL AND is_deleted = 0
+AND glpi_tickets.itilcategories_id IN (189,190,191,197) 
+AND glpi_tickets.date ".$datas."  
+AND glpi_tickets.entities_id = ".$id_ent."
+GROUP BY days, itilcategories_id) as tabela
+group by categoria";
+
+//print_r($query_new);exit;
+
+$result_new = $DB->query($query_new) or die('erro');
+$array_days = [];
+$array_days[189]['menor20'] = 0;
+$array_days[189]['maiorigual20'] = 0;
+$array_days[189]['maiorigual41'] = 0;
+$array_days[190]['menor20'] = 0;
+$array_days[190]['maiorigual20'] = 0;
+$array_days[190]['maiorigual41'] = 0;
+$array_days[191]['menor20'] = 0;
+$array_days[191]['maiorigual20'] = 0;
+$array_days[191]['maiorigual41'] = 0;
+$array_days[197]['menor20'] = 0;
+$array_days[197]['maiorigual20'] = 0;
+$array_days[197]['maiorigual41'] = 0;
+
+while ($row_result_new = $DB->fetch_assoc($result_new)) 
+{
+    $array_days[$row_result_new['categoria']]['menor20'] = $row_result_new['menor20'];
+    $array_days[$row_result_new['categoria']]['maiorigual20'] = $row_result_new['maiorigual20'];
+    $array_days[$row_result_new['categoria']]['maiorigual41'] = $row_result_new['maiorigual41'];
 }
 
-	
-echo "
-<script type='text/javascript'>
+echo "<script type='text/javascript'>
 
-$(function () {		
-    	   		
-		// Build the chart
-        $('#graf_tipo').highcharts({
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false
-            },
-            title: {
-                text: '".__('Tickets','dashboard')." ".__('by Type','dashboard')."'
-            },
-            tooltip: {
-        	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    size: '85%',
- 					dataLabels: {
-								format: '{point.y} - ( {point.percentage:.1f}% )',
-                   		style: {
-                        	color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                        		},
-                        connectorColor: 'black'
+        $(function () {
+                $('#graf_tipo').highcharts({
+                    chart: {
+                        type: 'column',
+                            height: 450,
+                        plotBorderColor: '#ffffff',
+                        plotBorderWidth: 0
                     },
-                showInLegend: true
-                }
-            },
-            series: [{
-                type: 'pie',
-                name: '".__('Tickets','dashboard')."',
-                data: [
-                   {
-                        name: '" . $grft2[0] . "',
-                        y: $quantt2[0],
-                        sliced: true,
-                        selected: true
-                    },";
-if($conta == 1) {                                      
-	for($i = 1; $i < $conta; $i++) {    
-	     echo '[ "' . $grft2[$i] . '", '.$quantt2[$i].'],';
-	        }
-        }  
-        
-if($conta > 1) {                                      
-	for($i = 1; $i <= $conta; $i++) {    
-	     echo '[ "' . $grft2[$i] . '", '.$quantt2[$i].'],';
-	        }
-        }                           
-                                                         
-echo "                ],
-            }]
-        });
-    });
+                    title: {
+                        text: '" .__('Open Tickets Age','dashboard')."'
+                        //text: ''
+                    },
 
-		</script>"; 
-		
+                    xAxis: {
+                        categories: [ '0-20', '21-40', '> 41' ],
+                        labels: {
+                            text: '',
+                            align: 'center',
+                            style: {
+                                //fontSize: '11px',
+                                //fontFamily: 'Verdana, sans-serif'
+                                
+                            },
+                            overflow: 'justify'
+                            },
+        //                     crosshair:true,
+                            title: {
+                                    text: '" .__('days','dashboard')."',
+                                align: 'middle'
+                                    }
+                            },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                                text: '',
+                            align: 'middle'
+                        },
+                        labels: {
+                            overflow: 'justify'
+                        },
+                        stackLabels: {
+                        enabled: true,
+                        y:-15,
+                        style: {
+                            //fontWeight: 'bold',
+                            //color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                        }
+                    }
+                    },
+
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.series.name + ': ' + this.y + '<br/>' +
+                            'Total: ' + this.point.stackTotal;
+                    }
+                },
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'left',
+                        x: 20,
+                        y: 10,
+                        verticalAlign: 'top',
+                        floating: true,
+                    adjustChartSize: true,
+                        borderWidth: 0	
+                },
+                credits: {
+                    enabled: false
+                    },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true,
+                            color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                            style: {
+                                textShadow: '0 0 3px black'
+                            }
+                        },
+                        borderWidth: 2,
+                            borderColor: '#fff',
+                            shadow:true,
+                            showInLegend: true,
+                    },
+                    series: {
+                    cursor: '',
+                        colorByPoint: false, 
+                    point: {
+                            events: {
+                          
+                            }
+                        }
+                    }
+                
+                    },
+                    series: [
+                        {
+                        name: 'Aditivo',
+                        data: [
+                        {y:" . $array_days[189]["menor20"] ."},
+                        {y:" . $array_days[189]["maiorigual20"] ."},
+                        {y:" . $array_days[189]["maiorigual41"] ."}]},
+                        {
+                        name: 'Cotação',
+                        data: [
+                        {y:" . $array_days[190]["menor20"] ."},
+                        {y:" . $array_days[190]["maiorigual20"] ."},
+                        {y:" . $array_days[190]["maiorigual41"] ."}]},
+                        {
+                        name: 'Dispensa',
+                        data: [
+                        {y:" . $array_days[191]["menor20"] ."},
+                        {y:" . $array_days[191]["maiorigual20"] ."},
+                        {y:" . $array_days[191]["maiorigual41"] ."}]},
+                        {                
+                        name: 'Distrato',
+                        data: [
+                        {y:" . $array_days[197]["menor20"] ."},
+                        {y:" . $array_days[197]["maiorigual20"] ."},
+                        {y:" . $array_days[197]["maiorigual41"] ."}],
+                        dataLabels: {
+                            enabled: false,
+                            style: {
+                                fontSize: '11px',
+                                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+
+                    }]
+                });
+            });
+
+	</script>";
+
 		?>

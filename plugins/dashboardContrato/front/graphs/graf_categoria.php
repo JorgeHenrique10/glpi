@@ -318,7 +318,7 @@ if($con == "1") {
 		
 		$total = $DB->fetch_assoc($result2);
 		
-		echo '<div id="entidade" class="col-md-12 col-sm-12 fluid" style="margin-top: -110px !important;">';
+		echo '<div id="entidade" class="col-md-12 col-sm-12 fluid" style="margin-top: 10px !important; margin-bottom: 55px">';
 		echo $ent_name['name']." ".$and_sons." - <span> ".$total['total']." ".__('Tickets','dashboard')."</span>";
       ?>
 		 
@@ -327,13 +327,13 @@ if($con == "1") {
 			<?php include ("./inc/graflinhas_cat.inc.php"); ?>
 		</div>
 		
-		<div id="graf2" class="col-md-6 col-sm-6" >
+		<div id="graf2" class="col-md-12 col-sm-12" >
 			<?php include ("./inc/grafpie_stat_cat.inc.php"); ?>
 		</div>
 		
-		<div id="graf_tipo" class="col-md-6 col-sm-6" style="margin-left: 0%;">
+		<!--<div id="graf_tipo" class="col-md-6 col-sm-6" style="margin-left: 0%;">
 			<?php include ("./inc/grafpie_tipo_cat.inc.php");  ?>
-		</div>
+		</div> -->
 		
 		<div id="graf3" class="col-md-12 col-sm-12" >
 			<?php  include ("./inc/grafbar_cat_user.inc.php");  ?>

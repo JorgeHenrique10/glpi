@@ -48,7 +48,7 @@ $(function () {
                 height: 500
             },
             title: {
-                text: 'Top 10 - ".__('Tickets by Category','dashboard')."'
+                text: '".__('Tickets by Category','dashboard')."'
             },
 
             xAxis: {

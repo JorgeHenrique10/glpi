@@ -648,7 +648,6 @@ $selected = $id_ent;
 				    odometer3.innerHTML = <?php echo $solve; ?>;
 				    odometer4.innerHTML = <?php echo $close; ?>;
 					if (<?php echo ($exibir ? 1 : 0) ?>) {
-						console.log("entrou")
 						odometer5.innerHTML = <?php echo $validacao_tr; ?>;
 						odometer6.innerHTML = <?php echo $publicacao; ?>;
 						odometer7.innerHTML = <?php echo $parecer_habilitacao; ?>;
@@ -693,7 +692,7 @@ $selected = $id_ent;
 			</div>	
 
 			<div id="graf_time1" class="col-md-12" style="height: 450px; margin-top: 25px; margin-left: -5px;">
-				<?php include ("./inc/grafcol_time_grupo.inc.php");
+				<?php 
 					}
 				?>
 			</div>

@@ -49,12 +49,12 @@ $(function () {
         $('#graf2').highcharts({
             chart: {
                 type: 'column',
-			    height: 330,
+			    height: 450,
                 plotBorderColor: '#ffffff',
             	plotBorderWidth: 0
             },
             title: {                
-                text: ''                
+                text: 'Chamados por Status'                
             },
              legend: {     
                    layout: 'horizontal',

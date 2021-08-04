@@ -22,7 +22,6 @@ WHERE glpi_tickets.id = glpi_tickets_users.`tickets_id`
 AND glpi_tickets.itilcategories_id IN (".$id_cat.")  
 AND glpi_tickets.date ".$datas."
 AND glpi_tickets_users.type = 2
-AND glpi_tickets_users.`users_id` NOT IN (SELECT DISTINCT users_id FROM glpi_tickets_users WHERE glpi_tickets_users.type=1)
 AND glpi_tickets.is_deleted = 0
 AND glpi_users.id = glpi_tickets_users.users_id
 ". $entidade ."
@@ -30,7 +29,7 @@ GROUP BY `users_id`
 ORDER BY conta DESC
 LIMIT 20
 ";
-
+//print_r($query4);exit;
 $result4 = $DB->query($query4) or die('erro');
 
 $arr_grf4 = array();
@@ -60,7 +59,7 @@ $(function () {
             },
 
             xAxis: {
-                categories: $grf_3,
+                categories: $grf_4,
                 labels: {
                     align: 'right',
                     style: {
