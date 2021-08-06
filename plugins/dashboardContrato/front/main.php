@@ -706,7 +706,7 @@ foreach ($sel_ent_contratos as $item) {
 				<div class="col-sm-12 col-md-12">
 					<div id="tickets_time" class="widget widget-table action-table striped card1">
 						<div class="widget-header wpurple">
-							<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Idade dos Chamados abertos por Unidade', 'dashboard'); ?></h3>
+							<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i><?php echo __('Idade dos Chamados Abertos por Unidade', 'dashboard'); ?></h3>
 							<span class="fa fa-times hide-widget"></span>
 						</div>
 						<!-- /widget-header -->
@@ -718,7 +718,7 @@ foreach ($sel_ent_contratos as $item) {
 					</div>
 				</div>
 
-				<div class="col-sm-6 col-md-6">
+				<div class="col-sm-12 col-md-12">
 					<div id="tickets_time" class="widget widget-table action-table striped card1">
 						<div class="widget-header wpurple">
 							<h3><i class="fa fa-bar-chart-o" style="margin-left:7px;">&nbsp;&nbsp;&nbsp;</i>Tempo médio por Status</h3>

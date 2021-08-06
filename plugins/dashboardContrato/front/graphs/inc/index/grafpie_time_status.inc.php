@@ -166,7 +166,7 @@ $(function () {
         $('#graf_media_status').highcharts({
             chart: {
                 type: 'column',
-			    height: 330,
+			    height: 450,
                 plotBorderColor: '#ffffff',
             	plotBorderWidth: 0
             },
