@@ -95,7 +95,7 @@ $total_mes = $DB->fetch_assoc($result);
 		<div id="charts" class="fluid chart"> 
 			<div id="head" class="fluid" style="min-height:120px !important;">			
 				<a href="../index.php"><i class="fa fa-home" style="font-size:14pt; margin-left:5%;"></i><span></span></a>				
-				<div id="titulo_graf" >				
+				<div id="titulo_graf" >
 					<?php echo __('Tickets Total','dashboard'); ?>: <?php //echo $ano .":" ; ?> 
 					<span class="quant"> <?php echo " ".$total_mes['total'] ; ?> </span> 
 				</div>
