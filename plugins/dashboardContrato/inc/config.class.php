@@ -9,7 +9,7 @@ class PluginDashboardConfig extends CommonDBTM {
     * @see CommonGLPI::getMenuName()
    **/
    static function getMenuName() {
-      return __('Dashboard');
+      return __('Dashboardcacas');
    }
    
    /**
