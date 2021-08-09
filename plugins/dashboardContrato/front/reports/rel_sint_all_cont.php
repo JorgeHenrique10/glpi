@@ -434,7 +434,11 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
 				COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
 				COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo,
+				SUM(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20 , 1, 0)) AS distrato_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS dispensa_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 41, 1, 0)) AS cotacao_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS aditivo_atraso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.date ".$sel_date."
@@ -451,6 +455,10 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
 			$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
 			$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+			$distrato_atraso = $DB->result($result_sla_contrato, 0, 'distrato_atraso');
+			$dispensa_atraso = $DB->result($result_sla_contrato, 0, 'dispensa_atraso');
+			$cotacao_atraso = $DB->result($result_sla_contrato, 0, 'cotacao_atraso');
+			$aditivo_atraso = $DB->result($result_sla_contrato, 0, 'aditivo_atraso');
 			
 
 			//Total de Chamados Fechado Contratos
@@ -482,6 +490,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
 
@@ -1074,7 +1083,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
+							<th colspan='7' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
 							</tr>
 						</thead>
 						<tbody> 
@@ -1084,6 +1093,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Opened','dashboard') ."</td>
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Solved','dashboard') ."</td>	
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Within','dashboard') ."</td>							
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Atrasados','dashboard') ."</td>							
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Leadtime (dias)','dashboard') ."</td>		
 							</tr>
 								<tr>
@@ -1092,6 +1102,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_cotacao ." </td>                        		
 							</tr>
 							<tr>
@@ -1100,6 +1111,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_dispensa ." </td>                        		
 							</tr>
 							<tr>
@@ -1108,6 +1120,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_aditivo ." </td>                        		
 							</tr>
 							<tr>
@@ -1116,6 +1129,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_distrato ." </td>                        		
 							</tr>
 						</tbody>
@@ -1150,7 +1164,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 				<thead>
 				<tr>
-				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . _('Tickets', 'dashboard') . " " . _('by Technician', 'dashboard') . "</th>						
+				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'> Chamados por Técnicos</th>						
 				</tr>
 				</thead>	
 				<tbody>";
@@ -1166,7 +1180,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 				<thead>
 				<tr>
-				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>" . _('Tickets', 'dashboard') . " " . _('by Requester', 'dashboard') . "</th>						
+				<th colspan='2' style='text-align:center; background:#286090; color:#fff;'> Chamados por Técnicos </th>						
 				</tr>
 				</thead>	
 				<tbody>";
