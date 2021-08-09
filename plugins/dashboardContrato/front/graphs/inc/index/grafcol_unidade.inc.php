@@ -240,10 +240,11 @@
     $string_15 ="";
     $string_30 ="";
     $string_60 ="";
-
+    
     $query_unidades_q = $DB->query($query_unidades);
     while ($objeto = $DB->fetch_assoc($query_unidades_q) ) 
     {
+
       $aditivo_15 = $array_15_aditivo[$objeto['name']] ? $array_15_aditivo[$objeto['name']] : 0;
       $cotacao_15 = $array_15_cotacao[$objeto['name']]  ? $array_15_cotacao[$objeto['name']] : 0;
       $dispensa_15 = $array_15_dipensa[$objeto['name']]  ? $array_15_dipensa[$objeto['name']] : 0;
@@ -262,11 +263,11 @@
       $distrato_60 = $array_60_distrato[$objeto['name']]  ? $array_60_distrato[$objeto['name']] : 0;
       $total_60 = $aditivo_60 + $cotacao_60 + $dispensa_60 + $distrato_60;
 
-      $string_15 .= "{y:  $total_15, aditivo: $aditivo_15, cotacao: $cotacao_15, dispensa: $dispensa_15, distrato: $distrato_15}, ";
+      $string_15 .= "{y:  $total_15, aditivo: $aditivo_15, cotacao: $cotacao_15, dispensa: $dispensa_15, distrato: $distrato_15, url:'reports/rel_data.php' }, ";
 
-      $string_30 .= "{y:  $total_30, aditivo: $aditivo_30, cotacao: $cotacao_30, dispensa: $dispensa_30, distrato: $distrato_30}, ";
+      $string_30 .= "{y:  $total_30, aditivo: $aditivo_30, cotacao: $cotacao_30, dispensa: $dispensa_30, distrato: $distrato_30, url:'reports/rel_data.php' }, ";
 
-      $string_60 .= "{y:  $total_60, aditivo: $aditivo_60, cotacao: $cotacao_60, dispensa: $dispensa_60, distrato: $distrato_60}, ";
+      $string_60 .= "{y:  $total_60, aditivo: $aditivo_60, cotacao: $cotacao_60, dispensa: $dispensa_60, distrato: $distrato_60, url:'reports/rel_data.php' }, ";
     }
 
     $string_unidades = implode("','", $a_string_unidades);
@@ -804,6 +805,17 @@ echo "
             pointFormat: '{series.name}: {point.y}<br/> <br/> Aditivo: {point.aditivo} <br/> Cotação: {point.cotacao} <br/>Dispensa: {point.dispensa} <br/> Distrato: {point.distrato} <br/>'
         },
         plotOptions: {
+          series: {
+            cursor: 'pointer',
+            point: {
+              events: {
+                  click: function () {
+                      window.open(this.options.url);
+                      //location.href = this.options.url;
+                  }
+              }
+            }
+          },
             column: {
                 stacking: 'normal',
                 dataLabels: {
