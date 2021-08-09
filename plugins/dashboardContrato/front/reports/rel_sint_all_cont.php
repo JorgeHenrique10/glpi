@@ -271,6 +271,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 				glpi_tickets.solvedate AS solvedate, glpi_tickets.status AS status
 				FROM glpi_tickets
 				WHERE glpi_tickets.solvedate " . $sel_date . "
+
 		AND glpi_tickets.is_deleted = 0		
 		" . $entidade . "
 		ORDER BY id DESC ";

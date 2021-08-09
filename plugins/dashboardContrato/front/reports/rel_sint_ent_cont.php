@@ -293,11 +293,11 @@ $result_ent = $DB->query($sql_ent);
 				
 		//quant de chamados
 		$sql_cham2 =
-		"SELECT count(id) AS total, count(date) AS numdias, AVG(close_delay_stat) AS avgtime
+		"SELECT count(id) AS total, AVG(close_delay_stat) AS avgtime
 		FROM glpi_tickets
-		WHERE date ".$sel_date."		
-		AND glpi_tickets.is_deleted = 0
-		".$entidade." ";
+		WHERE glpi_tickets.is_deleted = 0 		
+		AND date " . $sel_date . "		
+		" . $entidade . " ";
 		
 		$result_cham2 = $DB->query($sql_cham2);		
 		$conta_cham = $DB->fetch_assoc($result_cham2);
@@ -445,7 +445,11 @@ $result_ent = $DB->query($sql_ent);
 		COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
 		COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
 		COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-		COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+		COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo,
+		SUM(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20 , 1, 0)) AS distrato_atraso,
+		SUM(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS dispensa_atraso,
+		SUM(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 41, 1, 0)) AS cotacao_atraso,
+		SUM(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS aditivo_atraso
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = 0
 	AND glpi_tickets.date ".$sel_date."
@@ -462,6 +466,10 @@ $result_ent = $DB->query($sql_ent);
 	$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
 	$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
 	$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+	$distrato_atraso = $DB->result($result_sla_contrato, 0, 'distrato_atraso');
+	$dispensa_atraso = $DB->result($result_sla_contrato, 0, 'dispensa_atraso');
+	$cotacao_atraso = $DB->result($result_sla_contrato, 0, 'cotacao_atraso');
+	$aditivo_atraso = $DB->result($result_sla_contrato, 0, 'aditivo_atraso');
 
 	//Total de Chamados Fechado Contratos
 	$sql_sla_contratos = 
@@ -492,6 +500,7 @@ $result_ent = $DB->query($sql_ent);
 		COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 	FROM glpi_tickets
 	WHERE glpi_tickets.is_deleted = 0
+	AND glpi_tickets.solvedate is null
 	AND glpi_tickets.date ".$sel_date."
 	".$entidade;
 
@@ -595,27 +604,29 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 
 						foreach ($result_cham_contratos as $chamado) {
 
-							$query_dias_etapa1 = "SELECT DATEDIFF(
-								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
-									THEN NOW() 
-									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
+							$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+							(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
+								THEN (NULL)
+								ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
 								END),
-								(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-									THEN NOW() 
-									ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
+								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+									THEN (NULL) 
+									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
 								END)
 							) dias";
-			
-							$query_dias_etapa2 = "SELECT DATEDIFF(
+
+
+							$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-									THEN NOW() 
+									THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ") 
 									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
-								END),
-								(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-									THEN NOW() 
-									ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
-								END)
-							) dias";
+										END),
+										(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+											THEN (NULL)
+											ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+										END)
+								) dias";
+							
 
 							$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 							$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
@@ -624,16 +635,16 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 							$qtd_dias_cotacao_2 = intval($qtd_dias_cotacao_2) + intval($result_etapa2['dias']);
 						}
 
-					//Calculo para dispensa
-					$query_chamados_dispensa = "
-					SELECT * 
-					FROM glpi_tickets_status 
-					INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
-					WHERE glpi_tickets.solvedate $sel_date
-					AND glpi_tickets.is_deleted = 0
-					AND glpi_tickets.itilcategories_id = 191
-					$entidade
-				";
+						//Calculo para dispensa
+						$query_chamados_dispensa = "
+							SELECT DISTINCT ticket_id
+							FROM glpi_tickets_status 
+							INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
+							WHERE glpi_tickets.solvedate $sel_date
+							AND glpi_tickets.is_deleted = 0
+							AND glpi_tickets.itilcategories_id = 191
+							$entidade
+						";
 			
 									$query_cont_dispensa = "
 					SELECT count(DISTINCT ticket_id) as total from glpi_tickets_status
@@ -650,27 +661,28 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 						$qtd_dias_dispensa_2 = 0;
 	foreach ($result_cham_dispensa_contratos as $chamado) {
 
-		$query_dias_etapa1 = "SELECT DATEDIFF(
+		$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
-				THEN NOW() 
+				THEN (NULL)
 				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
 			END),
-			(CASE WHEN (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-				THEN NOW() 
-				ELSE (SELECT max(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (SELECT date FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ")
+				ELSE (SELECT min(data_fim) FROM glpi_tickets_status WHERE status_cod = 2 AND ticket_id = " . $chamado['ticket_id'] . ") 
 			END)
 		) dias";
-
-		$query_dias_etapa2 = "SELECT DATEDIFF(
+		//print_r($query_dias_etapa1); print_r('<br>');
+		$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-				THEN NOW() 
+				THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ")
 				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
 			END),
-			(CASE WHEN (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-				THEN NOW() 
-				ELSE (SELECT max(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+			(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+				THEN (NULL)
+				ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
 			END)
 		) dias";
+	
 
 							$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 							$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
@@ -915,7 +927,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 			 <td align='right'>" . $numdias . "</td>
 			 </tr>				
 			 <tr>
-			 <td>" . __('Tickets', 'dashboard') . " " . __('By day') . " - " . __('Average') . "</td>
+			 <td>" . _('Tickets', 'dashboard') . " " . _('By day') . " - " . __('Average') . "</td>
 			 <td align='right'>" . round($total_cham / $numdias, 0) . "</td>
 			 </tr>			
 			 <tr>
@@ -1087,7 +1099,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 						<thead>
 							<tr>
-							<th colspan='6' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
+							<th colspan='7' style='text-align:center; background:#286090; color:#fff;'>Solicitações por tipo </th>										
 							</tr>
 						</thead>
 						<tbody> 
@@ -1096,7 +1108,8 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 								<td style='font-weight:bold; text-align: center; cursor:pointer;'> ".__('Total de Chamados')." </td>
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Opened','dashboard') ."</td>
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Solved','dashboard') ."</td>	
-								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Within','dashboard') ."</td>							
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Within','dashboard') ."</td>		
+								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Atrasados','dashboard') ."</td>							
 								<td style='text-align:center; font-weight:bold; cursor:pointer;'> ". __('Leadtime (dias)','dashboard') ."</td>		
 							</tr>
 								<tr>
@@ -1105,6 +1118,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $cotacao_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_cotacao ." </td>                        		
 							</tr>
 							<tr>
@@ -1113,6 +1127,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $dispensa_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_dispensa ." </td>                        		
 							</tr>
 							<tr>
@@ -1121,6 +1136,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $aditivo_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_aditivo ." </td>                        		
 							</tr>
 							<tr>
@@ -1129,6 +1145,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_aberto ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_fechado ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $distrato_prazo ." </td>
+								<td style='vertical-align:middle; text-align:center;'> ". $distrato_atraso ." </td>
 								<td style='vertical-align:middle; text-align:center;'> ". $dias_distrato ." </td>                        		
 							</tr>
 						</tbody>
@@ -1143,7 +1160,7 @@ SELECT AVG(TOTAL_WEEKDAYS_2(if(solvedate is null, now(), solvedate), date)) dias
 					<table class='fluid table table-striped table-condensed'  style='font-size: 16px; width:55%; margin:auto; margin-bottom:25px;'>
 					<thead>
 					<tr>
-					<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . __('Tickets', 'dashboard') . " " . __('by Group', 'dashboard') . "</th>						
+					<th colspan='2' style='text-align:center; background:#286090; color:#fff;'>Top 5 - " . _('Tickets', 'dashboard') . " " . _('by Group', 'dashboard') . "</th>						
 					</tr>
 					</thead>	
 

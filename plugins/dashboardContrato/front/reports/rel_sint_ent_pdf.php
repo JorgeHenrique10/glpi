@@ -304,7 +304,11 @@ $_SESSION['id_entity_sintetico'] = NULL;
 				COUNT(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20 , glpi_tickets.itilcategories_id, NULL)) AS distrato_prazo,
 				COUNT(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS dispensa_prazo,
 				COUNT(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 41, glpi_tickets.itilcategories_id, NULL)) AS cotacao_prazo,
-				COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo
+				COUNT(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) <= 20, glpi_tickets.itilcategories_id, NULL)) AS aditivo_prazo,
+				SUM(IF(glpi_tickets.itilcategories_id = 197 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20 , 1, 0)) AS distrato_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 191 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS dispensa_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 190 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 41, 1, 0)) AS cotacao_atraso,
+				SUM(IF(glpi_tickets.itilcategories_id = 189 && TOTAL_WEEKDAYS(if(solvedate is null, now(), solvedate), date) > 20, 1, 0)) AS aditivo_atraso
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
 			AND glpi_tickets.date ".$sel_date."
@@ -321,6 +325,10 @@ $_SESSION['id_entity_sintetico'] = NULL;
 			$dispensa_prazo = $DB->result($result_sla_contrato, 0, 'dispensa_prazo');
 			$cotacao_prazo = $DB->result($result_sla_contrato, 0, 'cotacao_prazo');
 			$aditivo_prazo = $DB->result($result_sla_contrato, 0, 'aditivo_prazo');
+			$distrato_atraso = $DB->result($result_sla_contrato, 0, 'distrato_atraso');
+			$dispensa_atraso = $DB->result($result_sla_contrato, 0, 'dispensa_atraso');
+			$cotacao_atraso = $DB->result($result_sla_contrato, 0, 'cotacao_atraso');
+			$aditivo_atraso = $DB->result($result_sla_contrato, 0, 'aditivo_atraso');
 
 			//Total de Chamados Fechado Contratos
 			$sql_sla_contratos = 
@@ -351,6 +359,7 @@ $_SESSION['id_entity_sintetico'] = NULL;
 				COUNT(IF(glpi_tickets.itilcategories_id = 189, glpi_tickets.itilcategories_id, NULL)) AS aditivo_aberto
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = 0
+			AND glpi_tickets.solvedate is null
 			AND glpi_tickets.date ".$sel_date."
 			".$entidade;
 
@@ -450,31 +459,30 @@ $_SESSION['id_entity_sintetico'] = NULL;
 			$qtd_dias_cotacao_1 = 0;
 			$qtd_dias_cotacao_2 = 0;
 
-
 			foreach ($result_cham_contratos as $chamado) {
 
-				$query_dias_etapa1 = "SELECT DATEDIFF(
-					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
-						THEN (NULL)
-						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
-						END),
-						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-							THEN (NULL) 
-							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
-						END)
+				$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
+				(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
+					THEN (NULL)
+					ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END),
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN (NULL) 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 18 AND ticket_id = " . $chamado['ticket_id'] . ") 
+					END)
+				) dias";
+
+
+				$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
+					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+						THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ") 
+						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
+							END),
+							(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
+								THEN (NULL)
+								ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
+							END)
 					) dias";
-
-
-					$query_dias_etapa2 = "SELECT DATEDIFF(
-						(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-							THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ") 
-							ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
-								END),
-								(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
-									THEN (NULL)
-									ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
-								END)
-						) dias";
 
 
 				$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
@@ -510,8 +518,7 @@ $_SESSION['id_entity_sintetico'] = NULL;
 			$qtd_dias_dispensa_2 = 0;
 
 			foreach ($result_cham_dispensa_contratos as $chamado) {
-
-				$query_dias_etapa1 = "SELECT DATEDIFF(
+				$query_dias_etapa1 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . " ) IS NULL
 						THEN (NULL)
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 19 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -522,7 +529,7 @@ $_SESSION['id_entity_sintetico'] = NULL;
 					END)
 				) dias";
 				//print_r($query_dias_etapa1); print_r('<br>');
-				$query_dias_etapa2 = "SELECT DATEDIFF(
+				$query_dias_etapa2 = "SELECT TOTAL_WEEKDAYS(
 					(CASE WHEN (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") IS NULL
 						THEN (SELECT solvedate FROM glpi_tickets WHERE id = ". $chamado['ticket_id'] . ")
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 5 AND ticket_id = " . $chamado['ticket_id'] . ") 
@@ -532,6 +539,7 @@ $_SESSION['id_entity_sintetico'] = NULL;
 						ELSE (SELECT min(data_inicio) FROM glpi_tickets_status WHERE status_cod = 20 AND ticket_id = " . $chamado['ticket_id'] . ") 
 					END)
 				) dias";
+			
 
 				$result_etapa1 = $DB->query($query_dias_etapa1)->fetch_assoc();
 				$result_etapa2 = $DB->query($query_dias_etapa2)->fetch_assoc();
@@ -791,7 +799,7 @@ $_SESSION['id_entity_sintetico'] = NULL;
 			 </tr>	
 			
 			 <tr>
-			 <td>" . __('Tickets', 'dashboard') . " " . __('By day') . " - " . __('Average') . "</td>
+			 <td>" . _('Tickets', 'dashboard') . " " . _('By day') . " - " . __('Average') . "</td>
 			 <td align='right'>" . round($total_cham / $numdias, 0) . "</td>
 			 </tr>
 			
@@ -800,17 +808,13 @@ $_SESSION['id_entity_sintetico'] = NULL;
 			 <td align='right'>" . time_hrs($avgtime) . "</td>
 			 </tr>	
 			 <tr>
-			 <td>" . ('Média de dias de aditivos renovados') . "</td>
+			 <td>" . ('Média de dias contratos formalizados') . "</td>
 			 <td align='right'>" . $aditivos_renovados . "</td>
 			 </tr>		
 			 <tr>
 			 <td>" . ('Média de dias de aditivos renovados') . "</td>
 			 <td align='right'>" . $aditivos_dias . "</td>
 			 </tr>	
-			 <tr>
-			 <td>" . ('Média de dias leadtime') . "</td>
-			 <td align='right'>" . number_format($media_lead, 2, ',', ' ') . "</td>
-			 </tr>
 			 
 			 <tr><td>&nbsp;</td></tr>				
 		    </tbody> 
