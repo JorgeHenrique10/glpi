@@ -72,7 +72,7 @@
     }
 
     $query_menor_15 = "
-      SELECT glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
+      SELECT glpi_entities.id as unidade_id, glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
       FROM glpi_tickets 
       INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
       INNER JOIN glpi_entities ON glpi_entities.id = glpi_tickets.entities_id 
@@ -81,12 +81,12 @@
       AND DATE_FORMAT( date, '%Y' ) IN (".$years.")  
       ". $entidade ."
       AND status NOT IN (5,6)
-      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name
+      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name, glpi_entities.id
       order by glpi_entities.name
     ";
 
     $query_15_30 = "
-      SELECT glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
+      SELECT glpi_entities.id as unidade_id, glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
       FROM glpi_tickets 
       INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
       INNER JOIN glpi_entities ON glpi_entities.id = glpi_tickets.entities_id 
@@ -95,12 +95,12 @@
       AND DATE_FORMAT( date, '%Y' ) IN (".$years.")  
       ". $entidade ."
       AND status NOT IN (5,6)
-      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name
+      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name, glpi_entities.id
       order by glpi_entities.name
     ";
 
     $query_maior_30 = "
-      SELECT glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
+      SELECT glpi_entities.id as unidade_id, glpi_entities.name as unidade, glpi_itilcategories.name as categoria_nome, glpi_tickets.itilcategories_id as categoria, COUNT(glpi_tickets.id) as qtd
       FROM glpi_tickets 
       INNER JOIN glpi_itilcategories ON glpi_itilcategories.id = glpi_tickets.itilcategories_id
       INNER JOIN glpi_entities ON glpi_entities.id = glpi_tickets.entities_id 
@@ -109,7 +109,7 @@
       AND DATE_FORMAT( date, '%Y' ) IN (".$years.")  
       ". $entidade ."
       AND status NOT IN (5,6)
-      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name
+      group by glpi_entities.name, glpi_tickets.itilcategories_id, glpi_itilcategories.name, glpi_entities.id
       order by glpi_entities.name
     ";
 
@@ -145,6 +145,8 @@
     $array_60_cotacao = [];
     $array_60_dipensa = [];
     $array_60_distrato = [];
+
+    $array_unidades = [];
 
     //print_r($sel_ent);exit;
     $a_string_unidades=[];
@@ -190,7 +192,7 @@
           $array_15_distrato[$objeto['unidade']] = $objeto['qtd'];
           break;
       }
-      
+      $array_unidades[$objeto['unidade']][15] = $objeto['unidade_id'];
     }
 
     $query_15_30_q = $DB->query($query_15_30);
@@ -200,19 +202,19 @@
       switch ($objeto['categoria']) 
       {
         case 189:
-          $array_30_aditivo[$objeto['unidade']] = $objeto['qtd'];
+          $array_30_aditivo[$objeto['unidade']] = $objeto['qtd'];         
           break;
         case 190:
-          $array_30_cotacao[$objeto['unidade']] = $objeto['qtd'];
+          $array_30_cotacao[$objeto['unidade']] = $objeto['qtd'];        
           break;
         case 191:
-          $array_30_dipensa[$objeto['unidade']] = $objeto['qtd'];
+          $array_30_dipensa[$objeto['unidade']] = $objeto['qtd'];        
           break;
         case 197:
-          $array_30_distrato[$objeto['unidade']] = $objeto['qtd'];
+          $array_30_distrato[$objeto['unidade']] = $objeto['qtd'];        
           break;
       }
-      
+      $array_unidades[$objeto['unidade']][30] = $objeto['unidade_id'];
     }
 
     $query_maior_30_q = $DB->query($query_maior_30);
@@ -222,19 +224,19 @@
       switch ($objeto['categoria']) 
       {
         case 189:
-          $array_60_aditivo[$objeto['unidade']] = $objeto['qtd'];
+          $array_60_aditivo[$objeto['unidade']] = $objeto['qtd'];; 
           break;
         case 190:
-          $array_60_cotacao[$objeto['unidade']] = $objeto['qtd'];
+          $array_60_cotacao[$objeto['unidade']] = $objeto['qtd']; 
           break;
         case 191:
-          $array_60_dipensa[$objeto['unidade']] = $objeto['qtd'];
+          $array_60_dipensa[$objeto['unidade']] = $objeto['qtd']; 
           break;
         case 197:
           $array_60_distrato[$objeto['unidade']] = $objeto['qtd'];
           break;
       }
-      
+      $array_unidades[$objeto['unidade']][60] = $objeto['unidade_id'];
     }
 
     $string_15 ="";
@@ -263,11 +265,11 @@
       $distrato_60 = $array_60_distrato[$objeto['name']]  ? $array_60_distrato[$objeto['name']] : 0;
       $total_60 = $aditivo_60 + $cotacao_60 + $dispensa_60 + $distrato_60;
 
-      $string_15 .= "{y:  $total_15, aditivo: $aditivo_15, cotacao: $cotacao_15, dispensa: $dispensa_15, distrato: $distrato_15, url:'reports/rel_data.php' }, ";
+      $string_15 .= "{y:  $total_15, aditivo: $aditivo_15, cotacao: $cotacao_15, dispensa: $dispensa_15, distrato: $distrato_15, url:'reports/rel_data.php?entidade=". $array_unidades[$objeto['name']][15] . "&date1=". $dataf_q ."&date2=" . $dataf_s ."&con=1' }, ";
 
-      $string_30 .= "{y:  $total_30, aditivo: $aditivo_30, cotacao: $cotacao_30, dispensa: $dispensa_30, distrato: $distrato_30, url:'reports/rel_data.php' }, ";
+      $string_30 .= "{y:  $total_30, aditivo: $aditivo_30, cotacao: $cotacao_30, dispensa: $dispensa_30, distrato: $distrato_30, url:'reports/rel_data.php?entidade=". $array_unidades[$objeto['name']][30] . "&date1=". $dataf_m ."&date2=" . $dataf_q ."&con=1' }, ";
 
-      $string_60 .= "{y:  $total_60, aditivo: $aditivo_60, cotacao: $cotacao_60, dispensa: $dispensa_60, distrato: $distrato_60, url:'reports/rel_data.php' }, ";
+      $string_60 .= "{y:  $total_60, aditivo: $aditivo_60, cotacao: $cotacao_60, dispensa: $dispensa_60, distrato: $distrato_60, url:'reports/rel_data.php?entidade=". $array_unidades[$objeto['name']][60] . "&date1=". $dataf_m2 ."&date2=" . $datai_m1 ."&con=1' }, ";
     }
 
     $string_unidades = implode("','", $a_string_unidades);
