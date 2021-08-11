@@ -266,7 +266,8 @@ if(isset($_GET['con'])) {
 			WHERE glpi_tickets.entities_id = glpi_entities.id
 			AND glpi_entities.id = ".$id_ent['id']."
 			AND glpi_tickets.is_deleted = 0
-			AND glpi_tickets.status = 5
+			AND glpi_tickets.status in (5,6)
+			AND glpi_tickets.solvedate " .$datas2. "
 			AND glpi_tickets.date ".$datas2." ";
 			
 			$result_sol = $DB->query($sql_sol) or die ("erro_ab");
@@ -427,8 +428,8 @@ if(isset($_GET['con'])) {
 					<td style='vertical-align:middle; text-align:center;'> ". $abertos ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". ($exibir ? $atrasados_retorno_total['atraso'] : $atrasados) ." </td>
 					<td style='vertical-align:middle; text-align:center;'> ". $solucionados ." </td>
-					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>
-					<td style='vertical-align:middle; text-align:center;'> ". $fechados_period ." </td>				
+					<td style='vertical-align:middle; text-align:center;'> ". $fechados_period ." </td>
+					<td style='vertical-align:middle; text-align:center;'> ". $fechados ." </td>				
 					<!-- <td style='vertical-align:middle; text-align:center;'> 
 						<div class='progress' style='margin-top: 5px; margin-bottom: 5px;'>
 							<div class='progress-bar ". $cor ." ' role='progressbar' aria-valuenow='".$barra."' aria-valuemin='0' aria-valuemax='100' style='width: ".$width."%;'>
