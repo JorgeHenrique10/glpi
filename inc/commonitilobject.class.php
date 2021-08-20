@@ -6503,7 +6503,7 @@ abstract class CommonITILObject extends CommonDBTM {
 
       //add documents to timeline
       $document_obj   = new Document();
-      $document_items = $document_item_obj->find(['itemtype' => $objType, 'items_id' => $this->getID()]);
+      $document_items = $document_item_obj->find(['itemtype' => $objType, 'items_id' => $this->getID()] + $restrict_task);
       foreach ($document_items as $document_item) {
          $document_obj->getFromDB($document_item['documents_id']);
 
@@ -6610,7 +6610,7 @@ abstract class CommonITILObject extends CommonDBTM {
       $group             = new Group();
       $pics_url          = $CFG_GLPI['root_doc']."/pics/timeline";
       $timeline          = $this->getTimelineItems();
-
+      
       $autolink_options['strip_protocols'] = false;
 
       $objType = self::getType();
@@ -6618,7 +6618,7 @@ abstract class CommonITILObject extends CommonDBTM {
 
       //display timeline
       echo "<div class='timeline_history'>";
-
+      
       $followup_class    = 'ITILFollowup';
       $followup_obj      = new $followup_class();
       $followup_obj->getEmpty();
@@ -6637,8 +6637,8 @@ abstract class CommonITILObject extends CommonDBTM {
       $timeline_index = 0;
       foreach ($timeline as $item) {
          $options = [ 'parent' => $this,
-                           'rand' => $rand
-                           ];
+                        'rand' => $rand
+                        ];
          if ($obj = getItemForItemtype($item['type'])) {
             $obj->fields = $item['item'];
          } else {
@@ -6917,8 +6917,9 @@ abstract class CommonITILObject extends CommonDBTM {
          }
 
          echo "</div>"; // b_right
-
-         if ($item['type'] == 'Document_Item') {
+         
+         
+         if ( $item['type'] == 'Document_Item' ) {
             if ($item_i['filename']) {
                $filename = $item_i['filename'];
                $ext      = strtolower(pathinfo($filename, PATHINFO_EXTENSION));

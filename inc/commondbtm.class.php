@@ -654,16 +654,22 @@ class CommonDBTM extends CommonGLPI {
                $value = 0;
             }
             $params[$key] = $value;
-         }
+         }         
+         // print_r('tabela: ');
+         // print_r($this->getTable());
+         // print_r('<br>');
+         // print_r($params);
+         // print_r('<br>');
 
          $result = $DB->insert($this->getTable(), $params);
+         
          if ($result) {
             if (!isset($this->fields['id'])
                   || is_null($this->fields['id'])
                   || ($this->fields['id'] == 0)) {
                $this->fields['id'] = $DB->insert_id();
             }
-
+            
             return $this->fields['id'];
          }
       }
@@ -1080,7 +1086,7 @@ class CommonDBTM extends CommonGLPI {
          // Save this data to be available if add fail
          $this->saveInput();
       }
-
+      
       // Call the plugin hook - $this->input can be altered
       // This hook get the data from the form, not yet altered
       Plugin::doHook("pre_item_add", $this);
@@ -1094,7 +1100,7 @@ class CommonDBTM extends CommonGLPI {
 
          $this->input = $this->prepareInputForAdd($this->input);
       }
-
+      
       if ($this->input && is_array($this->input)) {
          // Call the plugin hook - $this->input can be altered
          // This hook get the data altered by the object method
@@ -1105,14 +1111,15 @@ class CommonDBTM extends CommonGLPI {
          //Check values to inject
          $this->filterValues(!isCommandLine());
       }
-
+      
       //Process business rules for assets
       $this->assetBusinessRules(\RuleAsset::ONADD);
-
+      
       if ($this->input && is_array($this->input)) {
          $this->fields = [];
          $table_fields = $DB->list_fields($this->getTable());
-
+         // print_r('<pre>');
+         // print_r($table_fields);
          // fill array for add
          foreach (array_keys($this->input) as $key) {
             if (($key[0] != '_')
@@ -1133,7 +1140,11 @@ class CommonDBTM extends CommonGLPI {
 
          if ($this->checkUnicity(true, $options)) {
             if ($this->addToDB() !== false) {
+               
                $this->post_addItem();
+               // print_r('<pre>');
+               // print_r('chegou');
+               
                $this->addMessageOnAddAction();
 
                if ($this->dohistory && $history) {
@@ -5037,7 +5048,7 @@ class CommonDBTM extends CommonGLPI {
     *
     * @return array the input param transformed
    **/
-   function addFiles(array $input, $options = []) {
+   function addFiles(array $input, $options = []) { 
       global $CFG_GLPI;
 
       $default_options = [
@@ -5111,10 +5122,14 @@ class CommonDBTM extends CommonGLPI {
             $input2["is_recursive"]            = 1;
             $input2["documentcategories_id"]   = $CFG_GLPI["documentcategories_id_forticket"];
             $input2["_only_if_upload_succeed"] = 1;
+            $input2["users_id_tech"] = $this->input['users_id_tech'];
+            $input2["groups_id_tech"] = $this->input['groups_id_tech'];
+            $input2["is_private"] = $this->input['is_private'];
             $input2["_filename"]               = [$file];
             if (isset($this->input['_prefix_filename'][$key])) {
                $input2["_prefix_filename"]  = [$this->input['_prefix_filename'][$key]];
             }
+            // print_r('Arquivosfgh: '); print_r($input2);exit;
             $docID = $doc->add($input2);
 
             if (isset($input['_tag'][$key])) {
