@@ -49,11 +49,27 @@
     $result_new = $DB->query($query_new) or die('erro');
     $array_days = [];
 
+    $array_days[189]["menor20"] = 0;
+    $array_days[189]["maiorigual20"] = 0;
+    $array_days[189]["maiorigual41"] = 0;
+    
+    $array_days[190]["menor20"] = 0;
+    $array_days[190]["maiorigual20"] = 0;
+    $array_days[190]["maiorigual41"] = 0;
+    
+    $array_days[191]["menor20"] = 0;
+    $array_days[191]["maiorigual20"] = 0;
+    $array_days[191]["maiorigual41"] = 0;
+    
+    $array_days[197]["menor20"] = 3;
+    $array_days[197]["maiorigual20"] = 3;
+    $array_days[197]["maiorigual41"] = 3;
+    print_r('<pre>');
     while ($row_result_new = $DB->fetch_assoc($result_new)) 
-    {
-        $array_days[$row_result_new['categoria']]['menor20'] = $row_result_new['menor20'];
-        $array_days[$row_result_new['categoria']]['maiorigual20'] = $row_result_new['maiorigual20'];
-        $array_days[$row_result_new['categoria']]['maiorigual41'] = $row_result_new['maiorigual41'];
+    {print_r($row_result_new);
+        $array_days[$row_result_new['categoria']]['menor20'] = $row_result_new['menor20'] ? $row_result_new['menor20'] : 0;
+        $array_days[$row_result_new['categoria']]['maiorigual20'] = $row_result_new['maiorigual20'] ? $row_result_new['maiorigual20'] : 0;
+        $array_days[$row_result_new['categoria']]['maiorigual41'] = $row_result_new['maiorigual41'] ? $row_result_new['maiorigual41'] : 0;
     }
 
     // $result2 = $DB->query($query2) or die('erro');
