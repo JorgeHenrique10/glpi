@@ -6503,7 +6503,8 @@ abstract class CommonITILObject extends CommonDBTM {
 
       //add documents to timeline
       $document_obj   = new Document();
-      $document_items = $document_item_obj->find(['itemtype' => $objType, 'items_id' => $this->getID()] + $restrict_task + $restrict_fup);
+      $document_items = $document_item_obj->find(['itemtype' => $objType, 'items_id' => $this->getID()] + $restrict_task);
+
       foreach ($document_items as $document_item) {
          $document_obj->getFromDB($document_item['documents_id']);
 

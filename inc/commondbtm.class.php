@@ -5166,11 +5166,13 @@ class CommonDBTM extends CommonGLPI {
                   '_do_notif'     => $donotif,
                   '_disablenotif' => $disablenotif,
                   'itemtype'      => $item_fordocitem->getType(),
-                  'items_id'      => $item_fordocitem->getID()
+                  'items_id'      => $item_fordocitem->getID(),
+                  'is_private'    => $this->input['is_private']
                ];
                if (isset($input['users_id'])) {
                   $toadd['users_id'] = $input['users_id'];
                }
+
                $docitem->add($toadd);
             }
          }
