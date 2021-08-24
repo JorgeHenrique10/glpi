@@ -214,7 +214,7 @@ $(function () {
                   
             },
             series: [{
-                            name: '" . __('Tickets', 'dashboard') . "',
+                            name: '" . __('Dias') . "',
                 data: [
                     {
                         name: 'Novo',
