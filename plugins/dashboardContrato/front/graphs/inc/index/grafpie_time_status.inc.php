@@ -39,8 +39,6 @@ $categorias = implode("','", $grf2);
 		SUM(case when glpi_tickets_status.status_cod = 2 then glpi_tickets_status.data_cons else 0 end) AS assig,
 		SUM(case when glpi_tickets_status.status_cod = 3 then glpi_tickets_status.data_cons else 0 end) AS plan,
 		SUM(case when glpi_tickets_status.status_cod = 4 then glpi_tickets_status.data_cons else 0 end) AS pend,
-		SUM(case when glpi_tickets_status.status_cod = 5 then glpi_tickets_status.data_cons else 0 end) AS solve,
-		SUM(case when glpi_tickets_status.status_cod = 6 then glpi_tickets_status.data_cons else 0 end) AS close,
 		SUM(case when glpi_tickets_status.status_cod = 12 then glpi_tickets_status.data_cons else 0 end) AS qualificacao,
 		SUM(case when glpi_tickets_status.status_cod = 23 then glpi_tickets_status.data_cons else 0 end) AS atribuido,
 		SUM(case when glpi_tickets_status.status_cod = 13 then glpi_tickets_status.data_cons else 0 end) AS validacao_tr,
@@ -63,8 +61,6 @@ $categorias = implode("','", $grf2);
 		count( IF(glpi_tickets_status.status_cod=2, glpi_tickets_status.id, NULL)  ) AS assig_count,
 		count( IF(glpi_tickets_status.status_cod=3, glpi_tickets_status.id, NULL)  ) AS plan_count,
 		count( IF(glpi_tickets_status.status_cod=4, glpi_tickets_status.id, NULL)  ) AS pend_count,
-		count( IF(glpi_tickets_status.status_cod=5, glpi_tickets_status.id, NULL)  ) AS solve_count,
-		count( IF(glpi_tickets_status.status_cod=6, glpi_tickets_status.id, NULL)  ) AS close_count,
 		count( IF(glpi_tickets_status.status_cod=12, glpi_tickets_status.id, NULL) ) AS qualificacao_count,
 		count( IF(glpi_tickets_status.status_cod=23, glpi_tickets_status.id, NULL) ) AS atribuido_count,
 		count( IF(glpi_tickets_status.status_cod=13, glpi_tickets_status.id, NULL) ) AS validacao_tr_count,
@@ -88,7 +84,7 @@ $categorias = implode("','", $grf2);
 		INNER JOIN glpi_itilcategories on glpi_tickets.itilcategories_id = glpi_itilcategories.id
 		WHERE glpi_tickets.is_deleted = '0'
 		AND glpi_tickets_status.data_fim is not null
-		AND glpi_itilcategories.id = 190
+		AND glpi_itilcategories.id in (189,190,191,197)
 		AND glpi_tickets.solvedate " . $sel_date . "			
 		" . $entidade . "";
 		
@@ -111,8 +107,6 @@ $categorias = implode("','", $grf2);
 		$assig_lead = number_format((($DB->result($result_stat_lead_time, 0, 'assig') + 0) / ($DB->result($result_stat_lead_time, 0, 'assig_count') + 0)), 2, '.', ' ');
 		$plan_lead = number_format((($DB->result($result_stat_lead_time, 0, 'plan') + 0) / ($DB->result($result_stat_lead_time, 0, 'plan_count') + 0)), 2, '.', ' ');
 		$pend_lead = number_format((($DB->result($result_stat_lead_time, 0, 'pend') + 0) / ($DB->result($result_stat_lead_time, 0, 'pend_count') + 0)), 2, '.', ' ');
-		$solve_lead = number_format((($DB->result($result_stat_lead_time, 0, 'solve') + 0) / ($DB->result($result_stat_lead_time, 0, 'solve_count') + 0)), 2, '.', ' ');
-		$close_lead = number_format((($DB->result($result_stat_lead_time, 0, 'close') + 0) / ($DB->result($result_stat_lead_time, 0, 'close_count') + 0)), 2, '.', ' ');
 		$atribuido_lead = number_format((($DB->result($result_stat_lead_time, 0, 'atribuido') + 0) / ($DB->result($result_stat_lead_time, 0, 'atribuido_count') + 0)), 2, '.', ' ');
 		$validacao_tr_lead = number_format((($DB->result($result_stat_lead_time, 0, 'validacao_tr') + 0) / ($DB->result($result_stat_lead_time, 0, 'validacao_tr_count') + 0)), 2, '.', ' ');
 		$publicacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'publicacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'publicacao_count') + 0)), 2, '.', ' ');
@@ -135,8 +129,6 @@ $categorias = implode("','", $grf2);
 		$assig_lead != 'nan' ? $assig_lead : $assig_lead = 0;
 		$plan_lead != 'nan' ? $plan_lead : $plan_lead = 0;
 		$pend_lead != 'nan' ? $pend_lead : $pend_lead = 0;
-		$solve_lead != 'nan' ? $solve_lead : $solve_lead = 0;
-		$close_lead != 'nan' ? $close_lead : $close_lead = 0;
 		$atribuido_lead != 'nan' ? $atribuido_lead : $atribuido_lead = 0;
 		$validacao_tr_lead != 'nan' ? $validacao_tr_lead : $validacao_tr_lead = 0;
 		$publicacao_lead != 'nan' ? $publicacao_lead : $publicacao_lead = 0;
@@ -184,7 +176,7 @@ $(function () {
 	            borderWidth: 0             
             },
             xAxis :{
-            categories: ['Novo','Processando','Planejamento','Pendente','Solucionado','Fechado','Validação TR', 'Publicação','Parecer Habilitação','Validação Técnica','Resultados','Homologação','Jurídico','Validação Interna', 'Envio de Contrato','Atribuído','Formalização','Pendente Unidade','Publicação Errata','Prorrogação', 'Diligência','Recurso'],
+            categories: ['Novo','Processando','Atribuído','Validação TR', 'Publicação','Parecer Habilitação','Validação Técnica','Resultados','Homologação','Jurídico','Validação Interna', 'Envio de Contrato','Formalização','Recurso', 'Diligência','Prorrogação','Publicação Errata','Pendente Unidade','Pendente','Planejamento'],
             },
             credits: {
                 enabled: false
@@ -237,24 +229,9 @@ $(function () {
                         url:'reports/rel_tickets.php?con=1&stat=". 2 . "' 
                     },
                     { 
-                        name: 'Planejamento',
-                        y: " .$plan_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 3 . "' 
-                    },
-                    { 
-                        name: 'Pendente',
-                        y: " .$pend_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 4 . "' 
-                    },
-                    { 
-                        name: 'Solucionado',
-                        y: " .$solve_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 5 . "' 
-                    },
-                    { 
-                        name: 'Fechado',
-                        y: " .$close_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 6 . "' 
+                        name: 'Atribuído',
+                        y: " .$atribuido_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 23 . "' 
                     },
                     { 
                         name: 'Validação TR',
@@ -266,7 +243,6 @@ $(function () {
                         y: " .$publicacao_lead.", 
                         url:'reports/rel_tickets.php?con=1&stat=". 14 . "' 
                     },
-
                     { 
                         name: 'Parecer Habilitação',
                         y: " .$parecer_habilitacao_lead.", 
@@ -303,29 +279,14 @@ $(function () {
                         url:'reports/rel_tickets.php?con=1&stat=". 21 . "' 
                     },
                     { 
-                        name: 'Atribuído',
-                        y: " .$atribuido_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 23 . "' 
-                    },
-                    { 
                         name: 'Formalização',
                         y: " .$formalizacao_lead.", 
                         url:'reports/rel_tickets.php?con=1&stat=". 22 . "' 
                     },
                     { 
-                        name: 'Pendente Unidade',
-                        y: " .$pendente_unidade_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 24 . "' 
-                    },
-                    { 
-                        name: 'Publicação Errata',
-                        y: " .$publicacao_errata_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 25 . "' 
-                    },
-                    { 
-                        name: 'Prorrogação',
-                        y: " .$prorrogacao_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 26 . "' 
+                        name: 'Recurso',
+                        y: " .$recurso_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 28 . "' 
                     },
                     { 
                         name: 'Diligência',
@@ -333,9 +294,24 @@ $(function () {
                         url:'reports/rel_tickets.php?con=1&stat=". 27 . "' 
                     },
                     { 
-                        name: 'Recurso',
-                        y: " .$recurso_lead.", 
-                        url:'reports/rel_tickets.php?con=1&stat=". 28 . "' 
+                        name: 'Prorrogação',
+                        y: " .$prorrogacao_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 26 . "' 
+                    },
+                    { 
+                        name: 'Publicação Errata',
+                        y: " .$publicacao_errata_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 25 . "' 
+                    },
+                    { 
+                        name: 'Pendente Unidade',
+                        y: " .$pendente_unidade_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 24 . "' 
+                    },
+                    { 
+                        name: 'Pendente',
+                        y: " .$pend_lead.", 
+                        url:'reports/rel_tickets.php?con=1&stat=". 4 . "' 
                     }
                 ],
                     ";
