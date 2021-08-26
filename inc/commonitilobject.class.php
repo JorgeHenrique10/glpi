@@ -92,6 +92,7 @@ abstract class CommonITILObject extends CommonDBTM {
    const EXTENSION            = 26; //prorrogação
    const DILIGENCE            = 27; //diligencia
    const RESOURCE             = 28; //recurso
+   const CANCELADO            = 29; //cancelado
 
 
    const TIMELINE_NOTSET   = 0;
@@ -3588,6 +3589,10 @@ abstract class CommonITILObject extends CommonDBTM {
             $class = 'circle';
             $solid = false;
             break;
+         case self::CANCELADO :
+               $class = 'circle';
+               $solid = false;
+               break;
 
       }
 
@@ -3690,6 +3695,9 @@ abstract class CommonITILObject extends CommonDBTM {
             break;
          case self::RESOURCE :
             $key = 'resource';
+            break;
+         case self::CANCELADO :
+            $key = 'cancelado';
             break;
 
       }

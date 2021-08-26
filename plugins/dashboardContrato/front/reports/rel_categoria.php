@@ -420,7 +420,8 @@ else {
 			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
 			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
 			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
-			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso,
+			SUM(case when glpi_tickets.status = 29 then 1 else 0 end) AS cancelado
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date ".$datas2."
@@ -451,6 +452,7 @@ else {
 		    $prorrogacao = $DB->result($result_stat,0,'prorrogacao') + 0;
 		    $diligencia = $DB->result($result_stat,0,'diligencia') + 0;
 		    $recurso = $DB->result($result_stat,0,'recurso') + 0;
+			$cancelado = $DB->result($result_stat,0,'cancelado') + 0;
 
 
 			echo "
@@ -499,8 +501,12 @@ else {
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Pendente Unidade').": </span>".$pendente_unidade." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Publicação de Errata').": </span>".$publicacao_errata." </td>
 						<td style='font-weight:bold;'><span style='color: #000;'>". __('Prorrogação').": </span>".$prorrogacao." </td>
-						<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>
-						<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>						
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Diligência'). ": </span>". ($diligencia) ."</td>					
+					</tr>
+
+					<tr>
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Recurso').": </span>".$recurso." </td>		
+						<td style='font-weight:bold;'><span style='color: #000;'>". __('Cancelado').": </span>".$cancelado." </td>				
 					</tr>
 					<tr><td>&nbsp;</td></tr>
 					<tr><td>&nbsp;</td></tr>
