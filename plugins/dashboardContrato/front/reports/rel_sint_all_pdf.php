@@ -234,7 +234,8 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			SUM(case when glpi_tickets.status = 25 then 1 else 0 end) AS publicacao_errata,
 			SUM(case when glpi_tickets.status = 26 then 1 else 0 end) AS prorrogacao,
 			SUM(case when glpi_tickets.status = 27 then 1 else 0 end) AS diligencia,
-			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso
+			SUM(case when glpi_tickets.status = 28 then 1 else 0 end) AS recurso,
+			SUM(case when glpi_tickets.status = 29 then 1 else 0 end) AS cancelado
 			FROM glpi_tickets
 			WHERE glpi_tickets.is_deleted = '0'
 			AND glpi_tickets.date " . $sel_date . "			
@@ -264,6 +265,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$prorrogacao = $DB->result($result_stat, 0, 'prorrogacao') + 0;
 			$diligencia = $DB->result($result_stat, 0, 'diligencia') + 0;
 			$recurso = $DB->result($result_stat, 0, 'recurso') + 0;
+			$cancelado = $DB->result($result_stat, 0, 'cancelado') + 0;
 
 			//count by type
 			$query_type = "
@@ -646,6 +648,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		SUM(case when glpi_tickets_status.status_cod = 26 then glpi_tickets_status.data_cons else 0 end) AS prorrogacao,
 		SUM(case when glpi_tickets_status.status_cod = 27 then glpi_tickets_status.data_cons else 0 end) AS diligencia,
 		SUM(case when glpi_tickets_status.status_cod = 28 then glpi_tickets_status.data_cons else 0 end) AS recurso,
+		SUM(case when glpi_tickets_status.status_cod = 29 then glpi_tickets_status.data_cons else 0 end) AS cancelado,
 
 		count( IF(glpi_tickets_status.status_cod=1, glpi_tickets_status.id, NULL)  ) AS new_count,
 		count( IF(glpi_tickets_status.status_cod=2, glpi_tickets_status.id, NULL)  ) AS assig_count,
@@ -669,7 +672,8 @@ if ($sel_ent == '' || $sel_ent == -1) {
 		count( IF(glpi_tickets_status.status_cod=25, glpi_tickets_status.id, NULL) ) AS publicacao_errata_count,
 		count( IF(glpi_tickets_status.status_cod=26, glpi_tickets_status.id, NULL) ) AS prorrogacao_count,
 		count( IF(glpi_tickets_status.status_cod=27, glpi_tickets_status.id, NULL) ) AS diligencia_count,
-		count( IF(glpi_tickets_status.status_cod=28, glpi_tickets_status.id, NULL) ) AS recurso_count
+		count( IF(glpi_tickets_status.status_cod=28, glpi_tickets_status.id, NULL) ) AS recurso_count,
+		count( IF(glpi_tickets_status.status_cod=29, glpi_tickets_status.id, NULL) ) AS cancelado_count
 
 		FROM glpi_tickets_status
 		INNER JOIN glpi_tickets on glpi_tickets.id = glpi_tickets_status.ticket_id
@@ -715,6 +719,7 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$prorrogacao_lead = number_format((($DB->result($result_stat_lead_time, 0, 'prorrogacao') + 0) / ($DB->result($result_stat_lead_time, 0, 'prorrogacao_count') + 0)), 2, ',', ' ');
 			$diligencia_lead = number_format((($DB->result($result_stat_lead_time, 0, 'diligencia') + 0) / ($DB->result($result_stat_lead_time, 0, 'diligencia_count') + 0)), 2, ',', ' ');
 			$recurso_lead = number_format((($DB->result($result_stat_lead_time, 0, 'recurso') + 0) / ($DB->result($result_stat_lead_time, 0, 'recurso_count') + 0)), 2, ',', ' ');
+			$cancelado_lead = number_format((($DB->result($result_stat_lead_time, 0, 'cancelado') + 0) / ($DB->result($result_stat_lead_time, 0, 'cancelado_count') + 0)), 2, ',', ' ');
 
 			//RETIRAR "NAN"
 			$new_lead != 'nan' ? $new_lead : $new_lead = 0;
@@ -739,8 +744,9 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			$prorrogacao_lead != 'nan' ? $prorrogacao_lead : $prorrogacao_lead = 0;
 			$diligencia_lead != 'nan' ? $diligencia_lead : $diligencia_lead = 0;
 			$recurso_lead != 'nan' ? $recurso_lead : $recurso_lead = 0;
+			$cancelado_lead != 'nan' ? $cancelado_lead : $cancelado_lead = 0;
 			$aditivos_renovados != 'nan' ? $aditivos_renovados : $aditivos_renovados = 0;
-			$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;
+			$aditivos_dias != 'nan' ? $aditivos_dias : $aditivos_dias = 0;			
 
 
 
@@ -969,6 +975,12 @@ if ($sel_ent == '' || $sel_ent == -1) {
 			 <td>" . 'Recurso' . "</td>
 			 <td align='center'>" . $recurso . "</td>			
 			 <td align='center'>" . $recurso_lead . "</td>			
+			 </tr>
+
+			 <tr>
+			 <td>" . 'Cancelado' . "</td>
+			 <td align='center'>" . $cancelado . "</td>			
+			 <td align='center'>" . $cancelado_lead . "</td>			
 			 </tr>
 
 			 <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>								
